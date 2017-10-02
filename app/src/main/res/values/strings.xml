@@ -1,0 +1,22 @@
+<resources>
+    <string name="app_name">SoftwareEng</string>
+
+    <string name="show_pwd">Şifreyi Göster</string>
+    <string name="hide_pwd">Şifreyi Gizle</string>
+    <string name="fullName">Ad Soyad</string>
+    <string name="hint_username">Kullanıcı Adı</string>
+    <string name="email">Email</string>
+    <string name="passowrd">Password</string>
+    <string name="confirmPassword">Tekrar Şifre</string>
+    <string name="terms_conditions">Şartları kabul ediyorum.</string>
+    <string name="signUp">Kayıt Ol</string>
+    <string name="login">Giriş</string>
+    <string name="forgot">Şifreyi Unuttum!</string>
+    <string name="spinner_title">Şehir Seç</string>
+    <string name="action_settings">Settings</string>
+
+
+
+    <string name="FCM_PREF">com.team3.softwareeng.LoginSign.fcm_pref</string>
+    <string name="FCM_TOKEN">com.team3.softwareeng.LoginSign.fcm_token</string>
+</resources>
