@@ -234,7 +234,6 @@ public class ShareFragment extends Fragment {
                 });
             }
     }
-
    /* public void notificationFilter(){
         DatabaseReference mDatabaseReference = FirebaseDatabase.getInstance()
                 .getReference();

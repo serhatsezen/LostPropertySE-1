@@ -169,7 +169,6 @@ public class SignUp_Fragment extends Fragment implements AdapterView.OnItemSelec
     }
 
 
-    // Check Validation Method
     private void checkValidation() {
         // Get all edittext texts
         final String getFullName = fullName.getText().toString();

@@ -64,8 +64,6 @@ public class SignIn_Fragment extends Fragment implements OnClickListener {
         mDatabaseUsers = FirebaseDatabase.getInstance().getReference().child("Users");
         mDatabaseUsers.keepSynced(true);
 
-        // set the view now
-
         if (auth.getCurrentUser() != null) {
             Intent intent = new Intent(getActivity(), BottomBarActivity.class);
             startActivity(intent);

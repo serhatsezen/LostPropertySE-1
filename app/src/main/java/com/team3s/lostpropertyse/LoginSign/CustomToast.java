@@ -12,8 +12,6 @@ import com.team3s.lostpropertyse.R;
 
 
 public class CustomToast {
-
-    // Custom Toast Method
     public void Show_Toast(Context context, View view, String error) {
 
         // Layout Inflater for inflating custom view

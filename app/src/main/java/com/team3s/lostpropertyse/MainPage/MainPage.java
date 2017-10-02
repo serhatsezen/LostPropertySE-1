@@ -404,7 +404,6 @@ public class MainPage extends Fragment {
 
         }
 
-
         public void setPost_image(Context ctx, String post_image){
             ImageView share_img = (ImageView) mView.findViewById(R.id.share_img);
             //Picasso.with(ctx).load(post_image).networkPolicy(NetworkPolicy.OFFLINE).fit().centerCrop().into(share_img);

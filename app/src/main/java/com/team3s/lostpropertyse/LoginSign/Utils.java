@@ -29,7 +29,6 @@ public class Utils {
         return height;
     }
 
-
     public static Drawable tintMyDrawable(Drawable drawable, int color) {
         drawable = DrawableCompat.wrap(drawable);
         DrawableCompat.setTint(drawable, color);

@@ -17,7 +17,6 @@ public class Share {
 
     public Share(){
     }
-
     public Share(String questions, String desc, String post_image, String name, String image, String addressname, String post_time, String post_date, String token, String isletmeAdi, double latMap, double longMap){
         this.questions = questions;
         this.desc = desc;
