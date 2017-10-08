@@ -59,6 +59,7 @@ public class BottomBarActivity extends AppCompatActivity {
                                 return true;
                             case R.id.action_bottombar_maps:
                                 Intent mapint = new Intent(BottomBarActivity.this,PropMaps.class);
+                                mapint.putExtra("post_id", "");
                                 startActivity(mapint);
                                 return true;
                             case R.id.action_bottombar_share:

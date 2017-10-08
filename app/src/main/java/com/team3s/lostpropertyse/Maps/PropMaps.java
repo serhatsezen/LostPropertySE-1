@@ -59,7 +59,7 @@ public class PropMaps extends FragmentActivity implements OnMapReadyCallback, Go
 
     double latMarkers;
     double lngMarkers;
-    private String post_key = null;
+    private String post_key;
 
 
     @Override
@@ -71,9 +71,11 @@ public class PropMaps extends FragmentActivity implements OnMapReadyCallback, Go
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
-        post_key = getIntent().getExtras().getString("post_id");
 
+        post_key = getIntent().getExtras().getString("post_id");
         mDatabaseShowMap = FirebaseDatabase.getInstance().getReference().child("Icerik").child(post_key).child("latlng");
+
+
 
 
         //get firebase auth instance
@@ -98,19 +100,22 @@ public class PropMaps extends FragmentActivity implements OnMapReadyCallback, Go
             buildGoogleApiClient();
             mMap.setMyLocationEnabled(true);
         }
-        mDatabaseShowMap.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot snapshot) {
-                latMarkers = (double) snapshot.child("latitude").getValue();
-                lngMarkers = (double) snapshot.child("longitude").getValue();
-                LatLng sydney = new LatLng(latMarkers, lngMarkers);
-                mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
-                mMap.animateCamera(CameraUpdateFactory.zoomTo(13));
-            }
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-            }
-        });
+        if(!post_key.equals("")) {
+            mDatabaseShowMap.addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot snapshot) {
+                    latMarkers = (double) snapshot.child("latitude").getValue();
+                    lngMarkers = (double) snapshot.child("longitude").getValue();
+                    LatLng sydney = new LatLng(latMarkers, lngMarkers);
+                    mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
+                    mMap.animateCamera(CameraUpdateFactory.zoomTo(13));
+                }
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+                }
+            });
+        }
+
 
         markers();
 
