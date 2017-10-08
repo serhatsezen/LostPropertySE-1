@@ -30,6 +30,7 @@ import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.team3s.lostpropertyse.CircleTransform;
 import com.team3s.lostpropertyse.LoginSign.TabsHeaderActivity;
+import com.team3s.lostpropertyse.Post.EditActivity;
 import com.team3s.lostpropertyse.R;
 import com.team3s.lostpropertyse.Share;
 
@@ -170,9 +171,9 @@ public class MainPage extends Fragment {
                     viewHolder.mView.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                           /* Intent editActivity = new Intent(getActivity(), EditActivity.class);
+                            Intent editActivity = new Intent(getActivity(), EditActivity.class);
                             editActivity.putExtra("post_id", post_key);
-                            startActivity(editActivity);*/
+                            startActivity(editActivity);
                         }
                     });
                     viewHolder.commentBtn.setOnClickListener(new View.OnClickListener() {

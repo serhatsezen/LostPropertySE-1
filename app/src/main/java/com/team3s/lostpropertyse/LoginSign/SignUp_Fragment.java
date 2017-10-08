@@ -1,6 +1,8 @@
 package com.team3s.lostpropertyse.LoginSign;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.res.ColorStateList;
 import android.content.res.XmlResourceParser;
 import android.graphics.BitmapFactory;
@@ -220,13 +222,16 @@ public class SignUp_Fragment extends Fragment implements AdapterView.OnItemSelec
                             if (task.isSuccessful()) {
                                 Toast.makeText(getActivity(), "Hoşgeldiniz", Toast.LENGTH_SHORT).show();
                                 user_id = auth.getCurrentUser().getUid();
+                                SharedPreferences sharedPreferences = getActivity().getApplicationContext().getSharedPreferences(getString(R.string.FCM_PREF), Context.MODE_PRIVATE);
+                                final String token = sharedPreferences.getString(getString(R.string.FCM_TOKEN), "");
+
                                 mStorageImage = FirebaseStorage.getInstance().getReference().child("Profile_images");
                                 current_user_db = mDatabase.child(user_id);
 
                                 current_user_db.child("namesurname").setValue(getFullName);
                                 current_user_db.child("username").setValue(getUserName);
                                 current_user_db.child("city").setValue(city_val);
-                                // current_user_db.child("token").setValue(token);
+                                current_user_db.child("token").setValue(token);
 
                                 StorageReference filepath = mStorageImage.child(mUserProf.getLastPathSegment());
                                 if (mUserProf != null) {

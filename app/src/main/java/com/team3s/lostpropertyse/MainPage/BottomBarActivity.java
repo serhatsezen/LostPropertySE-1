@@ -1,6 +1,7 @@
 package com.team3s.lostpropertyse.MainPage;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -10,7 +11,9 @@ import android.view.KeyEvent;
 import android.view.MenuItem;
 
 
+import com.team3s.lostpropertyse.Maps.PropMaps;
 import com.team3s.lostpropertyse.R;
+import com.team3s.lostpropertyse.services.MyService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,6 +43,10 @@ public class BottomBarActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_bottom_bar);
 
+
+        Intent servIntent = new Intent(BottomBarActivity.this, MyService.class);
+        startService(servIntent);
+
         bottomNavigationView = (BottomNavigationView) findViewById(R.id.bottom_nav);
 
         bottomNavigationView.setOnNavigationItemSelectedListener(
@@ -51,8 +58,8 @@ public class BottomBarActivity extends AppCompatActivity {
                                 switchFragment(0, TAG_FRAGMENT_NEWS);
                                 return true;
                             case R.id.action_bottombar_maps:
-                                //Intent mapint = new Intent(BottomBarActivity.this,Harita.class);
-                                //startActivity(mapint);
+                                Intent mapint = new Intent(BottomBarActivity.this,PropMaps.class);
+                                startActivity(mapint);
                                 return true;
                             case R.id.action_bottombar_share:
                                 switchFragment1(0, TAG_FRAGMENT_SHARE);

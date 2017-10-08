@@ -16,7 +16,8 @@
     <string name="action_settings">Settings</string>
 
 
-
     <string name="FCM_PREF">com.team3.softwareeng.LoginSign.fcm_pref</string>
     <string name="FCM_TOKEN">com.team3.softwareeng.LoginSign.fcm_token</string>
+    <string name="title_activity_prop_maps">Map</string>
+    <string name="title_activity_maps">Map</string>
 </resources>

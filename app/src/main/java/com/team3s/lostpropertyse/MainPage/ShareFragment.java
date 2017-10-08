@@ -2,7 +2,9 @@ package com.team3s.lostpropertyse.MainPage;
 
 import android.content.Intent;
 import android.graphics.BitmapFactory;
+import android.location.Location;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
@@ -18,6 +20,11 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
+import com.google.android.gms.common.GooglePlayServicesRepairableException;
+import com.google.android.gms.location.places.Place;
+import com.google.android.gms.location.places.ui.PlacePicker;
+import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
@@ -33,6 +40,17 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.team3s.lostpropertyse.R;
+
+import org.apache.http.HttpResponse;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.message.BasicNameValuePair;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static android.app.Activity.RESULT_OK;
 
@@ -72,7 +90,7 @@ public class ShareFragment extends Fragment {
 
     private TextView get_place_road;
     int PLACE_PICKER_REQUEST = 3;
-    //private LatLng addressLatLng;
+    private LatLng addressLatLng;
 
     private String latUsers;
     private String lngUsers;
@@ -114,7 +132,7 @@ public class ShareFragment extends Fragment {
         progressBarKonum = (ProgressBar) v.findViewById(R.id.progressBarKonum);
 
 
-       /* get_place_road.setOnClickListener(new View.OnClickListener(){
+        get_place_road.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v){
                 get_place_road.setVisibility(View.GONE);
@@ -131,7 +149,7 @@ public class ShareFragment extends Fragment {
                     e.printStackTrace();
                 }
             }
-        });*/
+        });
 
         selectImage.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -166,7 +184,7 @@ public class ShareFragment extends Fragment {
             String picturePath = cursor.getString(columnIndex);
             cursor.close();
             selectImage.setImageBitmap(BitmapFactory.decodeFile(picturePath));
-        }/*else if(requestCode==PLACE_PICKER_REQUEST){
+        }else if(requestCode==PLACE_PICKER_REQUEST){
             if(resultCode == RESULT_OK){
                 Place place = PlacePicker.getPlace(data,getActivity());
                 fullAddress = (String) place.getAddress();
@@ -177,7 +195,7 @@ public class ShareFragment extends Fragment {
                 get_place_road.setText(addressName);
 
             }
-        }*/
+        }
     }
 
 
@@ -205,10 +223,10 @@ public class ShareFragment extends Fragment {
 
                                 newPost2.child("questions").setValue(question_val);
                                 newPost2.child("desc").setValue(desc_val);
-                               // newPost2.child("fulladdress").setValue(fullAddress);
-                               // newPost2.child("addressname").setValue(addressName);
-                              // newPost2.child("latlng").setValue(addressLatLng);
-                               // newPost2.child("token").setValue(dataSnapshot.child("token").getValue());
+                                newPost2.child("fulladdress").setValue(fullAddress);
+                                newPost2.child("addressname").setValue(addressName);
+                                newPost2.child("latlng").setValue(addressLatLng);
+                                newPost2.child("token").setValue(dataSnapshot.child("token").getValue());
                                 newPost2.child("post_image").setValue(downloadUrl.toString());
                                 newPost2.child("post_time").setValue(today.format("%k:%M"));
                                 newPost2.child("post_date").setValue(today.format("%d/%m/%Y"));
@@ -218,7 +236,7 @@ public class ShareFragment extends Fragment {
                                     @Override
                                     public void onComplete(@NonNull Task<Void> task) {
                                         if (task.isSuccessful()) {
-                                            //notificationFilter();
+                                           // notificationFilter();
                                             startActivity(new Intent(getActivity(), BottomBarActivity.class));
                                         }
                                     }
@@ -284,7 +302,7 @@ public class ShareFragment extends Fragment {
         protected Long doInBackground(String... urls) {
 
             HttpClient httpclient = new DefaultHttpClient();
-            HttpPost httppost = new HttpPost("http://aydinserhatsezen.com/fcm/HaberlerSenden/haberlersendennewPost.php");
+            HttpPost httppost = new HttpPost("http://eam3s.atspace.cc/php/newPost.php");
 
             try {
                 List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(2);
