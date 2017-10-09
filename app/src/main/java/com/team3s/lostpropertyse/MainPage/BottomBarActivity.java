@@ -1,20 +1,19 @@
 package com.team3s.lostpropertyse.MainPage;
 
+import android.Manifest.permission;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.view.KeyEvent;
 import android.view.MenuItem;
-
-
 import com.team3s.lostpropertyse.Maps.PropMaps;
 import com.team3s.lostpropertyse.R;
 import com.team3s.lostpropertyse.services.MyService;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -37,6 +36,12 @@ public class BottomBarActivity extends AppCompatActivity {
      */
     private List<MainPage> fragments = new ArrayList<>(1);
     private List<ShareFragment> fragmentsShare = new ArrayList<>(1);
+
+    @Override
+    protected void onStart() {
+        checkPermissions();
+        super.onStart();
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -125,5 +130,14 @@ public class BottomBarActivity extends AppCompatActivity {
             return true;
         }
         return super.onKeyDown(keyCode, event);
+    }
+
+    // API 23 ve üzeri için gerekli.
+    public void checkPermissions(){
+        ActivityCompat.requestPermissions(this, new String[] {
+            permission.ACCESS_COARSE_LOCATION,
+            permission.ACCESS_FINE_LOCATION,
+            permission.WRITE_EXTERNAL_STORAGE}, 1
+        );
     }
 }
