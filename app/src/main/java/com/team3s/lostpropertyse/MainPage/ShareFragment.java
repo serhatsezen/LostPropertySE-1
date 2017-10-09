@@ -1,10 +1,10 @@
 package com.team3s.lostpropertyse.MainPage;
 
+import static android.app.Activity.RESULT_OK;
+
 import android.content.Intent;
-import android.graphics.BitmapFactory;
-import android.location.Location;
+import android.graphics.Bitmap;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
@@ -19,7 +19,6 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.common.GooglePlayServicesRepairableException;
 import com.google.android.gms.location.places.Place;
@@ -40,19 +39,7 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.team3s.lostpropertyse.R;
-
-import org.apache.http.HttpResponse;
-import org.apache.http.NameValuePair;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.message.BasicNameValuePair;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import static android.app.Activity.RESULT_OK;
+import java.io.IOException;
 
 public class ShareFragment extends Fragment {
     private ImageView selectImage;
@@ -176,14 +163,13 @@ public class ShareFragment extends Fragment {
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == GALLERY_REQUEST && resultCode == RESULT_OK && null != data) {
-            imageUri = data.getData();
-            String[] filePathColumn = { MediaStore.Images.Media.DATA };
-            android.database.Cursor cursor =getActivity().getContentResolver().query(imageUri,filePathColumn, null, null, null);
-            cursor.moveToFirst();
-            int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
-            String picturePath = cursor.getString(columnIndex);
-            cursor.close();
-            selectImage.setImageBitmap(BitmapFactory.decodeFile(picturePath));
+             imageUri = data.getData();
+            try {
+                Bitmap bitmap = MediaStore.Images.Media.getBitmap(getActivity().getContentResolver(), imageUri);
+                selectImage.setImageBitmap(bitmap);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }else if(requestCode==PLACE_PICKER_REQUEST){
             if(resultCode == RESULT_OK){
                 Place place = PlacePicker.getPlace(data,getActivity());

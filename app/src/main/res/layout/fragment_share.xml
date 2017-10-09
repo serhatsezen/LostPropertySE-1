@@ -17,13 +17,14 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
             <TextView
-                android:id="@+id/getlocationbtn"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Konum Seçin!"
-                android:padding="20dp"
-                android:textColor="#fff"
-                android:textSize="18sp"/>
+              android:id="@+id/getlocationbtn"
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:padding="20dp"
+              android:text="Konum Seçin!"
+              android:textAlignment="center"
+              android:textColor="#fff"
+              android:textSize="18sp" />
             <ProgressBar
                 android:id="@+id/progressBarKonum"
                 android:layout_width="30dp"
@@ -55,40 +56,39 @@
             android:layout_alignParentEnd="true" />
 
         <EditText
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:inputType="textPersonName"
-            android:background="@drawable/input_text"
-            android:ems="10"
-            android:gravity="center"
-            android:textColor="#fff"
-            android:id="@+id/post_titleET"
-            android:padding="10dp"
-            android:hint="Haberin Konusunu Buraya Girebilirsiniz..."
-            android:textColorHint="#fff"
-            android:layout_below="@+id/post_image_btn"
-            android:layout_margin="10dp"
-            />
+          android:id="@+id/post_titleET"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:layout_margin="10dp"
+          android:layout_below="@+id/post_image_btn"
+          android:padding="10dp"
+          android:background="@drawable/input_text"
+          android:ems="10"
+          android:gravity="center"
+          android:hint="Buraya başlık girebilirsiniz."
+          android:inputType="textPersonName"
+          android:textColor="#fff"
+          android:textColorHint="#fff" />
 
         <EditText
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:inputType="textMultiLine"
-            android:background="@drawable/input_text"
-            android:gravity="center"
-            android:id="@+id/post_descET"
-            android:textColor="#fff"
-            android:hint="Buraya İçerik Girebilirsiniz..."
-            android:textColorHint="#fff"
-            android:layout_below="@+id/post_titleET"
-            android:layout_alignParentRight="true"
-            android:layout_alignParentEnd="true"
-            android:layout_marginLeft="10dp"
-            android:layout_marginRight="10dp"
-            android:ems="10"
-            android:padding="10dp"
-            android:layout_above="@+id/editBtnSc"
-            android:scrollIndicators="top" />
+          android:id="@+id/post_descET"
+          android:layout_width="match_parent"
+          android:layout_height="match_parent"
+          android:layout_marginLeft="10dp"
+          android:layout_marginRight="10dp"
+          android:layout_above="@+id/editBtnSc"
+          android:layout_alignParentEnd="true"
+          android:layout_alignParentRight="true"
+          android:layout_below="@+id/post_titleET"
+          android:padding="10dp"
+          android:background="@drawable/input_text"
+          android:ems="10"
+          android:gravity="center"
+          android:hint="Buraya ek bilgi girebilirsiniz."
+          android:inputType="textMultiLine"
+          android:scrollIndicators="top"
+          android:textColor="#fff"
+          android:textColorHint="#fff" />
 
         <Button
             android:text="Paylaş"
