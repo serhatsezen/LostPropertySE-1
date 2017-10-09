@@ -302,7 +302,7 @@ public class ShareFragment extends Fragment {
         protected Long doInBackground(String... urls) {
 
             HttpClient httpclient = new DefaultHttpClient();
-            HttpPost httppost = new HttpPost("http://eam3s.atspace.cc/php/newPost.php");
+            HttpPost httppost = new HttpPost("http://team3s.atspace.cc/php/newPost.php");
 
             try {
                 List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(2);

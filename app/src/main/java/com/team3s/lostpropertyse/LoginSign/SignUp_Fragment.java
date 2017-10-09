@@ -244,7 +244,6 @@ public class SignUp_Fragment extends Fragment implements AdapterView.OnItemSelec
                                     });
                                 }
                                 Intent mainIntent = new Intent(getActivity(), BottomBarActivity.class);
-                                mainIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                                 startActivity(mainIntent);
                             } else {
                                 Toast.makeText(getActivity(), "Bu mail başkası tarafından kullanılmakta.", Toast.LENGTH_SHORT).show();

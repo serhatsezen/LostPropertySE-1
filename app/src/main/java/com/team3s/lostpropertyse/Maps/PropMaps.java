@@ -107,13 +107,15 @@ public class PropMaps extends FragmentActivity implements OnMapReadyCallback, Go
                     latMarkers = (double) snapshot.child("latitude").getValue();
                     lngMarkers = (double) snapshot.child("longitude").getValue();
                     LatLng sydney = new LatLng(latMarkers, lngMarkers);
-                    mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
-                    mMap.animateCamera(CameraUpdateFactory.zoomTo(13));
+                   // mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
+                    //mMap.animateCamera(CameraUpdateFactory.zoomTo(13));
+                    mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(sydney,18));
                 }
                 @Override
                 public void onCancelled(DatabaseError databaseError) {
                 }
             });
+
         }
 
 
