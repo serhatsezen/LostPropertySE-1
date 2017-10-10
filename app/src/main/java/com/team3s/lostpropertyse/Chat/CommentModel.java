@@ -13,16 +13,17 @@ public class CommentModel {
   private String commentUserUid;
   private String commentId;
   private String commentUsername;
-
+  private String postId;
   public CommentModel() {
   }
 
-  public CommentModel(String commentText, Date commentDate, String commentUserUid, String commentId,String commentUsername) {
+  public CommentModel(String commentText, Date commentDate, String commentUserUid, String commentId,String commentUsername, String postId) {
     this.commentText = commentText;
     this.commentDate = commentDate;
     this.commentUserUid = commentUserUid;
     this.commentId = commentId;
     this.commentUsername = commentUsername;
+    this.postId = postId;
   }
 
   public String getCommentText() {
@@ -63,5 +64,13 @@ public class CommentModel {
 
   public void setCommentUsername(String commentUsername) {
     this.commentUsername = commentUsername;
+  }
+
+  public String getPostId() {
+    return postId;
+  }
+
+  public void setPostId(String postId) {
+    this.postId = postId;
   }
 }

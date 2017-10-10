@@ -12,5 +12,6 @@
     <color name="background_color">#3d3032</color>
     <color name="sliver">#9DA29F</color>
     <color name="blue_grey">#455A64</color>
+    <color name="commentBackGround">#FF161616</color>
 
 </resources>
