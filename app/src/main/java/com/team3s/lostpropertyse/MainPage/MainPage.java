@@ -16,7 +16,6 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
@@ -28,6 +27,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
+import com.team3s.lostpropertyse.Chat.CommentActivity;
 import com.team3s.lostpropertyse.CircleTransform;
 import com.team3s.lostpropertyse.LoginSign.TabsHeaderActivity;
 import com.team3s.lostpropertyse.Post.EditActivity;
@@ -37,8 +37,8 @@ import com.team3s.lostpropertyse.Share;
 
 public class MainPage extends Fragment {
 
-    private ImageButton addBtn,profileBtn,roadBtn;
 
+    private ImageButton commentButton;
     private RecyclerView shareList;
 
     private DatabaseReference database,mDatabaseUsers,mmDatabaseUsers,mDatabaseUsersProfile,mDatabaseLikeCounter,mDatabaseUsersFilter;
@@ -73,6 +73,8 @@ public class MainPage extends Fragment {
 
         imgPg = (ProgressBar) v.findViewById(R.id.progressBar3);
         imgPg.setVisibility(View.VISIBLE);
+
+
 
         //get firebase auth instance
         auth = FirebaseAuth.getInstance();
@@ -179,9 +181,9 @@ public class MainPage extends Fragment {
                     viewHolder.commentBtn.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                           /* Intent editActivity = new Intent(getActivity(), NewsComment.class);
+                           Intent editActivity = new Intent(getActivity(), CommentActivity.class);
                             editActivity.putExtra("post_id", post_key);
-                            startActivity(editActivity);*/
+                            startActivity(editActivity);
                         }
                     });
                     viewHolder.profile.setOnClickListener(new View.OnClickListener() {
@@ -304,9 +306,6 @@ public class MainPage extends Fragment {
         });
     }
 
-
-
-
     public static class ShareViewHolder extends RecyclerView.ViewHolder {
 
         View mView;
@@ -388,6 +387,7 @@ public class MainPage extends Fragment {
 
         public void setName(String name){
             TextView shaUsername = (TextView) mView.findViewById(R.id.shaUsername);
+
             shaUsername.setText(name);
             username = name;
         }

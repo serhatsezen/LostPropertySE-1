@@ -62,12 +62,12 @@
                 android:visibility="invisible" />
 
             <ImageView
-                android:id="@+id/ivLike"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:scaleType="center"
-                android:src="@drawable/ic_heart_outline_white"
-                android:visibility="invisible" />
+              android:id="@+id/ivLike"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:scaleType="center"
+              android:src="@drawable/ic_heart_outline_white"
+              android:visibility="invisible" />
 
 
         </com.team3s.lostpropertyse.SquaredFrameLayout>
