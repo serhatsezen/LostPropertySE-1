@@ -191,8 +191,8 @@ public class MyService extends Service {
                         public void onDataChange(DataSnapshot dataSnapshot) {
                             if (i % 10 == 0) {
                                 Toast.makeText(MyService.this, "writtenLoc", Toast.LENGTH_LONG).show();
-                                database.child("lat").setValue(lat);
-                                database.child("lng").setValue(lng);
+                                database.child("latitude").setValue(lat);
+                                database.child("longitude").setValue(lng);
                                 i = 0;
                                 j = 0;
                             }

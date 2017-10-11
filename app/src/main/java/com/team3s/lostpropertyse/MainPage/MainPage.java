@@ -2,6 +2,7 @@ package com.team3s.lostpropertyse.MainPage;
 
 import android.content.Context;
 import android.content.Intent;
+import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
@@ -41,8 +42,8 @@ public class MainPage extends Fragment {
     private ImageButton commentButton;
     private RecyclerView shareList;
 
-    private DatabaseReference database,mDatabaseUsers,mmDatabaseUsers,mDatabaseUsersProfile,mDatabaseLikeCounter,mDatabaseUsersFilter;
-    private DatabaseReference mDatabaseLike;
+    private DatabaseReference database,mDatabaseUsers,mDatabaseUsersProfile,mDatabaseLikeCounter,mDatabaseUsersFilter;
+    private DatabaseReference mDatabaseLike, mDatabaseDistance;
     private FirebaseAuth.AuthStateListener authListener;
     private FirebaseAuth auth;
     private Query mQueryIcerik;
@@ -59,6 +60,20 @@ public class MainPage extends Fragment {
     public static String userNames = null;
     public String cityFilter = "Genel";
     ProgressBar imgPg;
+
+    private String latUsers;
+    private String lngUsers;
+
+    private String latPost;
+    private String lngPost;
+
+    double latPostL;
+    double lngPostL;
+
+    double latUserL;
+    double lngUserL;
+    double dist;
+    String distStr;
 
     public MainPage() {
         // Required empty public constructor
@@ -83,6 +98,7 @@ public class MainPage extends Fragment {
         final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
 
         mDatabaseUsersFilter = FirebaseDatabase.getInstance().getReference().child("Users").child(user.getUid());
+        mDatabaseDistance = FirebaseDatabase.getInstance().getReference().child("Users").child(user.getUid()).child("latLng");
 
         mDatabaseUsersFilter.addValueEventListener(new ValueEventListener() {
             @Override
@@ -96,10 +112,27 @@ public class MainPage extends Fragment {
             }
         });
 
+        mDatabaseDistance.addValueEventListener(new ValueEventListener() {      //kullanıcının lat lng değerleri
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                latUsers = dataSnapshot.child("latitude").getValue().toString();
+                lngUsers = dataSnapshot.child("longitude").getValue().toString();
+
+
+                latUserL = Double.parseDouble(String.valueOf(latUsers));
+                lngUserL = Double.parseDouble(String.valueOf(lngUsers));
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
         mDatabaseUsersFilter.child("filterCity").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                cityFilter = dataSnapshot.getValue(String.class);
+                userNames = (String) dataSnapshot.child("username").getValue();
             }
 
             @Override
@@ -151,7 +184,7 @@ public class MainPage extends Fragment {
 
         FirebaseRecyclerAdapter<Share, ShareViewHolder> firebaseRecyclerAdapter = new FirebaseRecyclerAdapter<Share, ShareViewHolder>(
                     Share.class,
-                    R.layout.main_row,
+                    R.layout.row,
                     ShareViewHolder.class,
                     database
             ) {
@@ -161,7 +194,7 @@ public class MainPage extends Fragment {
                     final String post_key = getRef(position).getKey();
 
                     viewHolder.setQuestions(model.getQuestions());
-                    viewHolder.setDesc(model.getDesc());
+                    //viewHolder.setDesc(model.getDesc());
                     viewHolder.setCity(model.getaddressname());
                     viewHolder.setPost_image(getActivity().getApplicationContext(), model.getPost_image());
                     viewHolder.setName(model.getName());
@@ -209,7 +242,7 @@ public class MainPage extends Fragment {
 
                         }
                     });
-                    database.child(post_key).child("Cevaplar").addValueEventListener(new ValueEventListener() {
+                    database.child(post_key).child("Comments").addValueEventListener(new ValueEventListener() {
                         @Override
                         public void onDataChange(DataSnapshot dataSnapshot) {
 
@@ -276,8 +309,51 @@ public class MainPage extends Fragment {
                             });
                         }
                     });
+
+                    database.child(post_key).child("latlng").addValueEventListener(new ValueEventListener() {       // her postun lat lng değerleri
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+
+                            for (DataSnapshot childDataSnapshot : dataSnapshot.getChildren()) {
+
+
+                                Location destination = new Location("destination");
+                                destination.setLatitude(latUserL);
+                                destination.setLongitude(lngUserL);
+
+
+                                latPost = dataSnapshot.child("latitude").getValue().toString();
+                                lngPost = dataSnapshot.child("longitude").getValue().toString();
+
+
+                                latPostL = Double.parseDouble(String.valueOf(latPost));
+                                lngPostL = Double.parseDouble(String.valueOf(lngPost));
+
+
+                                Location current = new Location("destination");
+                                current.setLatitude(latPostL);
+                                current.setLongitude(lngPostL);
+
+                                dist = current.distanceTo(destination) / 1000;                      //kullanıcının lat lng değerleri ile posttaki lat lng değerlerinin karşılarştırılması ve km olarak hesaplanması
+                                distStr = String.format("%.2f", dist );
+
+                                viewHolder.distanceUser.setText(distStr+" km");
+
+                            }
+                        }
+
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+
+                        }
+                    });
+
+
+
                 }
             };
+
+
 
             shareList.setAdapter(firebaseRecyclerAdapter);
 
@@ -321,6 +397,8 @@ public class MainPage extends Fragment {
         TextView counterLike;
         TextView commentCount;
 
+        TextView distanceUser;
+
 
 
         public ShareViewHolder(View itemView) {
@@ -333,8 +411,9 @@ public class MainPage extends Fragment {
 
             counterLike = (TextView) mView.findViewById(R.id.counterLike);
             commentCount = (TextView) mView.findViewById(R.id.commentCount);
+            distanceUser = (TextView) mView.findViewById(R.id.distanceTxt);
 
-            profile = (RelativeLayout) mView.findViewById(R.id.profile);
+            profile = (RelativeLayout) mView.findViewById(R.id.users_info);
             likeUsers = (LinearLayout) mView.findViewById(R.id.like_users);
 
 

@@ -90,7 +90,7 @@ public class EditActivity extends AppCompatActivity implements PopupMenu.OnMenuI
 
         mPostDelete.setVisibility(View.GONE);
         mPostUpdate.setVisibility(View.GONE);
-        mDatabase.child(post_key).child("Cevaplar").addValueEventListener(new ValueEventListener() {
+        mDatabase.child(post_key).child("Comments").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
 

@@ -134,12 +134,4 @@ public class CommentActivity extends AppCompatActivity {
         DatabaseReference comRef = firebaseDatabase.getInstance().getReference("Icerik").child(postId).child("Comments");
         comRef.child(model.getCommentId()).setValue(model);
   }
-
-
-
-
-
-
-
-
 }

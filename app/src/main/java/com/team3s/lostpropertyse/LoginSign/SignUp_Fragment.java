@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.ColorStateList;
 import android.content.res.XmlResourceParser;
+import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
@@ -20,9 +21,16 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
+import com.google.android.gms.common.GooglePlayServicesRepairableException;
+import com.google.android.gms.location.places.Place;
+import com.google.android.gms.location.places.ui.PlacePicker;
+import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
@@ -36,6 +44,9 @@ import com.google.firebase.storage.UploadTask;
 import com.team3s.lostpropertyse.MainPage.BottomBarActivity;
 import com.team3s.lostpropertyse.R;
 
+import org.w3c.dom.Text;
+
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -47,6 +58,7 @@ public class SignUp_Fragment extends Fragment implements AdapterView.OnItemSelec
     private static View view;
     private static EditText fullName, emailId, username, location,
             password, confirmPassword;
+    private static TextView selectLoc;
     private static ImageView profile;
     private static Button signUpButton;
     private static CheckBox terms_conditions;
@@ -54,15 +66,22 @@ public class SignUp_Fragment extends Fragment implements AdapterView.OnItemSelec
     private DatabaseReference mDatabase;
     private DatabaseReference current_user_db;
     private String cityname;
+    private ProgressBar selectLocProgress;
 
-    private Uri mUserProf = null;
 
     private StorageReference mStorageImage;
 
     String user_id;
 
-    private static final int GALLERY_REQUEST = 3;
-    //String app_server_url="http://aydinserhatsezen.com/fcm/fcm_haberler_insert.php";
+    int PLACE_PICKER_REQUEST = 3;
+
+    private String fullAddress;
+    private String addressName;
+    private LatLng addressLatLng;
+    private Uri imageUri = null;
+
+
+    private static final int GALLERY_REQUEST = 1;
 
     public SignUp_Fragment() {
 
@@ -72,34 +91,10 @@ public class SignUp_Fragment extends Fragment implements AdapterView.OnItemSelec
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.fragment_sign_up, container, false);
-        Spinner spinner = (Spinner) view.findViewById(R.id.location);
 
-        // Spinner click listener
-        spinner.setOnItemSelectedListener(this);
-        List<String> categories = new ArrayList<String>();
-        categories.add("Adana");        categories.add("Adıyaman");        categories.add("Afyonkarahisar");        categories.add("Ağrı");        categories.add("Amasya");        categories.add("Ankara");
-        categories.add("Antalya");        categories.add("Artvin");        categories.add("Aydın");        categories.add("Balıkesir");        categories.add("Bilecik");        categories.add("Bingöl");
-        categories.add("Bitlis");        categories.add("Bolu");        categories.add("Burdur");        categories.add("Bursa");        categories.add("Çanakkale");        categories.add("Çankırı");        categories.add("Çorum");
-        categories.add("Denizli");        categories.add("Diyarbakır");        categories.add("Edirne");        categories.add("Elazığ");        categories.add("Erzincan");        categories.add("Erzurum");
-        categories.add("Eskişehir");        categories.add("Gaziantep");        categories.add("Giresun");        categories.add("Gümüşhane");        categories.add("Hakkâri");        categories.add("Hatay");
-        categories.add("Isparta");        categories.add("Mersin");        categories.add("İstanbul");        categories.add("İzmir");        categories.add("Kars");        categories.add("Kastamonu");
-        categories.add("Kayseri");        categories.add("Kırklareli");        categories.add("Kırşehir");        categories.add("Genel");        categories.add("Kocaeli");        categories.add("Konya");
-        categories.add("Kütahya");        categories.add("Malatya");        categories.add("Manisa");        categories.add("Kahramanmaraş");        categories.add("Mardin");        categories.add("Muğla");
-        categories.add("Muş");        categories.add("Nevşehir");        categories.add("Niğde");        categories.add("Ordu");        categories.add("Rize");        categories.add("Sakarya");        categories.add("Samsun");
-        categories.add("Siirt");        categories.add("Sinop");        categories.add("Sivas");        categories.add("Tekirdağ");        categories.add("Tokat");        categories.add("Trabzon");
-        categories.add("Tunceli");        categories.add("Şanlıurfa");        categories.add("Uşak");        categories.add("Van");        categories.add("Yozgat");        categories.add("Zonguldak");
-        categories.add("Aksaray");        categories.add("Bayburt");        categories.add("Karaman");        categories.add("Kırıkkale");        categories.add("Batman");        categories.add("Şırnak");
-        categories.add("Bartın");        categories.add("Ardahan");        categories.add("Iğdır");        categories.add("Yalova");        categories.add("Karabük");        categories.add("Kilis");
-        categories.add("Osmaniye");        categories.add("Düzce");
-        // Creating adapter for spinner
-        ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_spinner_item, categories);
-
-        // Drop down layout style - list view with radio button
-        dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         initViews();
 
         // attaching data adapter to spinner
-        spinner.setAdapter(dataAdapter);
         signUpButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -118,6 +113,26 @@ public class SignUp_Fragment extends Fragment implements AdapterView.OnItemSelec
                 startActivityForResult(i, GALLERY_REQUEST);
             }
         });
+
+        selectLoc.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v){
+                selectLoc.setVisibility(View.GONE);
+                selectLocProgress.setVisibility(View.VISIBLE);
+                PlacePicker.IntentBuilder builder = new PlacePicker.IntentBuilder();
+                Intent intentroadpic;
+
+                try {
+                    intentroadpic = builder.build(getActivity());
+                    startActivityForResult(intentroadpic,PLACE_PICKER_REQUEST );
+                } catch (GooglePlayServicesRepairableException e) {
+                    e.printStackTrace();
+                } catch (GooglePlayServicesNotAvailableException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+
 
 
         return view;
@@ -142,7 +157,8 @@ public class SignUp_Fragment extends Fragment implements AdapterView.OnItemSelec
         signUpButton = (Button) view.findViewById(R.id.signUpBtn);
         profile = (ImageView) view.findViewById(R.id.signupProf);
         terms_conditions = (CheckBox) view.findViewById(R.id.terms_conditions);
-
+        selectLoc = (TextView) view.findViewById(R.id.selectLoc);
+        selectLocProgress = (ProgressBar) view.findViewById(R.id.selectLocProgress);
         // Setting text selector over textviews
         XmlResourceParser xrp = getResources().getXml(R.drawable.text_selector);
         try {
@@ -158,15 +174,24 @@ public class SignUp_Fragment extends Fragment implements AdapterView.OnItemSelec
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == GALLERY_REQUEST && resultCode == RESULT_OK && null != data) {
-            mUserProf = data.getData();
-            String[] filePathColumn = { MediaStore.Images.Media.DATA };
-            android.database.Cursor cursor =getActivity().getContentResolver().query(mUserProf,filePathColumn, null, null, null);
-            cursor.moveToFirst();
-            int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
-            String picturePath = cursor.getString(columnIndex);
-            cursor.close();
-            ImageView imageView = (ImageView) view.findViewById(R.id.signupProf);
-            imageView.setImageBitmap(BitmapFactory.decodeFile(picturePath));
+            imageUri = data.getData();
+            try {
+                Bitmap bitmap = MediaStore.Images.Media.getBitmap(getActivity().getContentResolver(), imageUri);
+                profile.setImageBitmap(bitmap);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }else if(requestCode==PLACE_PICKER_REQUEST){
+            if(resultCode == RESULT_OK){
+                Place place = PlacePicker.getPlace(data,getActivity());
+                fullAddress = (String) place.getAddress();
+                addressName = (String) place.getName();
+                addressLatLng = (LatLng) place.getLatLng();
+                selectLoc.setVisibility(View.VISIBLE);
+                selectLocProgress.setVisibility(View.GONE);
+                selectLoc.setText(addressName);
+
+            }
         }
     }
 
@@ -178,7 +203,6 @@ public class SignUp_Fragment extends Fragment implements AdapterView.OnItemSelec
         final String getUserName = username.getText().toString();
         String getPassword = password.getText().toString();
         String getConfirmPassword = confirmPassword.getText().toString();
-        final String city_val = cityname.toString().trim();
 
 
         // Pattern match for email id
@@ -210,7 +234,7 @@ public class SignUp_Fragment extends Fragment implements AdapterView.OnItemSelec
         else if (!terms_conditions.isChecked())
             new CustomToast().Show_Toast(getActivity(), view,
                     "Şartları kabul etmelisiniz!");
-        else if (mUserProf==null)
+        else if (imageUri==null)
             new CustomToast().Show_Toast(getActivity(), view,
                     "Profil Resmi Seçmediniz!");
 
@@ -230,12 +254,13 @@ public class SignUp_Fragment extends Fragment implements AdapterView.OnItemSelec
 
                                 current_user_db.child("namesurname").setValue(getFullName);
                                 current_user_db.child("username").setValue(getUserName);
-                                current_user_db.child("city").setValue(city_val);
+                                current_user_db.child("cityName").setValue(addressName);
+                                current_user_db.child("latLng").setValue(addressLatLng);
                                 current_user_db.child("token").setValue(token);
 
-                                StorageReference filepath = mStorageImage.child(mUserProf.getLastPathSegment());
-                                if (mUserProf != null) {
-                                    filepath.putFile(mUserProf).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                                StorageReference filepath = mStorageImage.child(imageUri.getLastPathSegment());
+                                if (imageUri != null) {
+                                    filepath.putFile(imageUri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                                         @Override
                                         public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
                                             String downloadUri = taskSnapshot.getDownloadUrl().toString();

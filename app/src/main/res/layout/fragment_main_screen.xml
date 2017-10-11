@@ -5,6 +5,7 @@
     android:layout_gravity="center"
     android:fitsSystemWindows="true"
     android:background="#fff"
+
     >
     <android.support.v7.widget.RecyclerView
         android:layout_width="match_parent"

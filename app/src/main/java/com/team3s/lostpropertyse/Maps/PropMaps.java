@@ -53,6 +53,7 @@ public class PropMaps extends FragmentActivity implements OnMapReadyCallback, Go
     private FirebaseAuth.AuthStateListener authListener;
     private FirebaseAuth auth;
 
+
     Button addDuk;
 
     Marker marker;
