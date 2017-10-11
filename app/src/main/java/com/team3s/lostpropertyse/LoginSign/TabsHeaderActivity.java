@@ -1,9 +1,11 @@
 package com.team3s.lostpropertyse.LoginSign;
 
 
+import android.Manifest.permission;
 import android.os.Bundle;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.TabLayout;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
@@ -11,9 +13,7 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
-
 import com.team3s.lostpropertyse.R;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,6 +29,7 @@ public class TabsHeaderActivity extends AppCompatActivity {
 
         final ViewPager viewPager = (ViewPager) findViewById(R.id.htab_viewpager);
         setupViewPager(viewPager);
+        checkPermissions();
         /*isUserFirstTime = Boolean.valueOf(Utils.readSharedSetting(TabsHeaderActivity.this, PREF_USER_FIRST_TIME, "true"));
 
         Intent introIntent = new Intent(TabsHeaderActivity.this, PagerActivity.class);
@@ -129,6 +130,13 @@ public class TabsHeaderActivity extends AppCompatActivity {
         }
     }
 
+    public void checkPermissions(){
+        ActivityCompat.requestPermissions(this, new String[] {
+            permission.ACCESS_COARSE_LOCATION,
+            permission.ACCESS_FINE_LOCATION,
+            permission.WRITE_EXTERNAL_STORAGE}, 1
+        );
+    }
 
 }
 

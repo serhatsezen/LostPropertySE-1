@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/LostPropertySE3.iml" filepath="$PROJECT_DIR$/LostPropertySE3.iml" />
+      <module fileurl="file://$PROJECT_DIR$/LostPropertySE.iml" filepath="$PROJECT_DIR$/LostPropertySE.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
     </modules>
   </component>
