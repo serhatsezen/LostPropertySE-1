@@ -255,6 +255,7 @@ public class SignUp_Fragment extends Fragment implements AdapterView.OnItemSelec
                                 current_user_db.child("namesurname").setValue(getFullName);
                                 current_user_db.child("username").setValue(getUserName);
                                 current_user_db.child("cityName").setValue(addressName);
+                                current_user_db.child("fullAddress").setValue(fullAddress);
                                 current_user_db.child("latLng").setValue(addressLatLng);
                                 current_user_db.child("token").setValue(token);
 

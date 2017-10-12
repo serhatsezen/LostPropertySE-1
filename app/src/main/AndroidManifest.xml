@@ -1,41 +1,41 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-  package="com.team3s.lostpropertyse">
+    package="com.team3s.lostpropertyse">
 
-  <uses-permission android:name="android.permission.INTERNET" />
-  <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-  <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-  <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-  <uses-permission android:name="com.google.android.providers.gsf.permission.READ_GSERVICES" />
-  <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
-  <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-  <uses-permission android:name="com.example.serha.thinkit.permission.MAPS_RECEIVE" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="com.google.android.providers.gsf.permission.READ_GSERVICES" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="com.example.serha.thinkit.permission.MAPS_RECEIVE" />
 
-  <application
-    android:allowBackup="true"
-    android:icon="@mipmap/ic_launcher"
-    android:label="@string/app_name"
-    android:roundIcon="@mipmap/ic_launcher_round"
-    android:supportsRtl="true"
-    android:theme="@style/AppTheme.NoActionBar">
-    <meta-data
-      android:name="com.google.android.gms.version"
-      android:value="@integer/google_play_services_version" />
+    <application
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/AppTheme.NoActionBar">
+        <meta-data
+            android:name="com.google.android.gms.version"
+            android:value="@integer/google_play_services_version" />
 
-    <activity
-      android:name=".LoginSign.TabsHeaderActivity"
-      android:screenOrientation="portrait">
-      <intent-filter>
-        <action android:name="android.intent.action.MAIN" />
+        <activity
+            android:name=".LoginSign.TabsHeaderActivity"
+            android:screenOrientation="portrait">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
 
-        <category android:name="android.intent.category.LAUNCHER" />
-      </intent-filter>
-    </activity>
-    <activity android:name=".Post.EditActivity" />
-    <activity
-      android:name=".MainPage.BottomBarActivity"
-      android:theme="@style/AppTheme.NoActionBar" />
-    <!--
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity android:name=".Post.EditActivity" />
+        <activity
+            android:name=".MainPage.BottomBarActivity"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <!--
              The API key for Google Maps-based APIs is defined as a string resource.
              (See the file "res/values/google_maps_api.xml").
              Note that the API key is linked to the encryption key used to sign the APK.
@@ -43,34 +43,35 @@
              sign the APK for publishing.
              You can define the keys for the debug and release targets in src/debug/ and src/release/. 
         -->
-    <meta-data
-      android:name="com.google.android.geo.API_KEY"
-      android:value="@string/google_maps_key" />
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="@string/google_maps_key" />
 
-    <activity
-      android:label="@string/title_activity_prop_maps"
-      android:name=".Maps.PropMaps" />
+        <activity
+            android:name=".Maps.PropMaps"
+            android:label="@string/title_activity_prop_maps" />
 
-    <service android:name=".services.FCMessagingService">
-      <intent-filter>
-        <action android:name="com.google.firebase.MESSAGING_EVENT" />
-      </intent-filter>
-    </service>
-    <service android:name=".services.FirebaseInstanceIDService">
-      <intent-filter>
-        <action android:name="com.google.firebase.INSTANCE_ID_EVENT" />
-      </intent-filter>
-    </service>
-    <service
-      android:enabled="true"
-      android:exported="true"
-      android:name=".services.MyService">
-      <intent-filter>
-        <action android:name="com.example.serha.thinkit.LONGRUNSERVICE" />
-      </intent-filter>
-    </service>
+        <service android:name=".services.FCMessagingService">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+            </intent-filter>
+        </service>
+        <service android:name=".services.FirebaseInstanceIDService">
+            <intent-filter>
+                <action android:name="com.google.firebase.INSTANCE_ID_EVENT" />
+            </intent-filter>
+        </service>
+        <service
+            android:name=".services.MyService"
+            android:enabled="true"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="com.example.serha.thinkit.LONGRUNSERVICE" />
+            </intent-filter>
+        </service>
 
-    <activity android:name=".Chat.CommentActivity"></activity>
-  </application>
+        <activity android:name=".Chat.CommentActivity" />
+        <activity android:name=".Profile.Profile" />
+    </application>
 
 </manifest>

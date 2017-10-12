@@ -79,25 +79,23 @@
                     app:siBorderColor="@color/black"
                     app:siBorderWidth="8dp"
                     android:layout_centerVertical="true"
-                    android:layout_alignParentEnd="true"
-                    android:layout_marginEnd="12dp" />
+                    android:layout_alignParentEnd="true" />
 
                 <TextView
                     android:id="@+id/shaUsername"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_alignParentStart="true"
-                    android:layout_centerVertical="true"
-                    android:layout_marginBottom="3dp"
                     android:layout_marginLeft="3dp"
                     android:layout_marginRight="3dp"
-                    android:layout_marginTop="3dp"
-                    android:layout_toStartOf="@+id/user_profile"
                     android:gravity="center"
                     android:maxLines="1"
-                    android:padding="5dp"
+                    android:padding="1dp"
                     android:text="Serhat"
-                    app:siBorderColor="@color/black" />
+                    app:siBorderColor="@color/black"
+                    android:layout_alignParentStart="true"
+                    android:layout_toStartOf="@+id/user_profile"
+                    android:layout_alignBottom="@+id/user_profile"
+                    android:layout_alignTop="@+id/user_profile" />
             </RelativeLayout>
         </LinearLayout>
 

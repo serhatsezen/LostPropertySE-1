@@ -12,6 +12,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.KeyEvent;
 import android.view.MenuItem;
 import com.team3s.lostpropertyse.Maps.PropMaps;
+import com.team3s.lostpropertyse.Profile.UsersProfiFrag;
 import com.team3s.lostpropertyse.R;
 import com.team3s.lostpropertyse.services.MyService;
 import java.util.ArrayList;
@@ -21,6 +22,7 @@ public class BottomBarActivity extends AppCompatActivity {
 
     private static final String TAG_FRAGMENT_NEWS = "tag_frag_news";
     private static final String TAG_FRAGMENT_SHARE = "tag_frag_share";
+    private static final String TAG_FRAGMENT_PROFILE = "tag_frag_profile";
 
     Context ctx;
 
@@ -36,6 +38,7 @@ public class BottomBarActivity extends AppCompatActivity {
      */
     private List<MainPage> fragments = new ArrayList<>(1);
     private List<ShareFragment> fragmentsShare = new ArrayList<>(1);
+    private List<UsersProfiFrag> fragmentsPro = new ArrayList<>(1);
 
     @Override
     protected void onStart() {
@@ -70,6 +73,9 @@ public class BottomBarActivity extends AppCompatActivity {
                             case R.id.action_bottombar_share:
                                 switchFragment1(0, TAG_FRAGMENT_SHARE);
                                 return true;
+                            case R.id.action_bottombar_profil:
+                                switchFragment2(0, TAG_FRAGMENT_PROFILE);
+                                return true;
                         }
                         return false;
                     }
@@ -97,14 +103,21 @@ public class BottomBarActivity extends AppCompatActivity {
                 .replace(R.id.frame_fragmentholder, fragmentsShare.get(pos), tag)
                 .commit();
     }
-
+    private void switchFragment2(int pos, String tag) {
+        getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.frame_fragmentholder, fragmentsPro.get(pos), tag)
+                .commit();
+    }
 
     private void buildFragmentsList() {
         MainPage mainScreen = buildFragment();
         ShareFragment shareScreen = buildFragmentShare();
+        UsersProfiFrag profileScreen = buildFragmentt();
 
         fragments.add(mainScreen);
         fragmentsShare.add(shareScreen);
+        fragmentsPro.add(profileScreen);
 
     }
 
@@ -122,6 +135,13 @@ public class BottomBarActivity extends AppCompatActivity {
         fragment.setArguments(bundle);
         return fragment;
     }
+    private UsersProfiFrag buildFragmentt() {
+        UsersProfiFrag fragment = new UsersProfiFrag();
+        Bundle bundle = new Bundle();
+        fragment.setArguments(bundle);
+        return fragment;
+    }
+
 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
