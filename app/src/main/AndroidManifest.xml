@@ -71,7 +71,6 @@
         </service>
 
         <activity android:name=".Chat.CommentActivity" />
-        <activity android:name=".Profile.Profile" />
     </application>
 
 </manifest>
