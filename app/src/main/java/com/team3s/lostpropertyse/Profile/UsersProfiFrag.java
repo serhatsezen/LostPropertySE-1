@@ -174,7 +174,7 @@ public class UsersProfiFrag extends Fragment {
             public void onCancelled(DatabaseError databaseError) {
             }
         });
-        mDatabaseUsers.child("fulladdress").addValueEventListener(new ValueEventListener() {
+        mDatabaseUsers.child("fullAddress").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot snapshot) {
                 String fullad = String.valueOf(snapshot.getValue());        //tam adres içinden şehir ve ülke yi yazıyorum.
