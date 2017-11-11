@@ -1,6 +1,9 @@
 package com.team3s.lostpropertyse.Profile;
 
+import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -12,12 +15,11 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
-
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
@@ -30,23 +32,23 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
-import com.team3s.lostpropertyse.Chat.CommentActivity;
 import com.team3s.lostpropertyse.CircleTransform;
 import com.team3s.lostpropertyse.LoginSign.TabsHeaderActivity;
 import com.team3s.lostpropertyse.Post.EditActivity;
 import com.team3s.lostpropertyse.R;
 import com.team3s.lostpropertyse.Share;
 
-import static android.app.Activity.RESULT_OK;
-
 public class UsersProfiFrag extends Fragment {
 
-
+    private StorageReference storageReference;
+    private StorageReference backgroundStorageReference;
     private ImageButton headerCover,exit;
     private TextView u_fullname,u_username,u_usernameprof,u_about,u_city;
     private ImageView profileImg;
+    private View backgroundView;
     public TextView follower_counter,num_post;
 
     private ImageButton editprof;
@@ -76,7 +78,47 @@ public class UsersProfiFrag extends Fragment {
     }
 
 
-    @Override
+  public void showDialog() {
+    AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+    builder.setTitle("Bir işlem seç")
+        .setItems(R.array.editButtonOptions, new DialogInterface.OnClickListener() {
+          public void onClick(DialogInterface dialog, int which) {
+            // The 'which' argument contains the index position
+            // of the selected item
+            System.out.println("*************"+which);
+            switch (which){
+              case 0: //arka planı değiştir
+                      break;
+              case 1: // profil resmini değiştir.
+                      break;
+              case 2: signOut();
+                      break;
+              default: break;
+            }
+
+          }
+        });
+        builder.create();
+        builder.show();
+  }
+    public void changeBackgroundPicture(){
+      Intent galleryIntent = new Intent(
+          Intent.ACTION_PICK,
+          android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+           startActivityForResult(galleryIntent,GALLERY_REQUEST);
+    }
+
+  @Override
+  public void onActivityResult(int requestCode, int resultCode, Intent data) {
+  if(requestCode == Activity.RESULT_OK){
+    if(requestCode == GALLERY_REQUEST){
+
+    }
+  }
+    super.onActivityResult(requestCode, resultCode, data);
+  }
+
+  @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
@@ -86,6 +128,9 @@ public class UsersProfiFrag extends Fragment {
 
         //get firebase auth instance
         auth = FirebaseAuth.getInstance();
+       FirebaseStorage storage = FirebaseStorage.getInstance();
+       storageReference = storage.getReference();
+       backgroundStorageReference = storageReference.child("background_images");
         //get current user
         final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
 
@@ -116,6 +161,7 @@ public class UsersProfiFrag extends Fragment {
         u_username = (TextView) v.findViewById(R.id.usernameprof);
         u_city = (TextView) v.findViewById(R.id.city);
         num_post = (TextView) v.findViewById(R.id.find_counter);
+        backgroundView = v.findViewById(R.id.background);
 
         String currentUserId = auth.getCurrentUser().getUid();
         mDatabaseCurrentUsers = FirebaseDatabase.getInstance().getReference().child("Icerik");
@@ -126,6 +172,12 @@ public class UsersProfiFrag extends Fragment {
         profileList = (RecyclerView) v.findViewById(R.id.rvUserProfile);
 
         editprof = (ImageButton) v.findViewById(R.id.edit_prof_btn);
+        editprof.setOnClickListener(new OnClickListener() {
+          @Override
+          public void onClick(View view) {
+            showDialog();
+          }
+        });
 
 
         mQueryUser.addValueEventListener(new ValueEventListener() {
@@ -185,6 +237,9 @@ public class UsersProfiFrag extends Fragment {
             public void onCancelled(DatabaseError databaseError) {
             }
         });
+
+
+
 
 
         LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());

@@ -21,4 +21,10 @@
     <string name="FCM_TOKEN">com.team3.softwareeng.LoginSign.fcm_token</string>
     <string name="title_activity_prop_maps">Map</string>
     <string name="title_activity_maps">Map</string>
+
+    <string-array name="editButtonOptions">
+        <item>Arka planı değiştir.</item>
+        <item>Profil resmini değiştir.</item>
+        <item>Çıkış yap.</item>
+    </string-array>
 </resources>
