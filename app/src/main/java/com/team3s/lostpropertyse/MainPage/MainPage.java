@@ -341,15 +341,11 @@ public class MainPage extends Fragment {
 
                             }
                         }
-
                         @Override
                         public void onCancelled(DatabaseError databaseError) {
 
                         }
                     });
-
-
-
                 }
             };
 
@@ -473,7 +469,6 @@ public class MainPage extends Fragment {
 
         public void setImage(Context ctx, String image){
             ImageView user_Pic = (ImageView) mView.findViewById(R.id.user_profile);
-           // Picasso.with(ctx).load(image).networkPolicy(NetworkPolicy.OFFLINE).fit().centerCrop().into(user_Pic);
             Glide.with(ctx)
                     .load(image)
                     .centerCrop()
@@ -486,7 +481,6 @@ public class MainPage extends Fragment {
 
         public void setPost_image(Context ctx, String post_image){
             ImageView share_img = (ImageView) mView.findViewById(R.id.share_img);
-            //Picasso.with(ctx).load(post_image).networkPolicy(NetworkPolicy.OFFLINE).fit().centerCrop().into(share_img);
             Glide.with(ctx)
                     .load(post_image)
                     .centerCrop()

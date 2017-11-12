@@ -29,6 +29,7 @@ import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -47,6 +48,7 @@ import com.team3s.lostpropertyse.Share;
 
 import java.io.FileNotFoundException;
 import java.io.InputStream;
+import java.util.HashMap;
 
 import static android.app.Activity.RESULT_OK;
 
@@ -54,11 +56,10 @@ public class UsersProfiFrag extends Fragment {
 
     private StorageReference storageReference;
     private StorageReference backgroundStorageReference;
-    private ImageButton headerCover,exit;
-    private TextView u_fullname,u_username,u_usernameprof,u_about,u_city;
-    private ImageView profileImg;
+    private TextView u_fullname,u_username,u_city;
+    private ImageView profileImg,backgroundImg;
     private View backgroundView;
-    public TextView follower_counter,num_post;
+    public TextView num_post;
 
     private ImageButton editprof;
 
@@ -76,9 +77,15 @@ public class UsersProfiFrag extends Fragment {
     private FirebaseAuth.AuthStateListener authListener;
     private FirebaseAuth auth;
 
-    private Uri mImageUri = null;
+    private Uri mProfImageUri = null;
+    private Uri mBackImageUri = null;
 
     TabLayout tlUserProfileTabs;
+    private boolean backgroundImage = false;
+    private boolean profileImage = false;
+    private Query mQueryUserId;
+    private FirebaseUser user;
+    private String currentUserId;
     public UsersProfiFrag() {
         // Required empty public constructor
     }
@@ -99,7 +106,7 @@ public class UsersProfiFrag extends Fragment {
        storageReference = storage.getReference();
        backgroundStorageReference = storageReference.child("background_images");
         //get current user
-        final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+       user = FirebaseAuth.getInstance().getCurrentUser();
 
         authListener = new FirebaseAuth.AuthStateListener() {
             @Override
@@ -132,11 +139,12 @@ public class UsersProfiFrag extends Fragment {
         num_post = (TextView) v.findViewById(R.id.find_counter);
         backgroundView = v.findViewById(R.id.background);
 
-        String currentUserId = auth.getCurrentUser().getUid();
+        currentUserId = auth.getCurrentUser().getUid();
         mDatabaseCurrentUsers = FirebaseDatabase.getInstance().getReference().child("Icerik");
         mQueryUser = mDatabaseCurrentUsers.orderByChild("uid").equalTo(currentUserId);
 
         profileImg = (ImageView) v.findViewById(R.id.ivUserProfilePhoto);
+        backgroundImg = (ImageView) v.findViewById(R.id.imageView3);
 
         profileList = (RecyclerView) v.findViewById(R.id.rvUserProfile);
 
@@ -176,6 +184,19 @@ public class UsersProfiFrag extends Fragment {
             public void onCancelled(DatabaseError databaseError) {
             }
         });
+      mDatabaseUsers.child("backgroundImage").addValueEventListener(new ValueEventListener() {
+          @Override
+          public void onDataChange(DataSnapshot snapshot) {
+              Glide.with(getActivity().getApplicationContext())
+                      .load(String.valueOf(snapshot.getValue()))
+                      .centerCrop()
+                      .diskCacheStrategy(DiskCacheStrategy.ALL)
+                      .into(backgroundImg);
+          }
+          @Override
+          public void onCancelled(DatabaseError databaseError) {
+          }
+      });
         mDatabaseUsers.child("namesurname").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot snapshot) {
@@ -227,9 +248,11 @@ public class UsersProfiFrag extends Fragment {
                         // of the selected item
                         System.out.println("*************"+which);
                         switch (which){
-                            case 0: //background Pic
+                            case 0: changeBackgroundImage();
+                                backgroundImage = true;
                                 break;
                             case 1: changeProfilePicture();
+                                profileImage = true;
                                 break;
                             case 2: signOut();
                                 break;
@@ -241,38 +264,93 @@ public class UsersProfiFrag extends Fragment {
         builder.create();
         builder.show();
     }
+    public void changeBackgroundImage(){
+        Intent backgroundPicker = new Intent(Intent.ACTION_PICK);
+        backgroundPicker.setType("image/*");
+        startActivityForResult(backgroundPicker, GALLERY_REQUEST);
+    }
     public void changeProfilePicture(){
-        Intent photoPickerIntent = new Intent(Intent.ACTION_PICK);
-        photoPickerIntent.setType("image/*");
-        startActivityForResult(photoPickerIntent, GALLERY_REQUEST);
+        Intent profilePicker = new Intent(Intent.ACTION_PICK);
+        profilePicker.setType("image/*");
+        startActivityForResult(profilePicker, GALLERY_REQUEST);
+
     }
 
     @Override
     public void onActivityResult(int reqCode, int resultCode, Intent data) {
         super.onActivityResult(reqCode, resultCode, data);
         if (resultCode == RESULT_OK) {
-            try {
-                mImageUri = data.getData();
-                final InputStream imageStream = getActivity().getContentResolver().openInputStream(mImageUri);
-                final Bitmap selectedImage = BitmapFactory.decodeStream(imageStream);
-                profileImg.setImageBitmap(selectedImage);
-                StorageReference filepath = mStorageImage.child(mImageUri.getLastPathSegment());
-                if (mImageUri != null) {
-                    filepath.putFile(mImageUri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                        @Override
-                        public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                            String downloadUri = taskSnapshot.getDownloadUrl().toString();
-                            mDatabaseUsers.child("profileImage").setValue(downloadUri);
-                        }
-                    });
-                }
 
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
-                Toast.makeText(getActivity(), "Bir sorun oluştu", Toast.LENGTH_LONG).show();
+            if(profileImage==true) {
+                try {
+                    mProfImageUri = data.getData();
+                    final InputStream imageStream = getActivity().getContentResolver().openInputStream(mProfImageUri);
+                    final Bitmap selectedImage = BitmapFactory.decodeStream(imageStream);
+                    profileImg.setImageBitmap(selectedImage);
+                    profileImage=false;
+                    StorageReference filepath = mStorageImage.child(mProfImageUri.getLastPathSegment());
+                    if (mProfImageUri != null) {
+                        filepath.putFile(mProfImageUri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                            @Override
+                            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                                final String downloadUri = taskSnapshot.getDownloadUrl().toString();
+                                mDatabaseUsers.child("profileImage").setValue(downloadUri);
+                                FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();                 //postlardaki profil resmini güncellemek için.
+                                final DatabaseReference reference = firebaseDatabase.getReference();
+                                mQueryUserId = database.orderByChild("uid").equalTo(currentUserId);
+                                mQueryUserId.addListenerForSingleValueEvent(new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(DataSnapshot dataSnapshot) {
+                                        DataSnapshot nodeDataSnapshot = dataSnapshot.getChildren().iterator().next();
+                                        String key = nodeDataSnapshot.getKey();
+                                        String path = "/" + dataSnapshot.getKey() + "/" + key;
+                                        HashMap<String, Object> result = new HashMap<>();
+                                        result.put("image", downloadUri);
+                                        reference.child(path).updateChildren(result);
+                                    }
+
+                                    @Override
+                                    public void onCancelled(DatabaseError databaseError) {
+
+                                    }
+                                });
+                            }
+                        });
+                    }
+
+
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                    Toast.makeText(getActivity(), "Bir sorun oluştu", Toast.LENGTH_LONG).show();
+                }
+            }
+            if(backgroundImage==true) {
+                try {
+                    mBackImageUri = data.getData();
+                    final InputStream imageStream = getActivity().getContentResolver().openInputStream(mBackImageUri);
+                    final Bitmap selectedImage = BitmapFactory.decodeStream(imageStream);
+                    backgroundImg.setImageBitmap(selectedImage);
+                    backgroundImage = false;
+                    StorageReference filepath = mStorageImage.child(mBackImageUri.getLastPathSegment());
+                    if (mBackImageUri != null) {
+                        filepath.putFile(mBackImageUri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                            @Override
+                            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                                String downloadUri = taskSnapshot.getDownloadUrl().toString();
+                                mDatabaseUsers.child("backgroundImage").setValue(downloadUri);
+                            }
+                        });
+                    }
+
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                    Toast.makeText(getActivity(), "Bir sorun oluştu", Toast.LENGTH_LONG).show();
+                }
             }
 
         }else {
+            backgroundImage = false;
+            profileImage=false;
             Toast.makeText(getActivity(), "Resim Seçmedin",Toast.LENGTH_LONG).show();
         }
     }
@@ -325,31 +403,6 @@ public class UsersProfiFrag extends Fragment {
     {  // After a pause OR at startup
         super.onResume();
     }
-
-
-    private void startSetupAccount() {
-
-
-        final String user_id = auth.getCurrentUser().getUid();
-
-        StorageReference filepath = mStorageImage.child(mImageUri.getLastPathSegment());
-        if (mImageUri != null) {
-
-            filepath.putFile(mImageUri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                @Override
-                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-
-                    String downloadUri = taskSnapshot.getDownloadUrl().toString();
-
-                    mDatabaseUsers.child(user_id).child("image").setValue(downloadUri);
-                    Glide.with(getActivity()).load(downloadUri).centerCrop().into(profileImg);
-                    profileImg.setImageURI(mImageUri);
-
-                }
-            });
-        }
-    }
-
 
     public static class ShareViewHolder extends RecyclerView.ViewHolder {
 
