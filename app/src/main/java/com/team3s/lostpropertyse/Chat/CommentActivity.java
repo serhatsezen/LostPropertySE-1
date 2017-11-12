@@ -1,45 +1,45 @@
-package com.team3s.lostpropertyse.Chat;
+       package com.team3s.lostpropertyse.Chat;
 
-import android.annotation.SuppressLint;
-import android.content.Intent;
-import android.graphics.Color;
-import android.graphics.Typeface;
-import android.os.AsyncTask;
-import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
-import android.view.View;
-import android.widget.EditText;
-import android.widget.ImageButton;
-import android.widget.ImageView;
-import android.widget.ListView;
-import android.widget.TextView;
-import com.bumptech.glide.Glide;
-import com.firebase.ui.database.FirebaseListAdapter;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.Query;
-import com.google.firebase.database.ValueEventListener;
-import com.team3s.lostpropertyse.R;
+        import android.annotation.SuppressLint;
+        import android.content.Intent;
+        import android.graphics.Color;
+        import android.graphics.Typeface;
+        import android.os.AsyncTask;
+        import android.os.Bundle;
+        import android.support.v7.app.AppCompatActivity;
+        import android.view.View;
+        import android.widget.EditText;
+        import android.widget.ImageButton;
+        import android.widget.ImageView;
+        import android.widget.ListView;
+        import android.widget.TextView;
+        import com.bumptech.glide.Glide;
+        import com.firebase.ui.database.FirebaseListAdapter;
+        import com.google.firebase.auth.FirebaseAuth;
+        import com.google.firebase.auth.FirebaseUser;
+        import com.google.firebase.database.DataSnapshot;
+        import com.google.firebase.database.DatabaseError;
+        import com.google.firebase.database.DatabaseReference;
+        import com.google.firebase.database.FirebaseDatabase;
+        import com.google.firebase.database.Query;
+        import com.google.firebase.database.ValueEventListener;
+        import com.team3s.lostpropertyse.R;
 
-import org.apache.http.HttpResponse;
-import org.apache.http.NameValuePair;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.message.BasicNameValuePair;
+        import org.apache.http.HttpResponse;
+        import org.apache.http.NameValuePair;
+        import org.apache.http.client.HttpClient;
+        import org.apache.http.client.entity.UrlEncodedFormEntity;
+        import org.apache.http.client.methods.HttpPost;
+        import org.apache.http.impl.client.DefaultHttpClient;
+        import org.apache.http.message.BasicNameValuePair;
 
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.UUID;
+        import java.util.ArrayList;
+        import java.util.Calendar;
+        import java.util.Date;
+        import java.util.HashMap;
+        import java.util.LinkedHashMap;
+        import java.util.List;
+        import java.util.UUID;
 
 public class CommentActivity extends AppCompatActivity {
   ListView commentListView;
@@ -122,7 +122,7 @@ public class CommentActivity extends AppCompatActivity {
     //Query comments1 = FirebaseDatabase.getInstance().getReference("Comments").orderByChild("postId").equalTo(postId);
     Query comments1 = FirebaseDatabase.getInstance().getReference("Icerik").child(postId).child("Comments").orderByChild("commentDate/time");
     //listviewi oluştur
-  FirebaseListAdapter<CommentModel> firebaseListAdapter = new FirebaseListAdapter<CommentModel>(this,CommentModel.class,android.R.layout.simple_list_item_2,comments1) {
+    FirebaseListAdapter<CommentModel> firebaseListAdapter = new FirebaseListAdapter<CommentModel>(this,CommentModel.class,android.R.layout.simple_list_item_2,comments1) {
       @SuppressLint("WrongConstant")
       @Override
       protected void populateView(View v, CommentModel model, int position) {
@@ -143,15 +143,15 @@ public class CommentActivity extends AppCompatActivity {
 
   //TODO sıralı hale getirilmesi gerek.
   public void sendComment(View view){
-        comment = commentText.getText().toString();
-        String userId = currentUser.getUid();
-        Date currentTime = Calendar.getInstance().getTime();
-        UUID commentId = UUID.randomUUID();
-        CommentModel model = new CommentModel(comment, currentTime,userId,commentId.toString(),username,postId);
-        DatabaseReference comRef = firebaseDatabase.getInstance().getReference("Icerik").child(postId).child("Comments");
-        comRef.child(model.getCommentId()).setValue(model);
-        new Send().execute();         //notification için
-        commentText.getText().clear();
+    comment = commentText.getText().toString();
+    String userId = currentUser.getUid();
+    Date currentTime = Calendar.getInstance().getTime();
+    UUID commentId = UUID.randomUUID();
+    CommentModel model = new CommentModel(comment, currentTime,userId,commentId.toString(),username,postId);
+    DatabaseReference comRef = firebaseDatabase.getInstance().getReference("Icerik").child(postId).child("Comments");
+    comRef.child(model.getCommentId()).setValue(model);
+    new Send().execute();         //notification için
+    commentText.getText().clear();
 
 
   }
@@ -159,8 +159,6 @@ public class CommentActivity extends AppCompatActivity {
 
 
   class Send extends AsyncTask<String, Void,Long > {      //sendNotification class
-
-
 
     protected Long doInBackground(String... urls) {
 

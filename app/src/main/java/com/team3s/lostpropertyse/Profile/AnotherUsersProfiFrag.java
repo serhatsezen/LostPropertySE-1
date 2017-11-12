@@ -11,9 +11,11 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -29,7 +31,6 @@ import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -45,17 +46,14 @@ import com.team3s.lostpropertyse.Post.EditActivity;
 import com.team3s.lostpropertyse.R;
 import com.team3s.lostpropertyse.Share;
 
-
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.HashMap;
 
 import static android.app.Activity.RESULT_OK;
 
-public class UsersProfiFrag extends Fragment {
+public class AnotherUsersProfiFrag extends Fragment {
 
-    private StorageReference storageReference;
-    private StorageReference backgroundStorageReference;
     private TextView u_fullname,u_username,u_city;
     private ImageView profileImg,backgroundImg;
     private View backgroundView;
@@ -63,31 +61,20 @@ public class UsersProfiFrag extends Fragment {
 
     private ImageButton editprof;
 
-    private StorageReference mStorageImage;
-    private StorageReference mStorageImageBack;
-
-    private static final int GALLERY_REQUEST = 1;
-    private static final int CAMERA_REQUEST_CODE = 2;
-
     private RecyclerView profileList;
 
-    private DatabaseReference database,mDatabaseUsers,databaseFollowers,mDatabaseUsersPostNum;
+    private DatabaseReference database,mDatabaseUsers,mDatabaseUsersPostNum;
     private DatabaseReference mDatabaseCurrentUsers;
     private Query mQueryUser;
     private DatabaseReference mDatabaseLike;
     private FirebaseAuth.AuthStateListener authListener;
     private FirebaseAuth auth;
 
-    private Uri mProfImageUri = null;
-    private Uri mBackImageUri = null;
-
-    TabLayout tlUserProfileTabs;
-    private boolean backgroundImage = false;
-    private boolean profileImage = false;
-    private Query mQueryUserId;
     private FirebaseUser user;
     private String currentUserId;
-    public UsersProfiFrag() {
+    private String post_key_user = null;
+
+    public AnotherUsersProfiFrag() {
         // Required empty public constructor
     }
 
@@ -99,11 +86,11 @@ public class UsersProfiFrag extends Fragment {
         // Inflate the layout for this fragment
         View v = inflater.inflate(R.layout.user_profil_frag, container, false);
 
+      Bundle bundle = getArguments();
+      post_key_user = bundle.getString("key");
+
         //get firebase auth instance
         auth = FirebaseAuth.getInstance();
-       FirebaseStorage storage = FirebaseStorage.getInstance();
-       storageReference = storage.getReference();
-       backgroundStorageReference = storageReference.child("background_images");
         //get current user
        user = FirebaseAuth.getInstance().getCurrentUser();
 
@@ -112,8 +99,6 @@ public class UsersProfiFrag extends Fragment {
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
                 FirebaseUser user = firebaseAuth.getCurrentUser();
                 if (user == null) {
-                    // user auth state is changed - user is null
-                    // launch login activity
                     Intent loginIntent = new Intent(getActivity(),TabsHeaderActivity.class);
                     loginIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                     startActivity(loginIntent);
@@ -124,13 +109,11 @@ public class UsersProfiFrag extends Fragment {
 
         database = FirebaseDatabase.getInstance().getReference().child("Icerik");
         database.keepSynced(true);
-        mDatabaseUsers = FirebaseDatabase.getInstance().getReference().child("Users").child(user.getUid());
+        mDatabaseUsers = FirebaseDatabase.getInstance().getReference().child("Users").child(post_key_user);
         mDatabaseUsers.keepSynced(true);
         mDatabaseLike = FirebaseDatabase.getInstance().getReference().child("Likes");
-       // databaseFollowers = FirebaseDatabase.getInstance().getReference().child("Users").child(user.getUid()).child("Takip_Edilenler");
-        mDatabaseUsersPostNum = FirebaseDatabase.getInstance().getReference().child("Users").child(user.getUid()).child("PostsId");
-        mStorageImage = FirebaseStorage.getInstance().getReference().child("Profile_images");
-        mStorageImageBack = FirebaseStorage.getInstance().getReference().child("Background_images");
+        mDatabaseUsersPostNum = FirebaseDatabase.getInstance().getReference().child("Users").child(post_key_user).child("PostsId");
+
 
 
         u_fullname = (TextView) v.findViewById(R.id.fullnameuser);
@@ -141,7 +124,7 @@ public class UsersProfiFrag extends Fragment {
 
         currentUserId = auth.getCurrentUser().getUid();
         mDatabaseCurrentUsers = FirebaseDatabase.getInstance().getReference().child("Icerik");
-        mQueryUser = mDatabaseCurrentUsers.orderByChild("uid").equalTo(currentUserId);
+        mQueryUser = mDatabaseCurrentUsers.orderByChild("uid").equalTo(post_key_user);
 
         profileImg = (ImageView) v.findViewById(R.id.ivUserProfilePhoto);
         backgroundImg = (ImageView) v.findViewById(R.id.imageView3);
@@ -227,7 +210,8 @@ public class UsersProfiFrag extends Fragment {
             }
         });
 
-        LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
+
+      LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
         layoutManager.setReverseLayout(true);
         layoutManager.setStackFromEnd(true);
 
@@ -242,21 +226,16 @@ public class UsersProfiFrag extends Fragment {
     public void showDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setTitle("Bir işlem seç")
-                .setItems(R.array.editButtonOptions, new DialogInterface.OnClickListener() {
+                .setItems(R.array.anotherUserEditButtonOptions, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
                         // The 'which' argument contains the index position
                         // of the selected item
                         System.out.println("*************"+which);
                         switch (which){
-                            case 0: changeBackgroundImage();
-                                backgroundImage = true;
+                            case 0:// şikayet et eklenebilir
+
                                 break;
-                            case 1: changeProfilePicture();
-                                profileImage = true;
-                                break;
-                            case 2: signOut();
-                                break;
-                            default: break;
+
                         }
 
                     }
@@ -264,104 +243,7 @@ public class UsersProfiFrag extends Fragment {
         builder.create();
         builder.show();
     }
-    public void changeBackgroundImage(){
-        Intent backgroundPicker = new Intent(Intent.ACTION_PICK);
-        backgroundPicker.setType("image/*");
-        startActivityForResult(backgroundPicker, GALLERY_REQUEST);
-    }
-    public void changeProfilePicture(){
-        Intent profilePicker = new Intent(Intent.ACTION_PICK);
-        profilePicker.setType("image/*");
-        startActivityForResult(profilePicker, GALLERY_REQUEST);
 
-    }
-
-    @Override
-    public void onActivityResult(int reqCode, int resultCode, Intent data) {
-        super.onActivityResult(reqCode, resultCode, data);
-        if (resultCode == RESULT_OK) {
-
-            if(profileImage==true) {
-                try {
-                    mProfImageUri = data.getData();
-                    final InputStream imageStream = getActivity().getContentResolver().openInputStream(mProfImageUri);
-                    final Bitmap selectedImage = BitmapFactory.decodeStream(imageStream);
-                    profileImg.setImageBitmap(selectedImage);
-                    profileImage=false;
-                    StorageReference filepath = mStorageImage.child(mProfImageUri.getLastPathSegment());
-                    if (mProfImageUri != null) {
-                        filepath.putFile(mProfImageUri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                            @Override
-                            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                                final String downloadUri = taskSnapshot.getDownloadUrl().toString();
-                                mDatabaseUsers.child("profileImage").setValue(downloadUri);
-                                    FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();                 //postlardaki profil resmini güncellemek için.
-                                    final DatabaseReference reference = firebaseDatabase.getReference();
-                                    mQueryUserId = database.orderByChild("uid").equalTo(currentUserId);
-                                    mQueryUserId.addListenerForSingleValueEvent(new ValueEventListener() {
-                                        @Override
-                                        public void onDataChange(DataSnapshot dataSnapshot) {
-                                            DataSnapshot nodeDataSnapshot = dataSnapshot.getChildren().iterator().next();
-                                            String key = nodeDataSnapshot.getKey();
-                                            String path = "/" + dataSnapshot.getKey() + "/" + key;
-                                            HashMap<String, Object> result = new HashMap<>();
-                                            result.put("image", downloadUri);
-                                            reference.child(path).updateChildren(result);
-                                        }
-
-                                        @Override
-                                        public void onCancelled(DatabaseError databaseError) {
-
-                                        }
-                                    });
-                            }
-                        });
-                    }
-
-
-                } catch (FileNotFoundException e) {
-                    e.printStackTrace();
-                    Toast.makeText(getActivity(), "Bir sorun oluştu", Toast.LENGTH_LONG).show();
-                }
-            }
-            if(backgroundImage==true) {
-                try {
-                    mBackImageUri = data.getData();
-                    final InputStream imageStream = getActivity().getContentResolver().openInputStream(mBackImageUri);
-                    final Bitmap selectedImage = BitmapFactory.decodeStream(imageStream);
-                    backgroundImg.setImageBitmap(selectedImage);
-                    backgroundImage = false;
-                    StorageReference filepathBack = mStorageImageBack.child(mBackImageUri.getLastPathSegment());
-                    if (mBackImageUri != null) {
-                        filepathBack.putFile(mBackImageUri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                            @Override
-                            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                                String downloadUri = taskSnapshot.getDownloadUrl().toString();
-                                mDatabaseUsers.child("backgroundImage").setValue(downloadUri);
-                            }
-                        });
-                    }
-
-                } catch (FileNotFoundException e) {
-                    e.printStackTrace();
-                    Toast.makeText(getActivity(), "Bir sorun oluştu", Toast.LENGTH_LONG).show();
-                }
-            }
-
-        }else {
-            backgroundImage = false;
-            profileImage=false;
-            Toast.makeText(getActivity(), "Resim Seçmedin",Toast.LENGTH_LONG).show();
-        }
-    }
-
-
-    //sign out method
-    public void signOut() {
-        auth.signOut();
-        Intent intent = new Intent(getActivity(), TabsHeaderActivity.class);
-        startActivity(intent);
-    }
 
     public void onStart(){
         super.onStart();
@@ -381,7 +263,7 @@ public class UsersProfiFrag extends Fragment {
                 viewHolder.setPost_date(model.getPost_date());
                 viewHolder.setPost_time(model.getPost_time());
 
-                viewHolder.mView.setOnClickListener(new View.OnClickListener() {
+                viewHolder.mView.setOnClickListener(new OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         Intent editActivity = new Intent(getActivity(), EditActivity.class);
@@ -417,6 +299,7 @@ public class UsersProfiFrag extends Fragment {
             mDatabaseLike = FirebaseDatabase.getInstance().getReference().child("Likes");
             mAuth = FirebaseAuth.getInstance();
         }
+
 
 
         public void setQuestions(String questions){

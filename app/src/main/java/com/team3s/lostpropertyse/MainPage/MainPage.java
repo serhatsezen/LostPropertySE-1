@@ -1,13 +1,17 @@
 package com.team3s.lostpropertyse.MainPage;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -32,8 +36,13 @@ import com.team3s.lostpropertyse.Chat.CommentActivity;
 import com.team3s.lostpropertyse.CircleTransform;
 import com.team3s.lostpropertyse.LoginSign.TabsHeaderActivity;
 import com.team3s.lostpropertyse.Post.EditActivity;
+import com.team3s.lostpropertyse.Profile.AnotherUsersProfiFrag;
 import com.team3s.lostpropertyse.R;
 import com.team3s.lostpropertyse.Share;
+
+import java.util.List;
+
+import static android.content.ContentValues.TAG;
 
 
 public class MainPage extends Fragment {
@@ -74,6 +83,9 @@ public class MainPage extends Fragment {
     double lngUserL;
     double dist;
     String distStr;
+
+    private final static String TAG_FRAGMENT = "TAG_FRAGMENT";
+
 
     public MainPage() {
         // Required empty public constructor
@@ -229,9 +241,19 @@ public class MainPage extends Fragment {
                                 @Override
                                 public void onDataChange(DataSnapshot dataSnapshot) {
                                     user_key = (String) dataSnapshot.child("uid").getValue();
-                                   /* Intent profActivity = new Intent(getActivity(), AnotherProfileActivity.class);
-                                    profActivity.putExtra("user_id", user_key);
-                                    startActivity(profActivity);*/
+
+                                    Bundle bundle = new Bundle();
+                                    bundle.putString("key",user_key); // Put anything what you want
+
+                                    AnotherUsersProfiFrag fragment2 = new AnotherUsersProfiFrag();
+
+                                    fragment2.setArguments(bundle);
+
+                                    getFragmentManager()
+                                            .beginTransaction()
+                                            .add(R.id.mainfrag, fragment2,TAG_FRAGMENT)
+                                            .addToBackStack(null)
+                                            .commit();
                                 }
 
                                 @Override
@@ -353,9 +375,7 @@ public class MainPage extends Fragment {
 
             shareList.setAdapter(firebaseRecyclerAdapter);
 
-
     }
-
 
     private void checkUser() {
 
@@ -377,7 +397,24 @@ public class MainPage extends Fragment {
             }
         });
     }
+    @Override
+    public void onResume() {
 
+        super.onResume();
+
+        getView().setFocusableInTouchMode(true);
+        getView().requestFocus();
+        getView().setOnKeyListener(new View.OnKeyListener() {
+            @Override
+            public boolean onKey(View v, int keyCode, KeyEvent event) {
+                if (event.getAction() == KeyEvent.ACTION_UP && keyCode == KeyEvent.KEYCODE_BACK){
+                    getActivity().getSupportFragmentManager().popBackStack();
+                    return true;
+                }
+                return false;
+            }
+        });
+    }
     public static class ShareViewHolder extends RecyclerView.ViewHolder {
 
         View mView;

@@ -152,6 +152,7 @@ public class BottomBarActivity extends AppCompatActivity {
         return super.onKeyDown(keyCode, event);
     }
 
+
     // API 23 ve üzeri için gerekli.
     public void checkPermissions(){
         ActivityCompat.requestPermissions(this, new String[] {

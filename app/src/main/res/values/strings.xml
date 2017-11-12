@@ -27,4 +27,7 @@
         <item>Profil resmini değiştir.</item>
         <item>Çıkış yap.</item>
     </string-array>
+    <string-array name="anotherUserEditButtonOptions">
+        <item>Şikayet Et</item>
+    </string-array>
 </resources>
