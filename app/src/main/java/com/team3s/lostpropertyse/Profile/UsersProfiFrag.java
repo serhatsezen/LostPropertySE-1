@@ -238,10 +238,6 @@ public class UsersProfiFrag extends Fragment {
             }
         });
 
-
-
-
-
         LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
         layoutManager.setReverseLayout(true);
         layoutManager.setStackFromEnd(true);
@@ -249,14 +245,6 @@ public class UsersProfiFrag extends Fragment {
         profileList.setHasFixedSize(true);
         profileList.setLayoutManager(layoutManager);
         setHasOptionsMenu(true);
-        /*editprof.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(getActivity(), ProfileActivity.class);
-                startActivity(intent);
-            }
-        });*/
-
 
         return v;
     }
@@ -282,86 +270,18 @@ public class UsersProfiFrag extends Fragment {
                 final String post_key = getRef(position).getKey();
 
                 viewHolder.setQuestions(model.getQuestions());
-               // viewHolder.setDesc(model.getDesc());
                 viewHolder.setPost_image(getActivity().getApplicationContext(),model.getPost_image());
-               // viewHolder.setLiikeBtn(post_key);
-                //viewHolder.setPost_date(model.getPost_date());
+                viewHolder.setPost_date(model.getPost_date());
+                viewHolder.setPost_time(model.getPost_time());
 
                 viewHolder.mView.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        // Toast.makeText(MainScreen.this,post_key, Toast.LENGTH_LONG).show();
-
                         Intent editActivity = new Intent(getActivity(), EditActivity.class);
                         editActivity.putExtra("post_id", post_key);
                         startActivity(editActivity);
                     }
                 });
-
-                /*viewHolder.commentBtn.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        Intent editActivity = new Intent(getActivity(), CommentActivity.class);
-                        editActivity.putExtra("post_id", post_key);
-                        startActivity(editActivity);
-                    }
-                });
-                viewHolder.mLikebtn.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-
-                        mProcessLike = true;
-                        mDatabaseLike.addValueEventListener(new ValueEventListener() {
-                            @Override
-                            public void onDataChange(DataSnapshot dataSnapshot) {
-                                if (mProcessLike) {
-                                    if (dataSnapshot.child(post_key).hasChild(auth.getCurrentUser().getUid())) {
-
-                                        mDatabaseLike.child(post_key).child(auth.getCurrentUser().getUid()).removeValue();
-                                        mProcessLike = false;
-
-                                    } else {
-                                        mDatabaseLike.child(post_key).child(auth.getCurrentUser().getUid()).setValue("RandomValue");
-
-                                        mProcessLike = false;
-                                    }
-                                }
-                            }
-                            @Override
-                            public void onCancelled(DatabaseError databaseError) {
-                            }
-                        });
-                    }
-                });
-                database.child(post_key).child("Cevaplar").addValueEventListener(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-
-                        for (DataSnapshot childDataSnapshot : dataSnapshot.getChildren()) {
-                            viewHolder.commentCounter.setText(String.valueOf(dataSnapshot.getChildrenCount()));  //displays the key for the node
-
-                        }
-                    }
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
-
-                    }
-                });
-
-                mDatabaseLike.child(post_key).addValueEventListener(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-
-                        for (DataSnapshot childDataSnapshot : dataSnapshot.getChildren()) {
-                            viewHolder.likeCounter.setText(String.valueOf(dataSnapshot.getChildrenCount()));  //displays the key for the node
-
-                        }
-                    }
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
-
-                    }
-                });*/
 
             }
         };
@@ -375,7 +295,6 @@ public class UsersProfiFrag extends Fragment {
     public void onResume()
     {  // After a pause OR at startup
         super.onResume();
-        //Refresh your stuff here
     }
 
 
@@ -407,51 +326,15 @@ public class UsersProfiFrag extends Fragment {
 
         View mView;
 
-        ImageButton mLikebtn;
-        ImageButton commentBtn;
-
-        TextView likeCounter;
-        TextView commentCounter;
-
-
         DatabaseReference mDatabaseLike;
         FirebaseAuth mAuth;
 
         public ShareViewHolder(View itemView) {
             super(itemView);
-
-
             mView = itemView;
-
-           /* mLikebtn = (ImageButton) mView.findViewById(R.id.likeImgBtn);
-            likeCounter = (TextView) mView.findViewById(R.id.like_counter);
-            commentCounter = (TextView) mView.findViewById(R.id.comment_counter);
-            commentBtn = (ImageButton) mView.findViewById(R.id.commentImgBtn);*/
-
-
             mDatabaseLike = FirebaseDatabase.getInstance().getReference().child("Likes");
             mAuth = FirebaseAuth.getInstance();
         }
-
-        /*public void setLiikeBtn(final String post_key){
-
-            mDatabaseLike.addValueEventListener(new ValueEventListener() {
-                @Override
-                public void onDataChange(DataSnapshot dataSnapshot) {
-                    if(dataSnapshot.child(post_key).hasChild(mAuth.getCurrentUser().getUid())){
-                        mLikebtn.setImageResource(R.drawable.ic_heart_red);
-
-                    }else{
-                        mLikebtn.setImageResource(R.drawable.ic_heart_outline_grey);
-                    }
-                }
-
-                @Override
-                public void onCancelled(DatabaseError databaseError) {
-
-                }
-            });
-        }*/
 
 
         public void setQuestions(String questions){
@@ -459,18 +342,16 @@ public class UsersProfiFrag extends Fragment {
             TextView questions_title = (TextView) mView.findViewById(R.id.titleProfileText);
             questions_title.setText(questions);
         }
-        /*public void setPost_date(String post_date){
+        public void setPost_date(String post_date){
 
-            TextView date = (TextView) mView.findViewById(R.id.date);
+            TextView date = (TextView) mView.findViewById(R.id.dateTxt);
             date.setText(post_date);
-        }*/
+        }
+        public void setPost_time(String post_time){
 
-       /* public void setDesc(String desc){
-
-            TextView share_desc = (TextView) mView.findViewById(R.id.descProfileText);
-            share_desc.setText(desc);
-
-        }*/
+            TextView time = (TextView) mView.findViewById(R.id.timeTxt);
+            time.setText(post_time);
+        }
 
         public void setPost_image(Context ctx, String post_image){
             ImageView post_img = (ImageView) mView.findViewById(R.id.post_img);
