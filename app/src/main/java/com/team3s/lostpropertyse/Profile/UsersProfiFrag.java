@@ -1,10 +1,11 @@
 package com.team3s.lostpropertyse.Profile;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -20,6 +21,8 @@ import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
+
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
@@ -41,6 +44,12 @@ import com.team3s.lostpropertyse.Post.EditActivity;
 import com.team3s.lostpropertyse.R;
 import com.team3s.lostpropertyse.Share;
 
+
+import java.io.FileNotFoundException;
+import java.io.InputStream;
+
+import static android.app.Activity.RESULT_OK;
+
 public class UsersProfiFrag extends Fragment {
 
     private StorageReference storageReference;
@@ -52,8 +61,6 @@ public class UsersProfiFrag extends Fragment {
     public TextView follower_counter,num_post;
 
     private ImageButton editprof;
-
-    private Uri mmImageUri = null;
 
     private StorageReference mStorageImage;
 
@@ -70,7 +77,6 @@ public class UsersProfiFrag extends Fragment {
     private FirebaseAuth auth;
 
     private Uri mImageUri = null;
-    private boolean mProcessLike = false;
 
     TabLayout tlUserProfileTabs;
     public UsersProfiFrag() {
@@ -78,45 +84,6 @@ public class UsersProfiFrag extends Fragment {
     }
 
 
-  public void showDialog() {
-    AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-    builder.setTitle("Bir işlem seç")
-        .setItems(R.array.editButtonOptions, new DialogInterface.OnClickListener() {
-          public void onClick(DialogInterface dialog, int which) {
-            // The 'which' argument contains the index position
-            // of the selected item
-            System.out.println("*************"+which);
-            switch (which){
-              case 0: //arka planı değiştir
-                      break;
-              case 1: // profil resmini değiştir.
-                      break;
-              case 2: signOut();
-                      break;
-              default: break;
-            }
-
-          }
-        });
-        builder.create();
-        builder.show();
-  }
-    public void changeBackgroundPicture(){
-      Intent galleryIntent = new Intent(
-          Intent.ACTION_PICK,
-          android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-           startActivityForResult(galleryIntent,GALLERY_REQUEST);
-    }
-
-  @Override
-  public void onActivityResult(int requestCode, int resultCode, Intent data) {
-  if(requestCode == Activity.RESULT_OK){
-    if(requestCode == GALLERY_REQUEST){
-
-    }
-  }
-    super.onActivityResult(requestCode, resultCode, data);
-  }
 
   @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -154,8 +121,10 @@ public class UsersProfiFrag extends Fragment {
         mDatabaseUsers = FirebaseDatabase.getInstance().getReference().child("Users").child(user.getUid());
         mDatabaseUsers.keepSynced(true);
         mDatabaseLike = FirebaseDatabase.getInstance().getReference().child("Likes");
-        databaseFollowers = FirebaseDatabase.getInstance().getReference().child("Users").child(user.getUid()).child("Takip_Edilenler");
+       // databaseFollowers = FirebaseDatabase.getInstance().getReference().child("Users").child(user.getUid()).child("Takip_Edilenler");
         mDatabaseUsersPostNum = FirebaseDatabase.getInstance().getReference().child("Users").child(user.getUid()).child("PostsId");
+        mStorageImage = FirebaseStorage.getInstance().getReference().child("Profile_images");
+
 
         u_fullname = (TextView) v.findViewById(R.id.fullnameuser);
         u_username = (TextView) v.findViewById(R.id.usernameprof);
@@ -202,7 +171,6 @@ public class UsersProfiFrag extends Fragment {
                         .transform(new CircleTransform(getActivity()))
                         .animate(R.anim.shake)
                         .into(profileImg);
-                profileImg.setImageURI(mImageUri);
             }
             @Override
             public void onCancelled(DatabaseError databaseError) {
@@ -248,6 +216,67 @@ public class UsersProfiFrag extends Fragment {
 
         return v;
     }
+
+
+    public void showDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder.setTitle("Bir işlem seç")
+                .setItems(R.array.editButtonOptions, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        // The 'which' argument contains the index position
+                        // of the selected item
+                        System.out.println("*************"+which);
+                        switch (which){
+                            case 0: //background Pic
+                                break;
+                            case 1: changeProfilePicture();
+                                break;
+                            case 2: signOut();
+                                break;
+                            default: break;
+                        }
+
+                    }
+                });
+        builder.create();
+        builder.show();
+    }
+    public void changeProfilePicture(){
+        Intent photoPickerIntent = new Intent(Intent.ACTION_PICK);
+        photoPickerIntent.setType("image/*");
+        startActivityForResult(photoPickerIntent, GALLERY_REQUEST);
+    }
+
+    @Override
+    public void onActivityResult(int reqCode, int resultCode, Intent data) {
+        super.onActivityResult(reqCode, resultCode, data);
+        if (resultCode == RESULT_OK) {
+            try {
+                mImageUri = data.getData();
+                final InputStream imageStream = getActivity().getContentResolver().openInputStream(mImageUri);
+                final Bitmap selectedImage = BitmapFactory.decodeStream(imageStream);
+                profileImg.setImageBitmap(selectedImage);
+                StorageReference filepath = mStorageImage.child(mImageUri.getLastPathSegment());
+                if (mImageUri != null) {
+                    filepath.putFile(mImageUri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                        @Override
+                        public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                            String downloadUri = taskSnapshot.getDownloadUrl().toString();
+                            mDatabaseUsers.child("profileImage").setValue(downloadUri);
+                        }
+                    });
+                }
+
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+                Toast.makeText(getActivity(), "Bir sorun oluştu", Toast.LENGTH_LONG).show();
+            }
+
+        }else {
+            Toast.makeText(getActivity(), "Resim Seçmedin",Toast.LENGTH_LONG).show();
+        }
+    }
+
 
     //sign out method
     public void signOut() {
