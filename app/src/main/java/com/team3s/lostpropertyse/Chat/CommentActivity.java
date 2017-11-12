@@ -144,14 +144,17 @@ public class CommentActivity extends AppCompatActivity {
   //TODO sıralı hale getirilmesi gerek.
   public void sendComment(View view){
     comment = commentText.getText().toString();
-    String userId = currentUser.getUid();
-    Date currentTime = Calendar.getInstance().getTime();
-    UUID commentId = UUID.randomUUID();
-    CommentModel model = new CommentModel(comment, currentTime,userId,commentId.toString(),username,postId);
-    DatabaseReference comRef = firebaseDatabase.getInstance().getReference("Icerik").child(postId).child("Comments");
-    comRef.child(model.getCommentId()).setValue(model);
-    new Send().execute();         //notification için
-    commentText.getText().clear();
+    if(!comment.equals("") && comment != null){
+      String userId = currentUser.getUid();
+      Date currentTime = Calendar.getInstance().getTime();
+      UUID commentId = UUID.randomUUID();
+      CommentModel model = new CommentModel(comment, currentTime,userId,commentId.toString(),username,postId);
+      DatabaseReference comRef = firebaseDatabase.getInstance().getReference("Icerik").child(postId).child("Comments");
+      comRef.child(model.getCommentId()).setValue(model);
+      new Send().execute();         //notification için
+      commentText.getText().clear();
+    }
+
 
 
   }

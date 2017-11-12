@@ -1,5 +1,6 @@
 package com.team3s.lostpropertyse.Chat;
 
+import android.net.Uri;
 import java.util.Date;
 
 /**
@@ -14,6 +15,7 @@ public class CommentModel {
   private String commentId;
   private String commentUsername;
   private String postId;
+  private Uri imageUri;
   public CommentModel() {
   }
 
@@ -72,5 +74,13 @@ public class CommentModel {
 
   public void setPostId(String postId) {
     this.postId = postId;
+  }
+
+  public Uri getImageUri() {
+    return imageUri;
+  }
+
+  public void setImageUri(Uri imageUri) {
+    this.imageUri = imageUri;
   }
 }
