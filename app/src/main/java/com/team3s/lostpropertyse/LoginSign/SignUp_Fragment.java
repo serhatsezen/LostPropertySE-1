@@ -238,6 +238,11 @@ public class SignUp_Fragment extends Fragment implements AdapterView.OnItemSelec
             new CustomToast().Show_Toast(getActivity(), view,
                     "Profil Resmi Seçmediniz!");
 
+        else if(fullAddress==null){
+            new CustomToast().Show_Toast(getActivity(), view,
+                    "Konum Seçmediniz!");
+        }
+
         else
             auth.createUserWithEmailAndPassword(getEmailId, getConfirmPassword)
                     .addOnCompleteListener(getActivity(), new OnCompleteListener<AuthResult>() {

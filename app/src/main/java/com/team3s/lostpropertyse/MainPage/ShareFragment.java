@@ -4,7 +4,9 @@ import static android.app.Activity.RESULT_OK;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.location.Location;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
@@ -39,7 +41,18 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.team3s.lostpropertyse.R;
+
+import org.apache.http.HttpResponse;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.message.BasicNameValuePair;
+
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ShareFragment extends Fragment {
     private ImageView selectImage;
@@ -222,7 +235,7 @@ public class ShareFragment extends Fragment {
                                     @Override
                                     public void onComplete(@NonNull Task<Void> task) {
                                         if (task.isSuccessful()) {
-                                           // notificationFilter();
+                                            notificationFilter();
                                             startActivity(new Intent(getActivity(), BottomBarActivity.class));
                                         }
                                     }
@@ -238,7 +251,7 @@ public class ShareFragment extends Fragment {
                 });
             }
     }
-   /* public void notificationFilter(){
+    public void notificationFilter(){
         DatabaseReference mDatabaseReference = FirebaseDatabase.getInstance()
                 .getReference();
         DatabaseReference node = mDatabaseReference.child("Users");
@@ -247,8 +260,8 @@ public class ShareFragment extends Fragment {
             @Override
             public void onDataChange(DataSnapshot snapshot) {
                 for (DataSnapshot data : snapshot.getChildren()) {
-                    latUsers = data.child("latLng").child("lat").getValue().toString();
-                    lngUsers = data.child("latLng").child("lng").getValue().toString();
+                    latUsers = data.child("latLng").child("latitude").getValue().toString();
+                    lngUsers = data.child("latLng").child("longitude").getValue().toString();
 
                     tokenUsers = "";
 
@@ -288,7 +301,7 @@ public class ShareFragment extends Fragment {
         protected Long doInBackground(String... urls) {
 
             HttpClient httpclient = new DefaultHttpClient();
-            HttpPost httppost = new HttpPost("http://team3s.atspace.cc/php/newPost.php");
+            HttpPost httppost = new HttpPost("http://aydinserhatsezen.com/fcm/LostP/lpnewPost.php");
 
             try {
                 List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(2);
@@ -310,7 +323,7 @@ public class ShareFragment extends Fragment {
         }
         protected void onPostExecute(Long result) {
         }
-    }*/
+    }
 
 }
 
