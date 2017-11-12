@@ -48,10 +48,12 @@ public class PropMaps extends FragmentActivity implements OnMapReadyCallback, Go
     LocationRequest mLocationRequest;
 
     private DatabaseReference databaseMarker;
+    private DatabaseReference mDatabaseUserLoc;
     private DatabaseReference mDatabaseLike;
     private DatabaseReference mDatabaseShowMap;
     private FirebaseAuth.AuthStateListener authListener;
     private FirebaseAuth auth;
+    private FirebaseUser currentUser;
 
 
     Button addDuk;
@@ -78,12 +80,12 @@ public class PropMaps extends FragmentActivity implements OnMapReadyCallback, Go
 
 
 
-
         //get firebase auth instance
         auth = FirebaseAuth.getInstance();
-        //get current user
-        final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        currentUser = auth.getCurrentUser();
+
         databaseMarker = FirebaseDatabase.getInstance().getReference().child("Icerik");
+        mDatabaseUserLoc = FirebaseDatabase.getInstance().getReference().child("Users").child(currentUser.getUid());
 
     }
 
@@ -107,16 +109,31 @@ public class PropMaps extends FragmentActivity implements OnMapReadyCallback, Go
                 public void onDataChange(DataSnapshot snapshot) {
                     latMarkers = (double) snapshot.child("latitude").getValue();
                     lngMarkers = (double) snapshot.child("longitude").getValue();
-                    LatLng sydney = new LatLng(latMarkers, lngMarkers);
+                    LatLng item = new LatLng(latMarkers, lngMarkers);
                    // mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
                     //mMap.animateCamera(CameraUpdateFactory.zoomTo(13));
-                    mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(sydney,18));
+                    mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(item,18));
                 }
                 @Override
                 public void onCancelled(DatabaseError databaseError) {
                 }
             });
 
+        }else{
+            mDatabaseUserLoc.child("latLng").addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot snapshot) {
+                    latMarkers = (double) snapshot.child("latitude").getValue();
+                    lngMarkers = (double) snapshot.child("longitude").getValue();
+                    LatLng user = new LatLng(latMarkers, lngMarkers);
+                    // mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
+                    //mMap.animateCamera(CameraUpdateFactory.zoomTo(13));
+                    mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(user,12));
+                }
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+                }
+            });
         }
 
 

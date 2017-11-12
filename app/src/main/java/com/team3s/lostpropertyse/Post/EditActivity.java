@@ -21,6 +21,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.team3s.lostpropertyse.Chat.CommentActivity;
 import com.team3s.lostpropertyse.MainPage.BottomBarActivity;
 import com.team3s.lostpropertyse.Maps.PropMaps;
 import com.team3s.lostpropertyse.R;
@@ -74,9 +75,9 @@ public class EditActivity extends AppCompatActivity implements PopupMenu.OnMenuI
         comments.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-              /*Intent editActivity = new Intent(EditActivity.this, NewsComment.class);
+              Intent editActivity = new Intent(EditActivity.this, CommentActivity.class);
                 editActivity.putExtra("post_id", post_key);
-                startActivity(editActivity);*/
+                startActivity(editActivity);
             }
         });
         showMap.setOnClickListener(new View.OnClickListener() {
