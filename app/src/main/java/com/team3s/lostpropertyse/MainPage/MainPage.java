@@ -37,9 +37,11 @@ import com.team3s.lostpropertyse.CircleTransform;
 import com.team3s.lostpropertyse.LoginSign.TabsHeaderActivity;
 import com.team3s.lostpropertyse.Post.EditActivity;
 import com.team3s.lostpropertyse.Profile.AnotherUsersProfiFrag;
+import com.team3s.lostpropertyse.Profile.UsersProfiFrag;
 import com.team3s.lostpropertyse.R;
 import com.team3s.lostpropertyse.Share;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static android.content.ContentValues.TAG;
@@ -187,9 +189,11 @@ public class MainPage extends Fragment {
         return v;
     }
 
+
+
     public void onStart(){
         super.onStart();
-        String currentUserId = auth.getCurrentUser().getUid();
+        final String currentUserId = auth.getCurrentUser().getUid();
         database = FirebaseDatabase.getInstance().getReference().child("Icerik");
         mQueryIcerik = database.orderByChild("city").equalTo(cityFilter);
 
@@ -245,15 +249,22 @@ public class MainPage extends Fragment {
                                     Bundle bundle = new Bundle();
                                     bundle.putString("key",user_key); // Put anything what you want
 
-                                    AnotherUsersProfiFrag fragment2 = new AnotherUsersProfiFrag();
-
-                                    fragment2.setArguments(bundle);
-
-                                    getFragmentManager()
-                                            .beginTransaction()
-                                            .add(R.id.mainfrag, fragment2,TAG_FRAGMENT)
-                                            .addToBackStack(null)
-                                            .commit();
+                                    if(currentUserId.equals(user_key)){
+                                        UsersProfiFrag fragment2 = new UsersProfiFrag();
+                                        getFragmentManager()
+                                                .beginTransaction()
+                                                .add(R.id.mainfrag, fragment2,TAG_FRAGMENT)
+                                                .addToBackStack(null)
+                                                .commit();
+                                    }else {
+                                        AnotherUsersProfiFrag fragment2 = new AnotherUsersProfiFrag();
+                                        fragment2.setArguments(bundle);
+                                        getFragmentManager()
+                                                .beginTransaction()
+                                                .add(R.id.mainfrag, fragment2, TAG_FRAGMENT)
+                                                .addToBackStack(null)
+                                                .commit();
+                                    }
                                 }
 
                                 @Override

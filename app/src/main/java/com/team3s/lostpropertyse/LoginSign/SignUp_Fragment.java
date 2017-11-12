@@ -262,6 +262,7 @@ public class SignUp_Fragment extends Fragment implements AdapterView.OnItemSelec
                                 current_user_db.child("cityName").setValue(addressName);
                                 current_user_db.child("fullAddress").setValue(fullAddress);
                                 current_user_db.child("latLng").setValue(addressLatLng);
+                                current_user_db.child("backgroundImage").setValue("https://firebasestorage.googleapis.com/v0/b/lostpro-776a5.appspot.com/o/Background_images%2F2142120171?alt=media&token=95caf486-3a0c-4dc8-947d-69385b54ffa1");
                                 current_user_db.child("token").setValue(token);
 
                                 StorageReference filepath = mStorageImage.child(imageUri.getLastPathSegment());
