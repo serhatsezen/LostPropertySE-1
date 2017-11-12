@@ -1,8 +1,10 @@
 package com.team3s.lostpropertyse.Chat;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.Typeface;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
@@ -22,10 +24,21 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.team3s.lostpropertyse.R;
+
+import org.apache.http.HttpResponse;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.message.BasicNameValuePair;
+
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.UUID;
 
 public class CommentActivity extends AppCompatActivity {
@@ -35,7 +48,9 @@ public class CommentActivity extends AppCompatActivity {
   ImageView postImage;
   private String postId;
   private String username;
+  private String tokenUser;
   private String path_to_image;
+  private  String comment;
   private LinkedHashMap<String, String> commentsMap;
   FirebaseDatabase firebaseDatabase;
   DatabaseReference databaseCommentsRef;
@@ -71,6 +86,8 @@ public class CommentActivity extends AppCompatActivity {
           path_to_image = hashMap.get("post_image");
           System.out.println("PATH TO IMAGE >>>>>>>>>>>> " + path_to_image);
           Glide.with(getApplicationContext()).load(path_to_image).into(postImage);
+          tokenUser = hashMap.get("token");
+          System.out.println("****************************** " + tokenUser);
         }
       }
 
@@ -102,11 +119,11 @@ public class CommentActivity extends AppCompatActivity {
     });
 
 
-
     //Query comments1 = FirebaseDatabase.getInstance().getReference("Comments").orderByChild("postId").equalTo(postId);
     Query comments1 = FirebaseDatabase.getInstance().getReference("Icerik").child(postId).child("Comments").orderByChild("commentDate/time");
     //listviewi oluştur
   FirebaseListAdapter<CommentModel> firebaseListAdapter = new FirebaseListAdapter<CommentModel>(this,CommentModel.class,android.R.layout.simple_list_item_2,comments1) {
+      @SuppressLint("WrongConstant")
       @Override
       protected void populateView(View v, CommentModel model, int position) {
         TextView textView1 = (TextView) v.findViewById(android.R.id.text1);
@@ -126,12 +143,55 @@ public class CommentActivity extends AppCompatActivity {
 
   //TODO sıralı hale getirilmesi gerek.
   public void sendComment(View view){
-        String comment = commentText.getText().toString();
+        comment = commentText.getText().toString();
         String userId = currentUser.getUid();
         Date currentTime = Calendar.getInstance().getTime();
         UUID commentId = UUID.randomUUID();
         CommentModel model = new CommentModel(comment, currentTime,userId,commentId.toString(),username,postId);
         DatabaseReference comRef = firebaseDatabase.getInstance().getReference("Icerik").child(postId).child("Comments");
         comRef.child(model.getCommentId()).setValue(model);
+        new Send().execute();
+        commentText.getText().clear();
+
+
   }
+
+
+
+  class Send extends AsyncTask<String, Void,Long > {
+
+
+
+    protected Long doInBackground(String... urls) {
+
+
+      HttpClient httpclient = new DefaultHttpClient();
+      HttpPost httppost = new HttpPost("http://aydinserhatsezen.com/fcm/LostP/lpyorum.php");
+
+      try {
+        // Add your data
+        List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(3);
+        nameValuePairs.add(new BasicNameValuePair("tokendevice", tokenUser));
+        nameValuePairs.add(new BasicNameValuePair("cevap", comment));
+        nameValuePairs.add(new BasicNameValuePair("userName", username));
+        httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
+
+        // Execute HTTP Post Request
+        HttpResponse response = httpclient.execute(httppost);
+
+      } catch (Exception e) {
+        // TODO Auto-generated catch block
+      }
+      return null;
+
+    }
+    protected void onProgressUpdate(Integer... progress) {
+
+    }
+
+    protected void onPostExecute(Long result) {
+
+    }
+  }
+
 }
