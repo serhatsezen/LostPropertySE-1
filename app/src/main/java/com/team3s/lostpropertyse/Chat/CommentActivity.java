@@ -150,7 +150,7 @@ public class CommentActivity extends AppCompatActivity {
         CommentModel model = new CommentModel(comment, currentTime,userId,commentId.toString(),username,postId);
         DatabaseReference comRef = firebaseDatabase.getInstance().getReference("Icerik").child(postId).child("Comments");
         comRef.child(model.getCommentId()).setValue(model);
-        new Send().execute();
+        new Send().execute();         //notification için
         commentText.getText().clear();
 
 
@@ -158,7 +158,7 @@ public class CommentActivity extends AppCompatActivity {
 
 
 
-  class Send extends AsyncTask<String, Void,Long > {
+  class Send extends AsyncTask<String, Void,Long > {      //sendNotification class
 
 
 
