@@ -160,8 +160,6 @@ public class CommentActivity extends AppCompatActivity {
 
   class Send extends AsyncTask<String, Void,Long > {      //sendNotification class
 
-
-
     protected Long doInBackground(String... urls) {
 
 
