@@ -251,6 +251,8 @@ public class ShareFragment extends Fragment {
                 });
             }
     }
+
+    //notification için kullanıcının bulunduğu konum ve post konumunun karşılarştırılması
     public void notificationFilter(){
         DatabaseReference mDatabaseReference = FirebaseDatabase.getInstance()
                 .getReference();
@@ -281,7 +283,7 @@ public class ShareFragment extends Fragment {
 
                     bildirimPost = question_val + " "+ addressName + " sana "+ distStr + " km uzaklıkta";
 
-                    if(dist <= rangeDest) {
+                    if(dist <= rangeDest) {                                                                     // eğer 5km içindeyse notificaion gönder
                         tokenUsers = String.valueOf(data.child("token").getValue());
                         new Send().execute();
                     }
@@ -301,7 +303,7 @@ public class ShareFragment extends Fragment {
         protected Long doInBackground(String... urls) {
 
             HttpClient httpclient = new DefaultHttpClient();
-            HttpPost httppost = new HttpPost("http://aydinserhatsezen.com/fcm/LostP/lpnewPost.php");
+            HttpPost httppost = new HttpPost("http://aydinserhatsezen.com/fcm/LostP/lpnewPost.php");        //web sitesi server üzerinden gönder
 
             try {
                 List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(2);
