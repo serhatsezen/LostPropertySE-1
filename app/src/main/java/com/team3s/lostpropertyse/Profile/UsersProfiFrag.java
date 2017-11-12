@@ -295,7 +295,7 @@ public class UsersProfiFrag extends Fragment {
                             public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
                                 final String downloadUri = taskSnapshot.getDownloadUrl().toString();
                                 mDatabaseUsers.child("profileImage").setValue(downloadUri);
-                                    FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();                 //postlardaki profil resmini güncellemek için.
+                                    FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();                 //postlardaki profil resmini güncellemek için
                                     final DatabaseReference reference = firebaseDatabase.getReference();
                                     mQueryUserId = database.orderByChild("uid").equalTo(currentUserId);
                                     mQueryUserId.addListenerForSingleValueEvent(new ValueEventListener() {

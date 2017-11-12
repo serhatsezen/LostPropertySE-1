@@ -232,7 +232,7 @@ public class AnotherUsersProfiFrag extends Fragment {
                         // of the selected item
                         System.out.println("*************"+which);
                         switch (which){
-                            case 0:// şikayet et eklenebilir
+                            case 0:// şikayet et butonu
 
                                 break;
 

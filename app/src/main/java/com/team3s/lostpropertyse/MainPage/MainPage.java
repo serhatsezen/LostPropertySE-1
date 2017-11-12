@@ -398,7 +398,7 @@ public class MainPage extends Fragment {
         });
     }
     @Override
-    public void onResume() {
+    public void onResume() {        // backpress
 
         super.onResume();
 

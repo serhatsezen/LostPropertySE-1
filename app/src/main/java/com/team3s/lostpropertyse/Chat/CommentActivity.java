@@ -99,7 +99,7 @@ public class CommentActivity extends AppCompatActivity {
       }
     });
 
-    // userıd'den username çekiyor
+    // userıd'den username çekme
     Query ref = FirebaseDatabase.getInstance().getReference("Users").orderByKey().equalTo(currentUser.getUid());
     ref.addValueEventListener(new ValueEventListener() {
       @Override
