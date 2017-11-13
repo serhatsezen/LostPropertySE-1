@@ -1,51 +1,50 @@
        package com.team3s.lostpropertyse.Chat;
 
         import android.annotation.SuppressLint;
-        import android.content.Intent;
-        import android.graphics.Color;
-        import android.graphics.Typeface;
-        import android.os.AsyncTask;
-        import android.os.Bundle;
-        import android.support.v7.app.AppCompatActivity;
-        import android.view.View;
-        import android.widget.EditText;
-        import android.widget.ImageButton;
-        import android.widget.ImageView;
-        import android.widget.ListView;
-        import android.widget.TextView;
-        import com.bumptech.glide.Glide;
-        import com.firebase.ui.database.FirebaseListAdapter;
-        import com.google.firebase.auth.FirebaseAuth;
-        import com.google.firebase.auth.FirebaseUser;
-        import com.google.firebase.database.DataSnapshot;
-        import com.google.firebase.database.DatabaseError;
-        import com.google.firebase.database.DatabaseReference;
-        import com.google.firebase.database.FirebaseDatabase;
-        import com.google.firebase.database.Query;
-        import com.google.firebase.database.ValueEventListener;
-        import com.team3s.lostpropertyse.R;
-
-        import org.apache.http.HttpResponse;
-        import org.apache.http.NameValuePair;
-        import org.apache.http.client.HttpClient;
-        import org.apache.http.client.entity.UrlEncodedFormEntity;
-        import org.apache.http.client.methods.HttpPost;
-        import org.apache.http.impl.client.DefaultHttpClient;
-        import org.apache.http.message.BasicNameValuePair;
-
-        import java.util.ArrayList;
-        import java.util.Calendar;
-        import java.util.Date;
-        import java.util.HashMap;
-        import java.util.LinkedHashMap;
-        import java.util.List;
-        import java.util.UUID;
+import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.Typeface;
+import android.os.AsyncTask;
+import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
+import android.view.View;
+import android.widget.EditText;
+import android.widget.ImageButton;
+import android.widget.ImageView;
+import android.widget.ListView;
+import android.widget.TextView;
+import com.bumptech.glide.Glide;
+import com.firebase.ui.database.FirebaseListAdapter;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
+import com.team3s.lostpropertyse.R;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.UUID;
+import org.apache.http.HttpResponse;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.message.BasicNameValuePair;
 
 public class CommentActivity extends AppCompatActivity {
   ListView commentListView;
   ImageButton sendCommentButton;
   EditText commentText;
   ImageView postImage;
+  ImageView profilePic;
   private String postId;
   private String username;
   private String tokenUser;
@@ -57,6 +56,29 @@ public class CommentActivity extends AppCompatActivity {
   DatabaseReference databaseUsersRef;
   FirebaseUser currentUser;
 
+  private String[] getProfilePictureFromUsername(String username){
+    final String[] path = new String[1];
+    Query profilePic = FirebaseDatabase.getInstance().getReference("Users").orderByChild("username").equalTo(username);
+    profilePic.addValueEventListener(new ValueEventListener() {
+
+      @Override
+      public void onDataChange(DataSnapshot dataSnapshot) {
+        for(DataSnapshot gelen : dataSnapshot.getChildren()){
+          System.out.println(">>>>>> INFO GELEN : " + gelen.getValue());
+          HashMap<String,String> hashMap = (HashMap<String, String>) gelen.getValue();
+          path[0] = hashMap.get("profileImage");
+          System.out.println(path[0]);
+        }
+      }
+
+      @Override
+      public void onCancelled(DatabaseError databaseError) {
+
+      }
+    });
+    return path;
+
+  }
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
@@ -122,19 +144,27 @@ public class CommentActivity extends AppCompatActivity {
     //Query comments1 = FirebaseDatabase.getInstance().getReference("Comments").orderByChild("postId").equalTo(postId);
     Query comments1 = FirebaseDatabase.getInstance().getReference("Icerik").child(postId).child("Comments").orderByChild("commentDate/time");
     //listviewi oluştur
-    FirebaseListAdapter<CommentModel> firebaseListAdapter = new FirebaseListAdapter<CommentModel>(this,CommentModel.class,android.R.layout.simple_list_item_2,comments1) {
+    FirebaseListAdapter<CommentModel> firebaseListAdapter = new FirebaseListAdapter<CommentModel>(this,CommentModel.class,R.layout.row_layout,comments1) {
       @SuppressLint("WrongConstant")
       @Override
       protected void populateView(View v, CommentModel model, int position) {
-        TextView textView1 = (TextView) v.findViewById(android.R.id.text1);
-        TextView textView2 = (TextView) v.findViewById(android.R.id.text2);
-        textView2.setTextColor(Color.RED);
-        textView2.setTextAlignment(3);
-        textView2.setTextSize(12);
-        textView1.setTextColor(Color.WHITE);
-        textView1.setTypeface(Typeface.SANS_SERIF);
-        textView1.setText(model.getCommentText());
-        textView2.setText(model.getCommentUsername());
+        ImageView profilePic = (ImageView) v.findViewById(R.id.ppID);
+        TextView commentTextView = (TextView) v.findViewById(R.id.commentID);
+        TextView usernameTextView = (TextView) v.findViewById(R.id.usernameID);
+        String path = getProfilePictureFromUsername(usernameTextView.getText().toString())[0];
+        Glide.with(getApplicationContext())
+            .load(path)
+            .fitCenter()
+            .error(R.drawable.common_full_open_on_phone) // deneme amaçlı
+            .into(profilePic);
+        usernameTextView.setTextColor(Color.RED);
+        usernameTextView.setTextAlignment(3);
+        usernameTextView.setTextSize(12);
+        commentTextView.setTextColor(Color.WHITE);
+        commentTextView.setTypeface(Typeface.SANS_SERIF);
+        commentTextView.setText(model.getCommentText());
+        usernameTextView.setText(model.getCommentUsername());
+
       }
     };
     commentListView.setAdapter(firebaseListAdapter);
@@ -144,19 +174,30 @@ public class CommentActivity extends AppCompatActivity {
   //TODO sıralı hale getirilmesi gerek.
   public void sendComment(View view){
     comment = commentText.getText().toString();
-    String userId = currentUser.getUid();
-    Date currentTime = Calendar.getInstance().getTime();
-    UUID commentId = UUID.randomUUID();
-    CommentModel model = new CommentModel(comment, currentTime,userId,commentId.toString(),username,postId);
-    DatabaseReference comRef = firebaseDatabase.getInstance().getReference("Icerik").child(postId).child("Comments");
-    comRef.child(model.getCommentId()).setValue(model);
-    new Send().execute();         //notification için
-    commentText.getText().clear();
+    if(!comment.equals("") && comment != null){ // Edittext(Yorum) boş değilse.
+      String userId = currentUser.getUid();
+      Date currentTime = Calendar.getInstance().getTime();
+      UUID commentId = UUID.randomUUID();
+      CommentModel model = new CommentModel(comment, currentTime,userId,commentId.toString(),username,postId);
+      DatabaseReference comRef = firebaseDatabase.getInstance().getReference("Icerik").child(postId).child("Comments");
+      comRef.child(model.getCommentId()).setValue(model);
+      new Send().execute();         //notification için
+      commentText.getText().clear();
+
+    }
+
 
 
   }
 
+  class Backgorund extends AsyncTask<String,String,String> {
 
+    @Override
+    protected String doInBackground(String... voids) {
+     // bu olabilir?
+      return "";
+    }
+  }
 
   class Send extends AsyncTask<String, Void,Long > {      //sendNotification class
 
