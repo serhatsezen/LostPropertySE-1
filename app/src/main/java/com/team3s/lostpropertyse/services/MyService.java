@@ -1,5 +1,6 @@
 package com.team3s.lostpropertyse.services;
 
+import android.annotation.SuppressLint;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
@@ -60,6 +61,7 @@ public class MyService extends Service {
         intent = new Intent(BROADCAST_ACTION);
     }
 
+    @SuppressLint("MissingPermission")
     @Override
     public void onStart(Intent intent, int startId)
     {
@@ -179,30 +181,28 @@ public class MyService extends Service {
                 intent.putExtra("Provider", loc.getProvider());
                 sendBroadcast(intent);
 
-                Toast.makeText(MyService.this, "location", Toast.LENGTH_LONG).show();
 
-                if(j == 10){
-                    lat = loc.getLatitude();
-                    lng = loc.getLongitude();
-                }
+                    if(j == 10){
+                        lat = loc.getLatitude();
+                        lng = loc.getLongitude();
+                    }
 
-                    database.addValueEventListener(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(DataSnapshot dataSnapshot) {
-                            if (i % 10 == 0) {
-                                Toast.makeText(MyService.this, "writtenLoc", Toast.LENGTH_LONG).show();
-                                database.child("latitude").setValue(lat);
-                                database.child("longitude").setValue(lng);
-                                i = 0;
-                                j = 0;
-                            }
+                database.addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        if (i % 10 == 0) {
+                            Toast.makeText(MyService.this, "location", Toast.LENGTH_LONG).show();
+                            database.child("latitude").setValue(lat);
+                            database.child("longitude").setValue(lng);
+                            i = 0;
+                            j = 0;
                         }
+                    }
 
-                        @Override
-                        public void onCancelled(DatabaseError databaseError) {
-
-                        }
-                    });
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+                    }
+                });
 
             }
         }

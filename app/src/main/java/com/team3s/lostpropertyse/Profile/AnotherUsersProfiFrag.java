@@ -324,7 +324,6 @@ public class AnotherUsersProfiFrag extends Fragment {
 
         public void setPost_image(Context ctx, String post_image){
             ImageView post_img = (ImageView) mView.findViewById(R.id.post_img);
-            //Picasso.with(ctx).load(post_image).networkPolicy(NetworkPolicy.OFFLINE).fit().centerCrop().into(post_img);
             Glide.with(ctx)
                     .load(post_image)
                     .centerCrop()

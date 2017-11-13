@@ -247,9 +247,9 @@ public class MainPage extends Fragment {
                                     user_key = (String) dataSnapshot.child("uid").getValue();
 
                                     Bundle bundle = new Bundle();
-                                    bundle.putString("key",user_key); // Put anything what you want
+                                    bundle.putString("key",user_key); // User ID çekip anotherUserProfile ekranını açmak için
 
-                                    if(currentUserId.equals(user_key)){
+                                    if(currentUserId.equals(user_key)){     //User ID ve CurrentUserID aynı ise kendi profil sayfasına gitmek için
                                         UsersProfiFrag fragment2 = new UsersProfiFrag();
                                         getFragmentManager()
                                                 .beginTransaction()
