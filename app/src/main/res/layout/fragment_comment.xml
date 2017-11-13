@@ -1,0 +1,59 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.team3s.lostpropertyse.Chat.CommentFrag"
+    android:background="#FFFFFF">
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/comment_list"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@+id/edtx_comment">
+
+    </android.support.v7.widget.RecyclerView>
+
+
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        >
+
+        <ProgressBar
+        android:id="@+id/news_cevap_progressBar"
+        style="?android:attr/progressBarStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+         />
+        <EditText
+            android:id="@+id/edtx_comment"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentEnd="true"
+            android:layout_marginEnd="60dp"
+            android:ems="10"
+            android:hint="Cevap"
+            android:inputType="textMultiLine" />
+
+        <ImageButton
+            android:id="@+id/comment_submit"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignTop="@+id/edtx_comment"
+            android:layout_marginStart="323dp"
+            android:layout_toEndOf="@+id/news_cevap_progressBar"
+            android:background="@null"
+            android:scaleType="centerCrop"
+            android:src="@drawable/ic_done_black_36dp" />
+    </RelativeLayout>
+
+
+</RelativeLayout>

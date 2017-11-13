@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/res-auto"
+    tools:ignore="ResAuto"
+    android:background="#FFFFFF">
+
+    <TextView
+        android:id="@+id/commentTxt"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:layout_toStartOf="@+id/profile_click"
+        android:gravity="center_vertical"
+        android:padding="10dp"
+        android:text="@string/aasdassad"
+        android:textColor="#000000" />
+
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/profile_click"
+        android:clickable="true"
+        android:layout_alignParentRight="true"
+        android:padding="10dp">
+
+        <TextView
+            android:id="@+id/shaUsernameCom"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:text="Serhat"
+            android:textColor="@color/commentBackGround"
+            android:layout_centerVertical="true"
+            android:layout_toRightOf="@+id/user_profile_com"
+            android:layout_toEndOf="@+id/user_profile_com"
+            android:layout_marginLeft="12dp"
+            android:layout_marginStart="12dp" />
+
+        <com.github.siyamed.shapeimageview.CircularImageView
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:src="@drawable/default_avatar"
+            app:siBorderWidth="8dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginLeft="8dp"
+            app:siBorderColor="@color/black"
+            android:id="@+id/user_profile_com" />
+
+    </RelativeLayout>
+</RelativeLayout>

@@ -33,6 +33,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.team3s.lostpropertyse.Chat.CommentActivity;
+import com.team3s.lostpropertyse.Chat.CommentFrag;
 import com.team3s.lostpropertyse.CircleTransform;
 import com.team3s.lostpropertyse.LoginSign.TabsHeaderActivity;
 import com.team3s.lostpropertyse.Post.EditActivity;
@@ -230,9 +231,20 @@ public class MainPage extends Fragment {
                     viewHolder.commentBtn.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                           Intent editActivity = new Intent(getActivity(), CommentActivity.class);
+                            Bundle bundleComment = new Bundle();
+                            bundleComment.putString("post_id_key",post_key);
+
+                            CommentFrag fragmentCom = new CommentFrag();
+                            fragmentCom.setArguments(bundleComment);
+                            getFragmentManager()
+                                    .beginTransaction()
+                                    .add(R.id.mainfrag, fragmentCom, TAG_FRAGMENT)
+                                    .addToBackStack(null)
+                                    .commit();
+
+                           /*Intent editActivity = new Intent(getActivity(), CommentActivity.class);
                             editActivity.putExtra("post_id", post_key);
-                            startActivity(editActivity);
+                            startActivity(editActivity);*/
                         }
                     });
                     viewHolder.profile.setOnClickListener(new View.OnClickListener() {
@@ -491,7 +503,6 @@ public class MainPage extends Fragment {
         public void setQuestions(String questions){
             TextView questions_title = (TextView) mView.findViewById(R.id.question_text);
             questions_title.setText(questions);
-            question = questions;
         }
 
         public void setDesc(String desc){

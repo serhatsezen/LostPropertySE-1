@@ -11,13 +11,15 @@ public class Share {
     private String post_time;
     private String post_date;
     private String token;
-    private String isletmeAdi;
+    private String commentText;
+    private String commentUsername;
+
     private double latMap;
     private double longMap;
 
     public Share(){
     }
-    public Share(String questions, String desc, String post_image, String name, String image, String addressname, String post_time, String post_date, String token, String isletmeAdi, double latMap, double longMap){
+    public Share(String questions, String desc, String post_image, String name, String image, String addressname, String post_time, String post_date, String token, String commentText, String commentUsername, double latMap, double longMap){
         this.questions = questions;
         this.desc = desc;
         this.post_image = post_image;
@@ -27,7 +29,8 @@ public class Share {
         this.post_time = post_time;
         this.post_date = post_date;
         this.token = token;
-        this.isletmeAdi = isletmeAdi;
+        this.commentText = commentText;
+        this.commentUsername = commentUsername;
         this.latMap = latMap;
         this.longMap = longMap;
 
@@ -104,12 +107,20 @@ public class Share {
         this.token = token;
     }
 
-    public String getisletmeAdi() {
-        return isletmeAdi;
+    public String getcommentText() {
+        return commentText;
     }
 
-    public void setisletmeAdi(String isletmeAdi) {
-        this.isletmeAdi = isletmeAdi;
+    public void setcommentText(String commentText) {
+        this.commentText = commentText;
+    }
+
+    public String getcommentUsername() {
+        return commentUsername;
+    }
+
+    public void setcommentUsername(String commentUsername) {
+        this.commentUsername = commentUsername;
     }
 
     public Double getLatMap() {
