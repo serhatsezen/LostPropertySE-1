@@ -31,7 +31,7 @@ import com.team3s.lostpropertyse.Maps.PropMaps;
 import com.team3s.lostpropertyse.Profile.UsersProfiFrag;
 import com.team3s.lostpropertyse.R;
 
-public class PostDetailFrag extends Fragment implements PopupMenu.OnMenuItemClickListener{
+public class PostDetailFrag extends Fragment{
 
     private String post_key = null;
 
@@ -48,9 +48,6 @@ public class PostDetailFrag extends Fragment implements PopupMenu.OnMenuItemClic
     private ImageButton comments;
 
     private FirebaseAuth auth;
-
-    private boolean mProcessLike = false;
-
 
     private Button showMap;
 
@@ -164,7 +161,6 @@ public class PostDetailFrag extends Fragment implements PopupMenu.OnMenuItemClic
             public void onClick(View v) {
                 mDatabase.child(post_key).removeValue();
                 mDatabaseLike.child(post_key).child(auth.getCurrentUser().getUid()).removeValue();
-                mProcessLike = false;
                 MainPage fragmentMain = new MainPage();
                 getFragmentManager()
                         .beginTransaction()
@@ -173,44 +169,6 @@ public class PostDetailFrag extends Fragment implements PopupMenu.OnMenuItemClic
                         .commit();
             }
         });
-
         return v;
-
-
     }
-
-
-    public void showPopup(View v) {
-        PopupMenu popup = new PopupMenu(getActivity(), v);
-        MenuInflater inflater = popup.getMenuInflater();
-        inflater.inflate(R.menu.poupup_menu, popup.getMenu());
-        popup.show();
-
-        popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem item) {
-                switch (item.getItemId()) {
-                    case R.id.sikayetBtn:
-
-                        break;
-
-                    default:
-                        break;
-                }
-
-                return true;
-            }
-        });
-    }
-
-    @Override
-    public boolean onMenuItemClick(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.sikayetBtn:
-                return true;
-            default:
-                return false;
-        }
-    }
-
 }

@@ -383,11 +383,11 @@ public class UsersProfiFrag extends Fragment {
                 viewHolder.mView.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        Bundle bundleComment = new Bundle();
-                        bundleComment.putString("post_id",post_key);
+                        Bundle bundlePostDetail = new Bundle();
+                        bundlePostDetail.putString("post_id",post_key);
 
                         PostDetailFrag fragmentCom = new PostDetailFrag();
-                        fragmentCom.setArguments(bundleComment);
+                        fragmentCom.setArguments(bundlePostDetail);
                         getFragmentManager()
                                 .beginTransaction()
                                 .add(R.id.frame_fragmentholder, fragmentCom)

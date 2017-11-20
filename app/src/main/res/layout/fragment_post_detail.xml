@@ -20,23 +20,8 @@
             android:layout_height="match_parent"
             android:orientation="vertical"
         >
-        <ImageButton
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:srcCompat="@drawable/ic_drawer"
-            android:id="@+id/popupMenu"
-            android:scaleType="centerCrop"
-            android:onClick="showPopup"
-            android:layout_gravity="right"
-            android:layout_marginRight="22dp"
-            android:layout_marginEnd="22dp"
-            android:background="#FFFFFF"
-            android:layout_above="@+id/post_image_btn"
-            android:layout_alignParentRight="true"
-            android:layout_alignParentEnd="true"
-            android:layout_marginBottom="14dp" />
 
-        <ImageView
+            <ImageView
             android:layout_width="match_parent"
             android:layout_height="250dp"
             app:srcCompat="@drawable/add_btn"
@@ -61,6 +46,17 @@
             android:layout_marginStart="17dp"
             android:layout_marginTop="15dp"
             android:id="@+id/comments">
+
+            <TextView
+                android:id="@+id/commentArticleCounter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="0"
+                android:layout_centerVertical="true"
+                android:textColor="@color/blue_grey"
+                android:layout_alignLeft="@+id/comments"
+                android:layout_marginLeft="16dp"
+                android:layout_marginStart="16dp" />
 
             <ImageButton
                 android:id="@+id/btnArticleComments"
@@ -139,6 +135,17 @@
                 android:layout_marginRight="14dp"
                 android:layout_marginEnd="14dp" />
 
+            <Button
+                android:id="@+id/showMap"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="10dp"
+                android:layout_below="@+id/post_descET"
+                android:text="Haritada Göster" />
+
+
         </RelativeLayout>
 
         <ProgressBar
@@ -149,25 +156,7 @@
             android:layout_alignParentBottom="true"
             />
 
-        <TextView
-            android:id="@+id/commentArticleCounter"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="0"
-            android:textColor="@color/blue_grey"
-            android:layout_alignBottom="@+id/popupMenu"
-            android:layout_alignLeft="@+id/comments"
-            android:layout_alignStart="@+id/comments"
-            android:layout_marginLeft="16dp"
-            android:layout_marginStart="16dp" />
 
-        <Button
-            android:id="@+id/showMap"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:layout_centerHorizontal="true"
-            android:text="Haritada Göster" />
 
     </RelativeLayout>
     </ScrollView>
