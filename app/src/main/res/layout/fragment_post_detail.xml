@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_gravity="center"
+    android:fitsSystemWindows="true"
+    android:background="#FFFFFF"
+    >
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/detailfrag"/>
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#ffffff">
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+        >
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:srcCompat="@drawable/ic_drawer"
+            android:id="@+id/popupMenu"
+            android:scaleType="centerCrop"
+            android:onClick="showPopup"
+            android:layout_gravity="right"
+            android:layout_marginRight="22dp"
+            android:layout_marginEnd="22dp"
+            android:background="#FFFFFF"
+            android:layout_above="@+id/post_image_btn"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"
+            android:layout_marginBottom="14dp" />
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="250dp"
+            app:srcCompat="@drawable/add_btn"
+            android:layout_gravity="center"
+            android:id="@+id/post_image_btn"
+            android:background="@null"
+            android:src="@drawable/add_btn"
+            android:scaleType="centerCrop"
+            android:adjustViewBounds="true"
+            android:layout_below="@+id/comments"
+            android:layout_toRightOf="@+id/progressBar"
+            android:layout_toEndOf="@+id/progressBar" />
+
+
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
+            android:layout_marginLeft="17dp"
+            android:layout_marginStart="17dp"
+            android:layout_marginTop="15dp"
+            android:id="@+id/comments">
+
+            <ImageButton
+                android:id="@+id/btnArticleComments"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:background="@drawable/btn_feed_action"
+                android:scaleType="centerCrop"
+                android:src="@drawable/ic_comment_outline_grey" />
+
+        </RelativeLayout>
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/post_image_btn">
+            <TextView
+                android:text="TextView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/post_descET"
+                android:padding="10dp"
+                android:textColor="#000000"
+                android:textStyle="bold"
+                android:layout_below="@+id/post_cityName"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true" />
+            <TextView
+                android:text="City"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/post_cityName"
+                android:layout_gravity="right"
+                android:padding="10dp"
+                android:layout_marginRight="28dp"
+                android:layout_marginEnd="28dp"
+                android:textColor="#000000"
+                android:layout_alignParentTop="true"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentEnd="true" />
+
+            <TextView
+                android:text="TextView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/post_titleET"
+                android:textStyle="bold|italic"
+                android:padding="10dp"
+                android:layout_marginRight="5dp"
+                android:textColor="#000000"
+                android:layout_toLeftOf="@+id/post_cityName"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true" />
+
+            <Button
+                android:id="@+id/deleteBtnSc"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/button"
+                android:text="Sil"
+                android:textColor="#FFFFFF"
+                android:layout_below="@+id/post_descET"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
+                android:layout_marginLeft="13dp"
+                android:layout_marginStart="13dp" />
+
+            <Button
+                android:id="@+id/editBtnSc"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/button"
+                android:text="Düzenle"
+                android:textColor="#FFFFFF"
+                android:layout_alignParentBottom="true"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentEnd="true"
+                android:layout_marginRight="14dp"
+                android:layout_marginEnd="14dp" />
+
+        </RelativeLayout>
+
+        <ProgressBar
+            android:id="@+id/progressBar"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:visibility="gone"
+            android:layout_alignParentBottom="true"
+            />
+
+        <TextView
+            android:id="@+id/commentArticleCounter"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="0"
+            android:textColor="@color/blue_grey"
+            android:layout_alignBottom="@+id/popupMenu"
+            android:layout_alignLeft="@+id/comments"
+            android:layout_alignStart="@+id/comments"
+            android:layout_marginLeft="16dp"
+            android:layout_marginStart="16dp" />
+
+        <Button
+            android:id="@+id/showMap"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            android:text="Haritada Göster" />
+
+    </RelativeLayout>
+    </ScrollView>
+</RelativeLayout>

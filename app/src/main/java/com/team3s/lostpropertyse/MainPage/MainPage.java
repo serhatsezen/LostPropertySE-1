@@ -1,14 +1,11 @@
 package com.team3s.lostpropertyse.MainPage;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.KeyEvent;
@@ -32,20 +29,14 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
-import com.team3s.lostpropertyse.Chat.CommentActivity;
 import com.team3s.lostpropertyse.Chat.CommentFrag;
 import com.team3s.lostpropertyse.CircleTransform;
 import com.team3s.lostpropertyse.LoginSign.TabsHeaderActivity;
-import com.team3s.lostpropertyse.Post.EditActivity;
+import com.team3s.lostpropertyse.Post.PostDetailFrag;
 import com.team3s.lostpropertyse.Profile.AnotherUsersProfiFrag;
 import com.team3s.lostpropertyse.Profile.UsersProfiFrag;
 import com.team3s.lostpropertyse.R;
 import com.team3s.lostpropertyse.Share;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import static android.content.ContentValues.TAG;
 
 
 public class MainPage extends Fragment {
@@ -223,9 +214,17 @@ public class MainPage extends Fragment {
                     viewHolder.mView.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                            Intent editActivity = new Intent(getActivity(), EditActivity.class);
-                            editActivity.putExtra("post_id", post_key);
-                            startActivity(editActivity);
+                            Bundle bundleComment = new Bundle();
+                            bundleComment.putString("post_id",post_key);
+
+                            PostDetailFrag fragmentCom = new PostDetailFrag();
+                            fragmentCom.setArguments(bundleComment);
+                            getFragmentManager()
+                                    .beginTransaction()
+                                    .add(R.id.mainfrag, fragmentCom, TAG_FRAGMENT)
+                                    .addToBackStack(null)
+                                    .commit();
+
                         }
                     });
                     viewHolder.commentBtn.setOnClickListener(new View.OnClickListener() {
@@ -438,6 +437,7 @@ public class MainPage extends Fragment {
             }
         });
     }
+
     public static class ShareViewHolder extends RecyclerView.ViewHolder {
 
         View mView;

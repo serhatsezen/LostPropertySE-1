@@ -13,7 +13,6 @@ import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -29,7 +28,6 @@ import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -39,9 +37,10 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
+import com.team3s.lostpropertyse.Chat.CommentFrag;
 import com.team3s.lostpropertyse.CircleTransform;
 import com.team3s.lostpropertyse.LoginSign.TabsHeaderActivity;
-import com.team3s.lostpropertyse.Post.EditActivity;
+import com.team3s.lostpropertyse.Post.PostDetailFrag;
 import com.team3s.lostpropertyse.R;
 import com.team3s.lostpropertyse.Share;
 
@@ -85,7 +84,7 @@ public class UsersProfiFrag extends Fragment {
     private boolean backgroundImage = false;
     private boolean profileImage = false;
     private Query mQueryUserId;
-    private FirebaseUser user;
+        private FirebaseUser user;
     private String currentUserId;
     public UsersProfiFrag() {
         // Required empty public constructor
@@ -384,9 +383,17 @@ public class UsersProfiFrag extends Fragment {
                 viewHolder.mView.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        Intent editActivity = new Intent(getActivity(), EditActivity.class);
-                        editActivity.putExtra("post_id", post_key);
-                        startActivity(editActivity);
+                        Bundle bundleComment = new Bundle();
+                        bundleComment.putString("post_id",post_key);
+
+                        PostDetailFrag fragmentCom = new PostDetailFrag();
+                        fragmentCom.setArguments(bundleComment);
+                        getFragmentManager()
+                                .beginTransaction()
+                                .add(R.id.frame_fragmentholder, fragmentCom)
+                                .addToBackStack(null)
+                                .commit();
+
                     }
                 });
 

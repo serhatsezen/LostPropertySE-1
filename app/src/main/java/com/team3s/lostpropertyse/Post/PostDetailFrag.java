@@ -1,17 +1,20 @@
 package com.team3s.lostpropertyse.Post;
 
+import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
+import android.support.v4.app.Fragment;
 import android.support.v7.widget.PopupMenu;
+import android.view.LayoutInflater;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
@@ -21,13 +24,15 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.team3s.lostpropertyse.Chat.CommentActivity;
+import com.team3s.lostpropertyse.Chat.CommentFrag;
 import com.team3s.lostpropertyse.MainPage.BottomBarActivity;
+import com.team3s.lostpropertyse.MainPage.MainPage;
 import com.team3s.lostpropertyse.Maps.PropMaps;
+import com.team3s.lostpropertyse.Profile.UsersProfiFrag;
 import com.team3s.lostpropertyse.R;
 
+public class PostDetailFrag extends Fragment implements PopupMenu.OnMenuItemClickListener{
 
-public class EditActivity extends AppCompatActivity implements PopupMenu.OnMenuItemClickListener{
     private String post_key = null;
 
     private DatabaseReference mDatabase;
@@ -49,10 +54,19 @@ public class EditActivity extends AppCompatActivity implements PopupMenu.OnMenuI
 
     private Button showMap;
 
+    private final static String TAG_FRAGMENT = "TAG_FRAGMENT";
+
+
+    public PostDetailFrag() {
+        // Required empty public constructor
+    }
+
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_edit);
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        // Inflate the layout for this fragment
+        View v = inflater.inflate(R.layout.fragment_post_detail, container, false);
+
 
         mDatabase = FirebaseDatabase.getInstance().getReference().child("Icerik");
         mDatabaseUsers = FirebaseDatabase.getInstance().getReference().child("Users");
@@ -60,30 +74,39 @@ public class EditActivity extends AppCompatActivity implements PopupMenu.OnMenuI
 
         auth = FirebaseAuth.getInstance();
 
-        post_key = getIntent().getExtras().getString("post_id");
+        Bundle bundlecom = getArguments();                          //mainFragment ten post un keyini çekiyoruz.
+        post_key = bundlecom.getString("post_id");
 
-        mPostImage = (ImageView) findViewById(R.id.post_image_btn);
-        mPostTitle = (TextView) findViewById(R.id.post_titleET);
-        mPostDesc = (TextView) findViewById(R.id.post_descET);
-        mPostCity = (TextView) findViewById(R.id.post_cityName);
-        mPostCommentCounter = (TextView) findViewById(R.id.commentArticleCounter);
-        mPostDelete = (Button) findViewById(R.id.deleteBtnSc);
-        mPostUpdate = (Button) findViewById(R.id.editBtnSc);
-        comments = (ImageButton) findViewById(R.id.btnArticleComments);
-        showMap = (Button) findViewById(R.id.showMap);
+        mPostImage = (ImageView) v.findViewById(R.id.post_image_btn);
+        mPostTitle = (TextView) v.findViewById(R.id.post_titleET);
+        mPostDesc = (TextView) v.findViewById(R.id.post_descET);
+        mPostCity = (TextView) v.findViewById(R.id.post_cityName);
+        mPostCommentCounter = (TextView) v.findViewById(R.id.commentArticleCounter);
+        mPostDelete = (Button) v.findViewById(R.id.deleteBtnSc);
+        mPostUpdate = (Button) v.findViewById(R.id.editBtnSc);
+        comments = (ImageButton) v.findViewById(R.id.btnArticleComments);
+        showMap = (Button) v.findViewById(R.id.showMap);
 
         comments.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-              Intent editActivity = new Intent(EditActivity.this, CommentActivity.class);
-                editActivity.putExtra("post_id", post_key);
-                startActivity(editActivity);
+                Bundle bundleComment = new Bundle();
+                bundleComment.putString("post_id_key",post_key);
+
+                CommentFrag fragmentCom = new CommentFrag();
+                fragmentCom.setArguments(bundleComment);
+                getFragmentManager()
+                        .beginTransaction()
+                        .add(R.id.frame_fragmentholder, fragmentCom, TAG_FRAGMENT)
+                        .addToBackStack(null)
+                        .commit();
+
             }
         });
         showMap.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent editActivity = new Intent(EditActivity.this, PropMaps.class);
+                Intent editActivity = new Intent(getActivity(), PropMaps.class);
                 editActivity.putExtra("post_id", post_key);
                 startActivity(editActivity);
             }
@@ -117,7 +140,7 @@ public class EditActivity extends AppCompatActivity implements PopupMenu.OnMenuI
                 mPostTitle.setText(post_title);
                 mPostDesc.setText(post_desc);
                 mPostCity.setText(post_city);
-                Glide.with(getApplicationContext())
+                Glide.with(getActivity().getApplicationContext())
                         .load(post_img)
                         .centerCrop()
                         .diskCacheStrategy(DiskCacheStrategy.ALL)
@@ -142,16 +165,23 @@ public class EditActivity extends AppCompatActivity implements PopupMenu.OnMenuI
                 mDatabase.child(post_key).removeValue();
                 mDatabaseLike.child(post_key).child(auth.getCurrentUser().getUid()).removeValue();
                 mProcessLike = false;
-
-                Intent mainIntent = new Intent(EditActivity.this, BottomBarActivity.class);
-                startActivity(mainIntent);
+                MainPage fragmentMain = new MainPage();
+                getFragmentManager()
+                        .beginTransaction()
+                        .add(R.id.mainfrag, fragmentMain,TAG_FRAGMENT)
+                        .addToBackStack(null)
+                        .commit();
             }
         });
 
+        return v;
+
+
     }
 
+
     public void showPopup(View v) {
-        PopupMenu popup = new PopupMenu(this, v);
+        PopupMenu popup = new PopupMenu(getActivity(), v);
         MenuInflater inflater = popup.getMenuInflater();
         inflater.inflate(R.menu.poupup_menu, popup.getMenu());
         popup.show();
@@ -160,7 +190,7 @@ public class EditActivity extends AppCompatActivity implements PopupMenu.OnMenuI
             @Override
             public boolean onMenuItemClick(MenuItem item) {
                 switch (item.getItemId()) {
-                        case R.id.sikayetBtn:
+                    case R.id.sikayetBtn:
 
                         break;
 
@@ -182,4 +212,5 @@ public class EditActivity extends AppCompatActivity implements PopupMenu.OnMenuI
                 return false;
         }
     }
+
 }

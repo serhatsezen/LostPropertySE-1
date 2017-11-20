@@ -31,7 +31,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".Post.EditActivity" />
         <activity
             android:name=".MainPage.BottomBarActivity"
             android:theme="@style/AppTheme.NoActionBar" />
@@ -70,7 +69,6 @@
             </intent-filter>
         </service>
 
-        <activity android:name=".Chat.CommentActivity" />
     </application>
 
 </manifest>

@@ -2,12 +2,9 @@ package com.team3s.lostpropertyse.Chat;
 
 
 import android.content.Context;
-import android.content.Intent;
-import android.location.Location;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -19,9 +16,7 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.ProgressBar;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
@@ -35,15 +30,8 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
-import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.StorageReference;
 import com.team3s.lostpropertyse.CircleTransform;
-import com.team3s.lostpropertyse.MainPage.MainPage;
-import com.team3s.lostpropertyse.Post.EditActivity;
-import com.team3s.lostpropertyse.Profile.AnotherUsersProfiFrag;
-import com.team3s.lostpropertyse.Profile.UsersProfiFrag;
 import com.team3s.lostpropertyse.R;
 import com.team3s.lostpropertyse.Share;
 
@@ -59,32 +47,21 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class CommentFrag extends Fragment {
-
     private EditText cevap;
-
     private ImageButton cevaponay;
-
     private ProgressBar progressBar;
-
     private FirebaseAuth auth;
-
     private FirebaseUser currentUser;
 
-    private StorageReference storage;
     private DatabaseReference database;
     private DatabaseReference mDatabase;
     private DatabaseReference mDatabaseAnswer;
     private DatabaseReference mDatabasePost;
     private DatabaseReference mDatabasePToken;
 
-
-    private static View view;
-
     private RecyclerView cevapList;
 
-
     private String post_key = null;
-    private String post_key_answer = null;
     private String tokenUser = null;
     private String nameFuser = null;
     private String mUID = null;
@@ -92,7 +69,6 @@ public class CommentFrag extends Fragment {
 
     public String user_key = null;
     public String cevap_val;
-
 
     public CommentFrag() {
         // Required empty public constructor
@@ -109,32 +85,25 @@ public class CommentFrag extends Fragment {
         Bundle bundlecom = getArguments();                          //mainFragment ten post un keyini çekiyoruz.
         post_key = bundlecom.getString("post_id_key");
 
-
         mDatabase = FirebaseDatabase.getInstance().getReference().child("Users").child(currentUser.getUid());
         mDatabaseAnswer = FirebaseDatabase.getInstance().getReference().child("Icerik").child(post_key).child("Comments");
         database = FirebaseDatabase.getInstance().getReference().child("Icerik");
         mDatabasePToken = FirebaseDatabase.getInstance().getReference().child("Icerik").child(post_key);
-
         mDatabasePToken.addValueEventListener(new ValueEventListener() {            //postun sahibinin token bilgisini çekiyoruz.
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 tokenUser = (String) dataSnapshot.child("token").getValue();
                 mUID = (String) dataSnapshot.child("uid").getValue();
             }
-
             @Override
             public void onCancelled(DatabaseError databaseError) {
-
             }
         });
-
         cevapList = (RecyclerView) v.findViewById(R.id.comment_list);
         cevap = (EditText) v.findViewById(R.id.edtx_comment);
         cevaponay = (ImageButton) v.findViewById(R.id.comment_submit);
         progressBar = (ProgressBar) v.findViewById(R.id.news_cevap_progressBar);
-
         LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
-
         cevapList.setLayoutManager(layoutManager);
         cevaponay.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -144,21 +113,15 @@ public class CommentFrag extends Fragment {
                 startPosting();
             }
         });
-
-
         return v;
     }
 
     private void startPosting() {
         cevap_val = cevap.getText().toString().trim();
         if (!TextUtils.isEmpty(cevap_val)) {
-
             final DatabaseReference newCevap = mDatabaseAnswer.push();      //veritabanına push işlemi
-
             final Time today = new Time(Time.getCurrentTimezone());         //posta verilen cavabın zamanını çekmek için.
             today.setToNow();
-
-
             mDatabase.addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {               //verilen cevabın veritabanına yazılması
@@ -181,17 +144,13 @@ public class CommentFrag extends Fragment {
                         }
                     });
                 }
-
                 @Override
                 public void onCancelled(DatabaseError databaseError) {
-
                 }
             });
             progressBar.setVisibility(View.GONE);
             cevaponay.setVisibility(View.VISIBLE);
-
         } else {
-
             progressBar.setVisibility(View.GONE);
             cevaponay.setVisibility(View.VISIBLE);
         }
@@ -214,17 +173,13 @@ public class CommentFrag extends Fragment {
                     public void onDataChange(DataSnapshot dataSnapshot) {
                         user_key = (String) dataSnapshot.child("uid").getValue();
                     }
-
                     @Override
                     public void onCancelled(DatabaseError databaseError) {
-
                     }
                 });
                 viewHolder.setcommentText(model.getcommentText());          //comment text
                 viewHolder.setcommentUsername(model.getcommentUsername());  //comment user name
                 viewHolder.setImage(getActivity().getApplicationContext(), model.getImage());   //comment user image
-
-
             }
         };
         cevapList.setAdapter(firebaseRecyclerAdapter);
@@ -233,29 +188,21 @@ public class CommentFrag extends Fragment {
     public static class ShareViewHolder extends RecyclerView.ViewHolder {       // burada bizim oluşturmuş olduğumuz comment_row layoutundaki bileşenleri kullandığımız yer
         View mViewRoad;
         FirebaseAuth mAuth;
-
         TextView counterComment;
-
-
         public ShareViewHolder(View itemView) {
             super(itemView);
             mViewRoad = itemView;
-
             counterComment = (TextView) mViewRoad.findViewById(R.id.counterLike);
-
             mAuth = FirebaseAuth.getInstance();
         }
-
         public void setcommentText(String commentText) {            //burada bulunan commentText ile firebasedeki child ın altındaki node aynı olmak zorunda ayrıca bunları Share.java classında tanımlıyoruz. get fonksiyonları share classdan çekiyoruz.
             TextView mAnswer = (TextView) mViewRoad.findViewById(R.id.commentTxt);
             mAnswer.setText(commentText);
         }
-
         public void setcommentUsername(String commentUsername) {
             TextView shaUsername = (TextView) mViewRoad.findViewById(R.id.shaUsernameCom);
             shaUsername.setText(commentUsername);
         }
-
         public void setImage(Context ctx, String image) {
             ImageView user_Pic = (ImageView) mViewRoad.findViewById(R.id.user_profile_com);
             Glide.with(ctx)
@@ -266,19 +213,18 @@ public class CommentFrag extends Fragment {
                     .animate(R.anim.shake)
                     .into(user_Pic);
         }
+    }
 
+    @Override
+    public void onResume()
+    {  // After a pause OR at startup
+        super.onResume();
     }
 
     class Send extends AsyncTask<String, Void,Long > {          //burası notification kısmı.
-
-
-
         protected Long doInBackground(String... urls) {
-
-
             HttpClient httpclient = new DefaultHttpClient();
             HttpPost httppost = new HttpPost("http://aydinserhatsezen.com/fcm/LostP/lpyorum.php");
-
             try {
                 // Add your data
                 List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(3);
@@ -286,24 +232,16 @@ public class CommentFrag extends Fragment {
                 nameValuePairs.add(new BasicNameValuePair("cevap", cevap_val));
                 nameValuePairs.add(new BasicNameValuePair("userName", nameFuser));
                 httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
-
                 // Execute HTTP Post Request
                 HttpResponse response = httpclient.execute(httppost);
-
             } catch (Exception e) {
                 // TODO Auto-generated catch block
             }
             return null;
-
         }
         protected void onProgressUpdate(Integer... progress) {
-
         }
-
         protected void onPostExecute(Long result) {
-
         }
     }
-
-
 }
