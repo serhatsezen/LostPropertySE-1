@@ -52,6 +52,7 @@ public class CommentFrag extends Fragment {
     private ProgressBar progressBar;
     private FirebaseAuth auth;
     private FirebaseUser currentUser;
+    private String ise_yaramayan_String;
 
     private DatabaseReference database;
     private DatabaseReference mDatabase;
