@@ -3,8 +3,10 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/LostPropertySE.iml" filepath="$PROJECT_DIR$/LostPropertySE.iml" />
+      <module fileurl="file://C:\Users\meric\AndroidStudioProjects\LostPropertySE\LostPropertySE.iml" filepath="C:\Users\meric\AndroidStudioProjects\LostPropertySE\LostPropertySE.iml" />
       <module fileurl="file://C:\Users\serhat\Desktop\LostPropertySE\LostPropertySE1.iml" filepath="C:\Users\serhat\Desktop\LostPropertySE\LostPropertySE1.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://C:\Users\meric\AndroidStudioProjects\LostPropertySE\app\app.iml" filepath="C:\Users\meric\AndroidStudioProjects\LostPropertySE\app\app.iml" />
     </modules>
   </component>
 </project>
