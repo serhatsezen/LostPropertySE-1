@@ -2,12 +2,15 @@ package com.team3s.lostpropertyse.MainPage;
 
 import static android.app.Activity.RESULT_OK;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.location.Location;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
@@ -21,6 +24,8 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
+
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.common.GooglePlayServicesRepairableException;
 import com.google.android.gms.location.places.Place;
@@ -31,6 +36,7 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -40,7 +46,9 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
+import com.team3s.lostpropertyse.Chat.CommentFrag;
 import com.team3s.lostpropertyse.R;
+import com.team3s.lostpropertyse.services.MyService;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
@@ -97,6 +105,12 @@ public class ShareFragment extends Fragment {
     private int rangeDest = 5;
     double dist;
     String distStr;
+    int z = 0;
+    int m = 0;
+
+    ArrayList<String> tokenList = new ArrayList<String>();
+    ArrayList<String> kmList = new ArrayList<String>();
+
     public ShareFragment() {
         // Required empty public constructor
     }
@@ -120,6 +134,19 @@ public class ShareFragment extends Fragment {
         mDatabaseNotificationFilter = FirebaseDatabase.getInstance().getReference().child("Users");
         mDatabaseNotificationFTokenValue = FirebaseDatabase.getInstance().getReference().child("Users");
 
+        mDatabaseNotificationFilter.addValueEventListener(new ValueEventListener() {            //database de kaç tane user olduğu
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                for (DataSnapshot childDataSnapshot : dataSnapshot.getChildren()) {
+                    z = (int) dataSnapshot.getChildrenCount();
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
 
 
         selectImage = (ImageView) v.findViewById(R.id.post_image_btn);
@@ -257,7 +284,6 @@ public class ShareFragment extends Fragment {
         DatabaseReference mDatabaseReference = FirebaseDatabase.getInstance()
                 .getReference();
         DatabaseReference node = mDatabaseReference.child("Users");
-
         node.orderByChild("latLng").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot snapshot) {
@@ -281,15 +307,18 @@ public class ShareFragment extends Fragment {
                     dist = current.distanceTo(destination) / 1000;
                     distStr = String.format("%.2f", dist );
 
-                    bildirimPost = question_val + " "+ addressName + " sana "+ distStr + " km uzaklıkta";
-
+                    m++;                                                                                        // user kontrol değeri
                     if(dist <= rangeDest) {                                                                     // eğer 5km içindeyse notificaion gönder
                         tokenUsers = String.valueOf(data.child("token").getValue());
-                        new Send().execute();
+                        tokenList.add(tokenUsers);
+                        kmList.add(distStr);
+
+                        if(m == z){                                                                             // eğer user sayısıyla kontrol değeri aynıysa tüm kullanıcıların km değeri hesaplanmış demek, bildirim gönderme işlemini başlatabiliriz.
+                            new Send().execute();
+                        }
                     }
-
-
                 }
+
             }
             @Override
             public void onCancelled(DatabaseError error) {
@@ -302,19 +331,25 @@ public class ShareFragment extends Fragment {
 
         protected Long doInBackground(String... urls) {
 
+            int i = tokenList.size();                                                                           //tokenlist size i ye atıyorum
+
             HttpClient httpclient = new DefaultHttpClient();
             HttpPost httppost = new HttpPost("http://aydinserhatsezen.com/fcm/LostP/lpnewPost.php");        //web sitesi server üzerinden gönder
 
             try {
-                List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(2);
-                nameValuePairs.add(new BasicNameValuePair("tokendevice", tokenUsers));
-                nameValuePairs.add(new BasicNameValuePair("bildirimPost", bildirimPost));
-                nameValuePairs.add(new BasicNameValuePair("userName", userNameU));
+                for(int t = 0; t<=i; t++){                                                                      //tek tek bildirim gönderme işlemi
+                    String myToken = tokenList.get(t);                                                          //sırayla listten çekip php ye göndermek için.
+                    String myKm = kmList.get(t);
 
+                    bildirimPost = question_val + " "+ addressName + " sana "+ myKm + " km uzaklıkta";
 
-                httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
-
-                HttpResponse response = httpclient.execute(httppost);
+                    List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(2);
+                    nameValuePairs.add(new BasicNameValuePair("tokendevice", myToken));
+                    nameValuePairs.add(new BasicNameValuePair("bildirimPost", bildirimPost));
+                    nameValuePairs.add(new BasicNameValuePair("userName", userNameU));
+                    httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
+                    HttpResponse response = httpclient.execute(httppost);
+                }
 
             } catch (Exception e) {
                 // TODO Auto-generated catch block

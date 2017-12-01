@@ -218,8 +218,12 @@ public class UsersProfiFrag extends Fragment {
             @Override
             public void onDataChange(DataSnapshot snapshot) {
                 String fullad = String.valueOf(snapshot.getValue());        //tam adres içinden şehir ve ülke yi yazıyorum.
-                String textStr[] = fullad.split("/");
-                u_city.setText(textStr[1]);
+                if(fullad.contains("/")) {
+                    String textStr[] = fullad.split("/");
+                    u_city.setText(textStr[1]);
+                }else{
+                    u_city.setText(fullad);
+                }
             }
             @Override
             public void onCancelled(DatabaseError databaseError) {
