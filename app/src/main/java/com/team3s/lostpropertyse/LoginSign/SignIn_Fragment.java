@@ -122,6 +122,7 @@ public class SignIn_Fragment extends Fragment implements OnClickListener,GoogleA
         setListeners();
         return view;
     }
+
     // Google giriş ayarları
     public void configureSignIn(){
 // Configure sign-in to request the user's basic profile like name and email
