@@ -31,7 +31,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.team3s.lostpropertyse.CircleTransform;
+import com.team3s.lostpropertyse.Utils.CircleTransform;
 import com.team3s.lostpropertyse.R;
 import com.team3s.lostpropertyse.Share;
 
@@ -62,6 +62,8 @@ public class CommentFrag extends Fragment {
     private RecyclerView cevapList;
 
     private String post_key = null;
+    private String post_type = null;
+
     private String tokenUser = null;
     private String nameFuser = null;
     private String mUID = null;
@@ -84,11 +86,12 @@ public class CommentFrag extends Fragment {
 
         Bundle bundlecom = getArguments();                          //mainFragment ten post un keyini çekiyoruz.
         post_key = bundlecom.getString("post_id_key");
+        post_type = bundlecom.getString("post_type");
 
         mDatabase = FirebaseDatabase.getInstance().getReference().child("Users").child(currentUser.getUid());
-        mDatabaseAnswer = FirebaseDatabase.getInstance().getReference().child("Icerik").child(post_key).child("Comments");
+        mDatabaseAnswer = FirebaseDatabase.getInstance().getReference().child("Icerik").child(post_type).child(post_key).child("Comments");
         database = FirebaseDatabase.getInstance().getReference().child("Icerik");
-        mDatabasePToken = FirebaseDatabase.getInstance().getReference().child("Icerik").child(post_key);
+        mDatabasePToken = FirebaseDatabase.getInstance().getReference().child("Icerik").child(post_type).child(post_key);
         mDatabasePToken.addValueEventListener(new ValueEventListener() {            //postun sahibinin token bilgisini çekiyoruz.
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {

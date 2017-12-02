@@ -27,6 +27,10 @@
         <item>Profil resmini değiştir.</item>
         <item>Çıkış yap.</item>
     </string-array>
+    <string-array name="lostorfind">
+        <item>Kayıp</item>
+        <item>Buldum</item>
+    </string-array>
     <string-array name="anotherUserEditButtonOptions">
         <item>Şikayet Et.</item>
     </string-array>
@@ -34,4 +38,17 @@
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="aasdassad">aasdassad</string>
+
+
+    <string name="gallery">GALERİ</string>
+    <string name="photo">KAMERA</string>
+    <string name="string_open_camera">Kamerayı Aç</string>
+    <string name="string_next">Devam</string>
+    <string name="string_share">Paylaş</string>
+    <string name="selected_image">selected_image</string>
+    <string name="return_to_fragment">return_to_fragment</string>
+    <string name="edit_profile_fragment">Edit Profile</string>
+    <string name="selected_bitmap">selected_bitmap</string>
+    <string name="selected_bituri">selected_bitmap</string>
+
 </resources>

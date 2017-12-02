@@ -2,9 +2,16 @@
 <android.support.v7.widget.Toolbar xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/toolbar"
-    android:layout_width="wrap_content"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@drawable/title"
+    android:background="@color/white_greyish"
     app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Bulunan Eşyalar"
+        android:textColor="@color/black"
+        android:textSize="25sp"
+        android:gravity="center"/>
 
 </android.support.v7.widget.Toolbar>

@@ -1,7 +1,6 @@
 package com.team3s.lostpropertyse.Profile;
 
 import android.app.AlertDialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -11,12 +10,17 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
-import android.support.v7.widget.LinearLayoutManager;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.app.FragmentTransaction;
+import android.support.v4.view.ViewPager;
 import android.support.v7.widget.RecyclerView;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -24,7 +28,6 @@ import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
-import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -37,17 +40,16 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
-import com.team3s.lostpropertyse.Chat.CommentFrag;
-import com.team3s.lostpropertyse.CircleTransform;
+import com.team3s.lostpropertyse.Utils.CircleTransform;
 import com.team3s.lostpropertyse.LoginSign.TabsHeaderActivity;
-import com.team3s.lostpropertyse.Post.PostDetailFrag;
 import com.team3s.lostpropertyse.R;
-import com.team3s.lostpropertyse.Share;
 
 
 import java.io.FileNotFoundException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import static android.app.Activity.RESULT_OK;
 
@@ -84,8 +86,10 @@ public class UsersProfiFrag extends Fragment {
     private boolean backgroundImage = false;
     private boolean profileImage = false;
     private Query mQueryUserId;
-        private FirebaseUser user;
+    private FirebaseUser user;
     private String currentUserId;
+    public String LostCount;
+
     public UsersProfiFrag() {
         // Required empty public constructor
     }
@@ -99,27 +103,33 @@ public class UsersProfiFrag extends Fragment {
         View v = inflater.inflate(R.layout.user_profil_frag, container, false);
 
         //get firebase auth instance
-        auth = FirebaseAuth.getInstance();
-       FirebaseStorage storage = FirebaseStorage.getInstance();
-       storageReference = storage.getReference();
-       backgroundStorageReference = storageReference.child("background_images");
+      auth = FirebaseAuth.getInstance();
+      FirebaseStorage storage = FirebaseStorage.getInstance();
+      storageReference = storage.getReference();
+      backgroundStorageReference = storageReference.child("background_images");
         //get current user
-       user = FirebaseAuth.getInstance().getCurrentUser();
+      user = FirebaseAuth.getInstance().getCurrentUser();
 
-        authListener = new FirebaseAuth.AuthStateListener() {
+      authListener = new FirebaseAuth.AuthStateListener() {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-                FirebaseUser user = firebaseAuth.getCurrentUser();
-                if (user == null) {
-                    // user auth state is changed - user is null
-                    // launch login activity
-                    Intent loginIntent = new Intent(getActivity(),TabsHeaderActivity.class);
-                    loginIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                    startActivity(loginIntent);
+              FirebaseUser user = firebaseAuth.getCurrentUser();
+              if (user == null) {
+                  // user auth state is changed - user is null
+                  // launch login activity
+                  Intent loginIntent = new Intent(getActivity(),TabsHeaderActivity.class);
+                  loginIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                  startActivity(loginIntent);
+              }
+      }
+            };
 
-                }
-            }
-        };
+      ViewPager viewPager = (ViewPager) v.findViewById(R.id.viewpager);
+      setupViewPager(viewPager);
+      // Set Tabs inside Toolbar
+      TabLayout tabs = (TabLayout) v.findViewById(R.id.result_tabs);
+      tabs.setupWithViewPager(viewPager);
+      tabs.setTabGravity(TabLayout.GRAVITY_CENTER);
 
         database = FirebaseDatabase.getInstance().getReference().child("Icerik");
         database.keepSynced(true);
@@ -135,17 +145,15 @@ public class UsersProfiFrag extends Fragment {
         u_fullname = (TextView) v.findViewById(R.id.fullnameuser);
         u_username = (TextView) v.findViewById(R.id.usernameprof);
         u_city = (TextView) v.findViewById(R.id.city);
-        num_post = (TextView) v.findViewById(R.id.find_counter);
         backgroundView = v.findViewById(R.id.background);
 
         currentUserId = auth.getCurrentUser().getUid();
         mDatabaseCurrentUsers = FirebaseDatabase.getInstance().getReference().child("Icerik");
-        mQueryUser = mDatabaseCurrentUsers.orderByChild("uid").equalTo(currentUserId);
+        mQueryUser = mDatabaseCurrentUsers.child("Kayıplar").orderByChild("uid").equalTo(currentUserId);
 
         profileImg = (ImageView) v.findViewById(R.id.ivUserProfilePhoto);
         backgroundImg = (ImageView) v.findViewById(R.id.imageView3);
 
-        profileList = (RecyclerView) v.findViewById(R.id.rvUserProfile);
 
         editprof = (ImageButton) v.findViewById(R.id.edit_prof_btn);
         editprof.setOnClickListener(new OnClickListener() {
@@ -155,20 +163,7 @@ public class UsersProfiFrag extends Fragment {
           }
         });
 
-
-        mQueryUser.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                for (DataSnapshot childDataSnapshot : dataSnapshot.getChildren()) {
-                    num_post.setText(String.valueOf(dataSnapshot.getChildrenCount()));
-                }
-            }
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-            }
-        });
-
-        mDatabaseUsers.child("profileImage").addValueEventListener(new ValueEventListener() {
+      mDatabaseUsers.child("profileImage").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot snapshot) {
                 Glide.with(getActivity().getApplicationContext())
@@ -230,15 +225,45 @@ public class UsersProfiFrag extends Fragment {
             }
         });
 
-        LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
-        layoutManager.setReverseLayout(true);
-        layoutManager.setStackFromEnd(true);
-
-        profileList.setHasFixedSize(true);
-        profileList.setLayoutManager(layoutManager);
-        setHasOptionsMenu(true);
-
         return v;
+    }
+
+
+    private void setupViewPager(ViewPager viewPager) {
+
+
+        Adapter adapter = new Adapter(getChildFragmentManager());
+        adapter.addFragment(new LostProp_Fragment(), "Kaybettiklerim");
+        adapter.addFragment(new FindProp_Fragment(), "Bulduklarım");
+        viewPager.setAdapter(adapter);
+    }
+    static class Adapter extends FragmentPagerAdapter {
+        private final List<Fragment> mFragmentList = new ArrayList<>();
+        private final List<String> mFragmentTitleList = new ArrayList<>();
+
+        public Adapter(FragmentManager manager) {
+            super(manager);
+        }
+
+        @Override
+        public Fragment getItem(int position) {
+            return mFragmentList.get(position);
+        }
+
+        @Override
+        public int getCount() {
+            return mFragmentList.size();
+        }
+
+        public void addFragment(Fragment fragment, String title) {
+            mFragmentList.add(fragment);
+            mFragmentTitleList.add(title);
+        }
+
+        @Override
+        public CharSequence getPageTitle(int position) {
+            return mFragmentTitleList.get(position);
+        }
     }
 
 
@@ -365,98 +390,27 @@ public class UsersProfiFrag extends Fragment {
         Intent intent = new Intent(getActivity(), TabsHeaderActivity.class);
         startActivity(intent);
     }
-
-    public void onStart(){
-        super.onStart();
-        FirebaseRecyclerAdapter<Share, ShareViewHolder> firebaseRecyclerAdapter = new FirebaseRecyclerAdapter<Share, ShareViewHolder>(
-                Share.class,
-                R.layout.profile_row,
-                ShareViewHolder.class,
-                mQueryUser
-        ) {
-            @Override
-            protected void populateViewHolder(final ShareViewHolder viewHolder, Share model, final int position) {
-
-                final String post_key = getRef(position).getKey();
-
-                viewHolder.setQuestions(model.getQuestions());
-                viewHolder.setPost_image(getActivity().getApplicationContext(),model.getPost_image());
-                viewHolder.setPost_date(model.getPost_date());
-                viewHolder.setPost_time(model.getPost_time());
-
-                viewHolder.mView.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        Bundle bundlePostDetail = new Bundle();
-                        bundlePostDetail.putString("post_id",post_key);
-
-                        PostDetailFrag fragmentCom = new PostDetailFrag();
-                        fragmentCom.setArguments(bundlePostDetail);
-                        getFragmentManager()
-                                .beginTransaction()
-                                .add(R.id.frame_fragmentholder, fragmentCom)
-                                .addToBackStack(null)
-                                .commit();
-
-                    }
-                });
-
-            }
-        };
-
-        profileList.setAdapter(firebaseRecyclerAdapter);
-
-    }
-
-
     @Override
-    public void onResume()
-    {  // After a pause OR at startup
+    public void onResume() {
         super.onResume();
-    }
 
-    public static class ShareViewHolder extends RecyclerView.ViewHolder {
+        getView().setFocusableInTouchMode(true);
+        getView().requestFocus();
+        getView().setOnKeyListener(new View.OnKeyListener() {
+            @Override
+            public boolean onKey(View v, int keyCode, KeyEvent event) {
+                if (event.getAction() == KeyEvent.ACTION_UP && keyCode == KeyEvent.KEYCODE_BACK) {
+                    FrameLayout layout = (FrameLayout) v.findViewById(R.id.postdetproflost);
+                    layout.removeAllViewsInLayout();
+                    FragmentTransaction ft = getFragmentManager().beginTransaction();
 
-        View mView;
-
-        DatabaseReference mDatabaseLike;
-        FirebaseAuth mAuth;
-
-        public ShareViewHolder(View itemView) {
-            super(itemView);
-            mView = itemView;
-            mDatabaseLike = FirebaseDatabase.getInstance().getReference().child("Likes");
-            mAuth = FirebaseAuth.getInstance();
-        }
-
-
-        public void setQuestions(String questions){
-
-            TextView questions_title = (TextView) mView.findViewById(R.id.titleProfileText);
-            questions_title.setText(questions);
-        }
-        public void setPost_date(String post_date){
-
-            TextView date = (TextView) mView.findViewById(R.id.dateTxt);
-            date.setText(post_date);
-        }
-        public void setPost_time(String post_time){
-
-            TextView time = (TextView) mView.findViewById(R.id.timeTxt);
-            time.setText(post_time);
-        }
-
-        public void setPost_image(Context ctx, String post_image){
-            ImageView post_img = (ImageView) mView.findViewById(R.id.post_img);
-            //Picasso.with(ctx).load(post_image).networkPolicy(NetworkPolicy.OFFLINE).fit().centerCrop().into(post_img);
-            Glide.with(ctx)
-                    .load(post_image)
-                    .centerCrop()
-                    .diskCacheStrategy(DiskCacheStrategy.ALL)
-                    .animate(R.anim.shake)
-                    .into(post_img);
-        }
+                    return true;
+                }
+                return false;
+            }
+        });
 
     }
+
 
 }

@@ -11,26 +11,12 @@
       android:layout_width="match_parent"
       android:layout_height="match_parent">
 
-
-      <android.support.design.widget.AppBarLayout
-          android:id="@+id/appBarLayout"
-          android:layout_width="match_parent"
-          android:layout_height="wrap_content">
-
-          <include
-              android:id="@+id/toolbar"
-              layout="@layout/view_feed_toolbar" />
-      </android.support.design.widget.AppBarLayout>
-
-
       <FrameLayout
           android:id="@+id/frame_fragmentholder"
           android:layout_width="match_parent"
           android:layout_height="match_parent"
           android:layout_below="@+id/appBarLayout"
           android:layout_marginBottom="?attr/actionBarSize"/>
-
-
 
     <android.support.design.widget.BottomNavigationView
         android:id="@+id/bottom_nav"

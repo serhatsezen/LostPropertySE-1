@@ -43,7 +43,7 @@
                 android:layout_marginStart="12dp" />
         </RelativeLayout>
 
-        <com.team3s.lostpropertyse.SquaredFrameLayout
+        <com.team3s.lostpropertyse.Utils.SquaredFrameLayout
             android:id="@+id/vImageRoot"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
@@ -70,7 +70,7 @@
               android:visibility="invisible" />
 
 
-        </com.team3s.lostpropertyse.SquaredFrameLayout>
+        </com.team3s.lostpropertyse.Utils.SquaredFrameLayout>
 
         <ImageView
             android:id="@+id/ivFeedBottom"

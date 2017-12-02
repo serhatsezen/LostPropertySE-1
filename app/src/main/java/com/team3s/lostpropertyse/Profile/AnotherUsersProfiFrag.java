@@ -1,25 +1,29 @@
 package com.team3s.lostpropertyse.Profile;
 
 import android.app.AlertDialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
-import android.support.v7.widget.LinearLayoutManager;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.app.FragmentTransaction;
+import android.support.v4.view.ViewPager;
 import android.support.v7.widget.RecyclerView;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
-import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -28,11 +32,12 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
-import com.team3s.lostpropertyse.CircleTransform;
+import com.team3s.lostpropertyse.Utils.CircleTransform;
 import com.team3s.lostpropertyse.LoginSign.TabsHeaderActivity;
-import com.team3s.lostpropertyse.Post.PostDetailFrag;
 import com.team3s.lostpropertyse.R;
-import com.team3s.lostpropertyse.Share;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class AnotherUsersProfiFrag extends Fragment {
 
@@ -71,6 +76,13 @@ public class AnotherUsersProfiFrag extends Fragment {
       Bundle bundle = getArguments();
       post_key_user = bundle.getString("key");
 
+      ViewPager viewPager = (ViewPager) v.findViewById(R.id.viewpager);
+      setupViewPager(viewPager);
+      // Set Tabs inside Toolbar
+      TabLayout tabs = (TabLayout) v.findViewById(R.id.result_tabs);
+      tabs.setupWithViewPager(viewPager);
+      tabs.setTabGravity(TabLayout.GRAVITY_CENTER);
+
         //get firebase auth instance
         auth = FirebaseAuth.getInstance();
         //get current user
@@ -101,17 +113,15 @@ public class AnotherUsersProfiFrag extends Fragment {
         u_fullname = (TextView) v.findViewById(R.id.fullnameuser);
         u_username = (TextView) v.findViewById(R.id.usernameprof);
         u_city = (TextView) v.findViewById(R.id.city);
-        num_post = (TextView) v.findViewById(R.id.find_counter);
+        //num_post = (TextView) v.findViewById(R.id.find_counter);
         backgroundView = v.findViewById(R.id.background);
 
         currentUserId = auth.getCurrentUser().getUid();
-        mDatabaseCurrentUsers = FirebaseDatabase.getInstance().getReference().child("Icerik");
+        mDatabaseCurrentUsers = FirebaseDatabase.getInstance().getReference().child("Icerik").child("Bulunanlar");
         mQueryUser = mDatabaseCurrentUsers.orderByChild("uid").equalTo(post_key_user);
 
         profileImg = (ImageView) v.findViewById(R.id.ivUserProfilePhoto);
         backgroundImg = (ImageView) v.findViewById(R.id.imageView3);
-
-        profileList = (RecyclerView) v.findViewById(R.id.rvUserProfile);
 
         editprof = (ImageButton) v.findViewById(R.id.edit_prof_btn);
         editprof.setOnClickListener(new OnClickListener() {
@@ -122,7 +132,7 @@ public class AnotherUsersProfiFrag extends Fragment {
         });
 
 
-        mQueryUser.addValueEventListener(new ValueEventListener() {
+        /*mQueryUser.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 for (DataSnapshot childDataSnapshot : dataSnapshot.getChildren()) {
@@ -132,7 +142,7 @@ public class AnotherUsersProfiFrag extends Fragment {
             @Override
             public void onCancelled(DatabaseError databaseError) {
             }
-        });
+        });*/
 
         mDatabaseUsers.child("profileImage").addValueEventListener(new ValueEventListener() {
             @Override
@@ -195,19 +205,44 @@ public class AnotherUsersProfiFrag extends Fragment {
             public void onCancelled(DatabaseError databaseError) {
             }
         });
-
-
-      LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
-      layoutManager.setReverseLayout(true);
-      layoutManager.setStackFromEnd(true);
-
-      profileList.setHasFixedSize(true);
-      profileList.setLayoutManager(layoutManager);
-      setHasOptionsMenu(true);
-
       return v;
     }
+    private void setupViewPager(ViewPager viewPager) {
 
+
+        UsersProfiFrag.Adapter adapter = new UsersProfiFrag.Adapter(getChildFragmentManager());
+        adapter.addFragment(new LostProp_Fragment(), "\nKaybettiklerim");
+        adapter.addFragment(new FindProp_Fragment(), "Bulduklarım");
+        viewPager.setAdapter(adapter);
+    }
+    static class Adapter extends FragmentPagerAdapter {
+        private final List<Fragment> mFragmentList = new ArrayList<>();
+        private final List<String> mFragmentTitleList = new ArrayList<>();
+
+        public Adapter(FragmentManager manager) {
+            super(manager);
+        }
+
+        @Override
+        public Fragment getItem(int position) {
+            return mFragmentList.get(position);
+        }
+
+        @Override
+        public int getCount() {
+            return mFragmentList.size();
+        }
+
+        public void addFragment(Fragment fragment, String title,String userKey) {
+            mFragmentList.add(fragment);
+            mFragmentTitleList.add(title);
+        }
+
+        @Override
+        public CharSequence getPageTitle(int position) {
+            return mFragmentTitleList.get(position);
+        }
+    }
 
     public void showDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
@@ -229,98 +264,25 @@ public class AnotherUsersProfiFrag extends Fragment {
         builder.create();
         builder.show();
     }
-
-
-    public void onStart(){
-        super.onStart();
-        FirebaseRecyclerAdapter<Share, ShareViewHolder> firebaseRecyclerAdapter = new FirebaseRecyclerAdapter<Share, ShareViewHolder>(
-                Share.class,
-                R.layout.profile_row,
-                ShareViewHolder.class,
-                mQueryUser
-        ) {
-            @Override
-            protected void populateViewHolder(final ShareViewHolder viewHolder, Share model, final int position) {
-
-                final String post_key = getRef(position).getKey();
-
-                viewHolder.setQuestions(model.getQuestions());
-                viewHolder.setPost_image(getActivity().getApplicationContext(),model.getPost_image());
-                viewHolder.setPost_date(model.getPost_date());
-                viewHolder.setPost_time(model.getPost_time());
-
-                viewHolder.mView.setOnClickListener(new OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        Bundle bundleComment = new Bundle();
-                        bundleComment.putString("post_id",post_key);
-
-                        PostDetailFrag fragmentCom = new PostDetailFrag();
-                        fragmentCom.setArguments(bundleComment);
-                        getFragmentManager()
-                                .beginTransaction()
-                                .add(R.id.frame_fragmentholder, fragmentCom)
-                                .addToBackStack(null)
-                                .commit();
-                    }
-                });
-
-            }
-        };
-
-        profileList.setAdapter(firebaseRecyclerAdapter);
-
-    }
-
-
     @Override
-    public void onResume()
-    {  // After a pause OR at startup
+    public void onResume() {
         super.onResume();
-    }
 
-    public static class ShareViewHolder extends RecyclerView.ViewHolder {
+        getView().setFocusableInTouchMode(true);
+        getView().requestFocus();
+        getView().setOnKeyListener(new View.OnKeyListener() {
+            @Override
+            public boolean onKey(View v, int keyCode, KeyEvent event) {
+                if (event.getAction() == KeyEvent.ACTION_UP && keyCode == KeyEvent.KEYCODE_BACK) {
+                    FrameLayout layout = (FrameLayout) v.findViewById(R.id.postdetproflost);
+                    layout.removeAllViewsInLayout();
+                    FragmentTransaction ft = getFragmentManager().beginTransaction();
 
-        View mView;
-
-        DatabaseReference mDatabaseLike;
-        FirebaseAuth mAuth;
-
-        public ShareViewHolder(View itemView) {
-            super(itemView);
-            mView = itemView;
-            mDatabaseLike = FirebaseDatabase.getInstance().getReference().child("Likes");
-            mAuth = FirebaseAuth.getInstance();
-        }
-
-
-
-        public void setQuestions(String questions){
-
-            TextView questions_title = (TextView) mView.findViewById(R.id.titleProfileText);
-            questions_title.setText(questions);
-        }
-        public void setPost_date(String post_date){
-
-            TextView date = (TextView) mView.findViewById(R.id.dateTxt);
-            date.setText(post_date);
-        }
-        public void setPost_time(String post_time){
-
-            TextView time = (TextView) mView.findViewById(R.id.timeTxt);
-            time.setText(post_time);
-        }
-
-        public void setPost_image(Context ctx, String post_image){
-            ImageView post_img = (ImageView) mView.findViewById(R.id.post_img);
-            Glide.with(ctx)
-                    .load(post_image)
-                    .centerCrop()
-                    .diskCacheStrategy(DiskCacheStrategy.ALL)
-                    .animate(R.anim.shake)
-                    .into(post_img);
-        }
+                    return true;
+                }
+                return false;
+            }
+        });
 
     }
-
 }

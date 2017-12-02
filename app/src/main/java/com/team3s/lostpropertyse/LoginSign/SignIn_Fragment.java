@@ -164,6 +164,7 @@ public class SignIn_Fragment extends Fragment implements OnClickListener,GoogleA
                 photoUri = account.getPhotoUrl();
                 photo = photoUri.toString();
                 username=name.replaceAll("\\s+","");
+                username.toLowerCase();
                 addressName = "Türkiye";
 
 

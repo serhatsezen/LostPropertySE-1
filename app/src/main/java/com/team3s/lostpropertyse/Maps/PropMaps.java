@@ -1,5 +1,6 @@
 package com.team3s.lostpropertyse.Maps;
 
+import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -9,6 +10,7 @@ import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.location.LocationListener;
 import android.os.Build;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
@@ -47,10 +49,12 @@ public class PropMaps extends FragmentActivity implements OnMapReadyCallback, Go
     Marker mCurrLocationMarker;
     LocationRequest mLocationRequest;
 
-    private DatabaseReference databaseMarker;
     private DatabaseReference mDatabaseUserLoc;
     private DatabaseReference mDatabaseLike;
     private DatabaseReference mDatabaseShowMap;
+    private DatabaseReference mDatabaseLostMap;
+    private DatabaseReference mDatabaseFindMap;
+    private DatabaseReference node;
     private FirebaseAuth.AuthStateListener authListener;
     private FirebaseAuth auth;
     private FirebaseUser currentUser;
@@ -63,6 +67,7 @@ public class PropMaps extends FragmentActivity implements OnMapReadyCallback, Go
     double latMarkers;
     double lngMarkers;
     private String post_key;
+    private String post_type;
 
 
     @Override
@@ -76,15 +81,18 @@ public class PropMaps extends FragmentActivity implements OnMapReadyCallback, Go
         mapFragment.getMapAsync(this);
 
         post_key = getIntent().getExtras().getString("post_id");
-        mDatabaseShowMap = FirebaseDatabase.getInstance().getReference().child("Icerik").child(post_key).child("latlng");
+        post_type = getIntent().getExtras().getString("post_type");
 
+        if(post_type != null) {
+            mDatabaseShowMap = FirebaseDatabase.getInstance().getReference().child("Icerik").child(post_type).child(post_key).child("latlng");
+        }
 
-
+        mDatabaseLostMap = FirebaseDatabase.getInstance().getReference().child("Icerik").child("Kayıplar");
+        mDatabaseFindMap = FirebaseDatabase.getInstance().getReference().child("Icerik").child("Bulunanlar");
         //get firebase auth instance
         auth = FirebaseAuth.getInstance();
         currentUser = auth.getCurrentUser();
 
-        databaseMarker = FirebaseDatabase.getInstance().getReference().child("Icerik");
         mDatabaseUserLoc = FirebaseDatabase.getInstance().getReference().child("Users").child(currentUser.getUid());
 
     }
@@ -97,39 +105,46 @@ public class PropMaps extends FragmentActivity implements OnMapReadyCallback, Go
         //Initialize Google Play Services
         if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             buildGoogleApiClient();
+            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                // TODO: Consider calling
+                //    ActivityCompat#requestPermissions
+                // here to request the missing permissions, and then overriding
+                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                //                                          int[] grantResults)
+                // to handle the case where the user grants the permission. See the documentation
+                // for ActivityCompat#requestPermissions for more details.
+                return;
+            }
             mMap.setMyLocationEnabled(true);
-        }
-        else {
+        } else {
             buildGoogleApiClient();
             mMap.setMyLocationEnabled(true);
         }
-        if(!post_key.equals("")) {
+        if (!post_key.equals("")) {
             mDatabaseShowMap.addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot snapshot) {
                     latMarkers = (double) snapshot.child("latitude").getValue();
                     lngMarkers = (double) snapshot.child("longitude").getValue();
                     LatLng item = new LatLng(latMarkers, lngMarkers);
-                   // mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
-                    //mMap.animateCamera(CameraUpdateFactory.zoomTo(13));
-                    mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(item,18));
+                    mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(item, 18));
                 }
+
                 @Override
                 public void onCancelled(DatabaseError databaseError) {
                 }
             });
 
-        }else{
+        } else {
             mDatabaseUserLoc.child("latLng").addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot snapshot) {
                     latMarkers = (double) snapshot.child("latitude").getValue();
                     lngMarkers = (double) snapshot.child("longitude").getValue();
                     LatLng user = new LatLng(latMarkers, lngMarkers);
-                    // mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
-                    //mMap.animateCamera(CameraUpdateFactory.zoomTo(13));
-                    mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(user,12));
+                    mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(user, 12));
                 }
+
                 @Override
                 public void onCancelled(DatabaseError databaseError) {
                 }
@@ -140,36 +155,51 @@ public class PropMaps extends FragmentActivity implements OnMapReadyCallback, Go
         markers();
 
     }
-    public void markers(){
-        DatabaseReference mDatabaseReference = FirebaseDatabase.getInstance()
-                .getReference();
-        DatabaseReference node = mDatabaseReference.child("Icerik");
 
-        node.orderByChild("latlng").addValueEventListener(new ValueEventListener() {
+    public void markers() {
+        mDatabaseLostMap.orderByChild("latlng").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot snapshot) {
                 for (DataSnapshot data : snapshot.getChildren()) {
                     double latUserL = (double) data.child("latlng").child("latitude").getValue();
                     double lngUserL = (double) data.child("latlng").child("longitude").getValue();
 
-
-
                     marker = mMap.addMarker(new MarkerOptions()
                             .position(new LatLng(latUserL, lngUserL))
                             .title((String) data.child("questions").getValue())
-                            //.icon(bitmapDescriptorFromVector(PropMaps.this, ids))
+                            .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE))
                             .snippet((String) data.child("desc").getValue()));
                 }
             }
+
             @Override
             public void onCancelled(DatabaseError error) {
             }
         });
-        mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener()
-        {
+        mDatabaseFindMap.orderByChild("latlng").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot snapshot) {
+                for (DataSnapshot data : snapshot.getChildren()) {
+                    double latUserL = (double) data.child("latlng").child("latitude").getValue();
+                    double lngUserL = (double) data.child("latlng").child("longitude").getValue();
+
+                    marker = mMap.addMarker(new MarkerOptions()
+                            .position(new LatLng(latUserL, lngUserL))
+                            .title((String) data.child("questions").getValue())
+                            .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED))
+                            .snippet((String) data.child("desc").getValue()));
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError error) {
+
+            }});
+        mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
             @Override
             public boolean onMarkerClick(Marker arg0) {
-                if(arg0 != null && arg0.getTitle().equals(marker.getTitle().toString())); // if marker  source is clicked
+                if (arg0 != null && arg0.getTitle().equals(marker.getTitle().toString()))
+                    ; // if marker  source is clicked
                 arg0.showInfoWindow();
                 return true;
             }
@@ -177,6 +207,7 @@ public class PropMaps extends FragmentActivity implements OnMapReadyCallback, Go
         });
 
     }
+
     private BitmapDescriptor bitmapDescriptorFromVector(Context context, int vectorResId) {
         Drawable vectorDrawable = ContextCompat.getDrawable(context, vectorResId);
         vectorDrawable.setBounds(0, 0, vectorDrawable.getIntrinsicWidth(), vectorDrawable.getIntrinsicHeight());
@@ -185,6 +216,7 @@ public class PropMaps extends FragmentActivity implements OnMapReadyCallback, Go
         vectorDrawable.draw(canvas);
         return BitmapDescriptorFactory.fromBitmap(bitmap);
     }
+
     protected synchronized void buildGoogleApiClient() {
         mGoogleApiClient = new GoogleApiClient.Builder(this)
                 .addConnectionCallbacks(this)
@@ -202,6 +234,16 @@ public class PropMaps extends FragmentActivity implements OnMapReadyCallback, Go
         mLocationRequest.setFastestInterval(1000);
         mLocationRequest.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
 
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return;
+        }
         LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
 
     }
@@ -258,6 +300,16 @@ public class PropMaps extends FragmentActivity implements OnMapReadyCallback, Go
                     // contacts-related task you need to do.
                     if (mGoogleApiClient == null) {
                         buildGoogleApiClient();
+                    }
+                    if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                        // TODO: Consider calling
+                        //    ActivityCompat#requestPermissions
+                        // here to request the missing permissions, and then overriding
+                        //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                        //                                          int[] grantResults)
+                        // to handle the case where the user grants the permission. See the documentation
+                        // for ActivityCompat#requestPermissions for more details.
+                        return;
                     }
                     mMap.setMyLocationEnabled(true);
 

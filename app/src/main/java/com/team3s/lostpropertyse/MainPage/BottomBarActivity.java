@@ -4,6 +4,7 @@ import android.Manifest.permission;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
@@ -11,9 +12,14 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.view.KeyEvent;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.ProgressBar;
+
+import com.google.firebase.auth.FirebaseAuth;
 import com.team3s.lostpropertyse.Maps.PropMaps;
 import com.team3s.lostpropertyse.Profile.UsersProfiFrag;
 import com.team3s.lostpropertyse.R;
+import com.team3s.lostpropertyse.ShareSc.ShareActivity;
 import com.team3s.lostpropertyse.services.MyService;
 import java.util.ArrayList;
 import java.util.List;
@@ -37,8 +43,11 @@ public class BottomBarActivity extends AppCompatActivity {
      * Maintains a list of Fragments for {@link BottomNavigationView}
      */
     private List<MainPage> fragments = new ArrayList<>(1);
-    private List<ShareFragment> fragmentsShare = new ArrayList<>(1);
     private List<UsersProfiFrag> fragmentsPro = new ArrayList<>(1);
+    private FirebaseAuth auth;
+    private String currentUserId;
+    private SharedPreferences sharedpreferences;
+    public static final String MyPREFERENCES = "MyPrefs" ;
 
     @Override
     protected void onStart() {
@@ -51,9 +60,13 @@ public class BottomBarActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_bottom_bar);
 
-
         Intent servIntent = new Intent(BottomBarActivity.this, MyService.class);
         startService(servIntent);
+
+        auth = FirebaseAuth.getInstance();
+
+        currentUserId = auth.getCurrentUser().getUid();
+        sharedpreferences = getSharedPreferences(MyPREFERENCES, Context.MODE_PRIVATE);
 
         bottomNavigationView = (BottomNavigationView) findViewById(R.id.bottom_nav);
 
@@ -71,9 +84,13 @@ public class BottomBarActivity extends AppCompatActivity {
                                 startActivity(mapint);
                                 return true;
                             case R.id.action_bottombar_share:
-                                switchFragment1(0, TAG_FRAGMENT_SHARE);
+                                Intent shareint = new Intent(BottomBarActivity.this,ShareActivity.class);
+                                startActivity(shareint);
                                 return true;
                             case R.id.action_bottombar_profil:
+                                SharedPreferences.Editor editor = sharedpreferences.edit();
+                                editor.putString("USERKEY_SHARED", currentUserId);
+                                editor.commit();
                                 switchFragment2(0, TAG_FRAGMENT_PROFILE);
                                 return true;
                         }
@@ -90,17 +107,10 @@ public class BottomBarActivity extends AppCompatActivity {
         switchFragment(0, TAG_FRAGMENT_NEWS);
 
     }
-
     private void switchFragment(int pos, String tag) {
         getSupportFragmentManager()
                 .beginTransaction()
                 .replace(R.id.frame_fragmentholder, fragments.get(pos), tag)
-                .commit();
-    }
-    private void switchFragment1(int pos, String tag) {
-        getSupportFragmentManager()
-                .beginTransaction()
-                .replace(R.id.frame_fragmentholder, fragmentsShare.get(pos), tag)
                 .commit();
     }
     private void switchFragment2(int pos, String tag) {
@@ -112,11 +122,9 @@ public class BottomBarActivity extends AppCompatActivity {
 
     private void buildFragmentsList() {
         MainPage mainScreen = buildFragment();
-        ShareFragment shareScreen = buildFragmentShare();
         UsersProfiFrag profileScreen = buildFragmentt();
 
         fragments.add(mainScreen);
-        fragmentsShare.add(shareScreen);
         fragmentsPro.add(profileScreen);
 
     }
@@ -129,12 +137,7 @@ public class BottomBarActivity extends AppCompatActivity {
         return fragment;
     }
 
-    private ShareFragment buildFragmentShare() {
-        ShareFragment fragment = new ShareFragment();
-        Bundle bundle = new Bundle();
-        fragment.setArguments(bundle);
-        return fragment;
-    }
+
     private UsersProfiFrag buildFragmentt() {
         UsersProfiFrag fragment = new UsersProfiFrag();
         Bundle bundle = new Bundle();
