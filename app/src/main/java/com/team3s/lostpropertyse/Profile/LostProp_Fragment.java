@@ -3,18 +3,14 @@ package com.team3s.lostpropertyse.Profile;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -26,10 +22,10 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
+import com.team3s.lostpropertyse.Adapter;
 import com.team3s.lostpropertyse.LoginSign.TabsHeaderActivity;
 import com.team3s.lostpropertyse.Post.PostDetailFrag;
 import com.team3s.lostpropertyse.R;
-import com.team3s.lostpropertyse.Share;
 
 public class LostProp_Fragment extends Fragment {
 
@@ -104,14 +100,14 @@ public class LostProp_Fragment extends Fragment {
 
     public void onStart(){
         super.onStart();
-        FirebaseRecyclerAdapter<Share, ShareViewHolder> firebaseRecyclerAdapter = new FirebaseRecyclerAdapter<Share, ShareViewHolder>(
-                Share.class,
+        FirebaseRecyclerAdapter<Adapter, ShareViewHolder> firebaseRecyclerAdapter = new FirebaseRecyclerAdapter<Adapter, ShareViewHolder>(
+                Adapter.class,
                 R.layout.profile_row,
                 ShareViewHolder.class,
                 mQueryUser
         ) {
             @Override
-            protected void populateViewHolder(final ShareViewHolder viewHolder, Share model, final int position) {
+            protected void populateViewHolder(final ShareViewHolder viewHolder, Adapter model, final int position) {
 
                 final String post_key = getRef(position).getKey();
 

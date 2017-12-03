@@ -1,6 +1,6 @@
 package com.team3s.lostpropertyse;
 
-public class Share {
+public class Adapter {
     public int id = -1;
     public String questions ;
     public String desc;
@@ -17,9 +17,9 @@ public class Share {
     private double latMap;
     private double longMap;
 
-    public Share(){
+    public Adapter(){
     }
-    public Share(String questions, String desc, String post_image, String name, String image, String addressname, String post_time, String post_date, String token, String commentText, String commentUsername, double latMap, double longMap){
+    public Adapter(String questions, String desc, String post_image, String name, String image, String addressname, String post_time, String post_date, String token, String commentText, String commentUsername, double latMap, double longMap){
         this.questions = questions;
         this.desc = desc;
         this.post_image = post_image;

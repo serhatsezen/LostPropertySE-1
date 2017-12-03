@@ -1,9 +1,11 @@
 package com.team3s.lostpropertyse.ShareSc;
 
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -12,10 +14,16 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.Toast;
 
 import com.team3s.lostpropertyse.Utils.Permissions;
 import com.team3s.lostpropertyse.R;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 
 public class PhotoFragment extends Fragment {
@@ -25,7 +33,6 @@ public class PhotoFragment extends Fragment {
     private static final int PHOTO_FRAGMENT_NUM = 1;
     private static final int GALLERY_FRAGMENT_NUM = 2;
     private static final int  CAMERA_REQUEST_CODE = 5;
-
 
     @Nullable
     @Override
@@ -64,7 +71,6 @@ public class PhotoFragment extends Fragment {
             return false;
         }
     }
-
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -73,7 +79,10 @@ public class PhotoFragment extends Fragment {
             Log.d(TAG, "onActivityResult: done taking a photo.");
             Log.d(TAG, "onActivityResult: attempting to navigate to final share screen.");
 
-            Uri uri = data.getData();
+            Bitmap bitmap;
+            bitmap = (Bitmap) data.getExtras().get("data");
+
+            Uri uri = getImageUri(getActivity().getApplicationContext(), bitmap);
 
             if(isRootTask()){
                 try{
@@ -92,6 +101,12 @@ public class PhotoFragment extends Fragment {
             }
 
         }
+    }
+    public Uri getImageUri(Context inContext, Bitmap inImage) {
+        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+        inImage.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
+        String path = MediaStore.Images.Media.insertImage(inContext.getContentResolver(), inImage, "Title", null);
+        return Uri.parse(path);
     }
 }
 

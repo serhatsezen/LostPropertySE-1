@@ -40,7 +40,7 @@ import com.team3s.lostpropertyse.Post.PostDetailFrag;
 import com.team3s.lostpropertyse.Profile.AnotherUsersProfiFrag;
 import com.team3s.lostpropertyse.Profile.UsersProfiFrag;
 import com.team3s.lostpropertyse.R;
-import com.team3s.lostpropertyse.Share;
+import com.team3s.lostpropertyse.Adapter;
 
 public class FindMainFrag extends Fragment {
 
@@ -186,14 +186,14 @@ public class FindMainFrag extends Fragment {
         mQueryIcerik = database.orderByChild("city").equalTo(cityFilter);
 
 
-        FirebaseRecyclerAdapter<Share, ShareViewHolder> firebaseRecyclerAdapter = new FirebaseRecyclerAdapter<Share, ShareViewHolder>(
-                Share.class,
+        FirebaseRecyclerAdapter<Adapter, ShareViewHolder> firebaseRecyclerAdapter = new FirebaseRecyclerAdapter<Adapter, ShareViewHolder>(
+                Adapter.class,
                 R.layout.row,
                 ShareViewHolder.class,
                 database
         ) {
             @Override
-            protected void populateViewHolder(final ShareViewHolder viewHolder, Share model, final int position) {
+            protected void populateViewHolder(final ShareViewHolder viewHolder, Adapter model, final int position) {
 
                 final String post_key = getRef(position).getKey();
 
@@ -211,6 +211,7 @@ public class FindMainFrag extends Fragment {
                         Bundle bundleComment = new Bundle();
                         bundleComment.putString("post_id",post_key);
                         bundleComment.putString("post_type","Bulunanlar");
+                        appBarLayout.setVisibility(View.GONE);
 
 
                         PostDetailFrag fragmentD = new PostDetailFrag();
@@ -229,6 +230,7 @@ public class FindMainFrag extends Fragment {
                         Bundle bundleComment = new Bundle();
                         bundleComment.putString("post_id_key",post_key);
                         bundleComment.putString("post_type","Bulunanlar");
+                        appBarLayout.setVisibility(View.GONE);
 
                         CommentFrag fragmentCom = new CommentFrag();
                         fragmentCom.setArguments(bundleComment);
@@ -268,6 +270,7 @@ public class FindMainFrag extends Fragment {
 
                                 }else {
 
+                                    appBarLayout.setVisibility(View.GONE);
 
                                     AnotherUsersProfiFrag fragment2 = new AnotherUsersProfiFrag();
                                     fragment2.setArguments(bundle);
@@ -490,7 +493,6 @@ public class FindMainFrag extends Fragment {
                     .centerCrop()
                     .diskCacheStrategy(DiskCacheStrategy.ALL)
                     .transform(new CircleTransform(ctx))
-                    .animate(R.anim.shake)
                     .into(user_Pic);
 
         }
@@ -501,7 +503,6 @@ public class FindMainFrag extends Fragment {
                     .load(post_image)
                     .centerCrop()
                     .diskCacheStrategy(DiskCacheStrategy.ALL)
-                    .animate(R.anim.shake)
                     .into(share_img);
 
 

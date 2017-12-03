@@ -35,11 +35,16 @@ public class FileSearch {
         ArrayList<String> pathArray = new ArrayList<>();
         File file = new File(directory);
         File[] listfiles = file.listFiles();
-        for(int i = 0; i < listfiles.length; i++){
-            if(listfiles[i].isFile()){
-                pathArray.add(listfiles[i].getAbsolutePath());
+        try {
+            for(int i = 0; i < listfiles.length; i++){
+                if(listfiles[i].isFile()){
+                    pathArray.add(listfiles[i].getAbsolutePath());
+                }
             }
+        }catch (Exception e){
+
         }
+
         return pathArray;
     }
 }

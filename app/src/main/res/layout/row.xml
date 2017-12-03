@@ -109,8 +109,10 @@
                 android:id="@+id/likeBtn"
                 android:layout_width="30dp"
                 android:layout_height="30dp"
-                android:scaleType="centerCrop"
+                android:layout_alignParentBottom="true"
+                android:layout_alignParentStart="true"
                 android:background="@null"
+                android:scaleType="centerCrop"
                 card_view:srcCompat="@drawable/ic_heart_outline_grey" />
 
             <RelativeLayout
@@ -149,6 +151,7 @@
                 android:background="@drawable/btn_feed_action"
                 android:gravity="center_vertical|center_horizontal"
                 android:text="Android"
+                android:maxLines="2"
                 android:textColor="#000"
                 android:layout_weight="1.52" />
 

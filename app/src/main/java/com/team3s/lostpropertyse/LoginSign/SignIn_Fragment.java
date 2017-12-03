@@ -54,6 +54,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ServerValue;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
@@ -78,9 +79,12 @@ public class SignIn_Fragment extends Fragment implements OnClickListener,GoogleA
     private static FragmentManager fragmentManager;
 
     private FirebaseAuth auth;
-    private DatabaseReference mDatabaseUsers;
+    private DatabaseReference mDatabaseUsers,mDatabaseFindUsers,mDatabaseLostUsers;
     private DatabaseReference current_user_db;
-    String user_id;
+    private Query mQueryUserTokenFind,mQueryUserTokenLost;
+
+    public String user_id;
+    public String token;
     private static final int RC_SIGN_IN = 9001;
     private static final String TAG = "MainActivity";
     private String idToken;
@@ -106,6 +110,8 @@ public class SignIn_Fragment extends Fragment implements OnClickListener,GoogleA
         auth = FirebaseAuth.getInstance();
         mDatabaseUsers = FirebaseDatabase.getInstance().getReference().child("Users");
         mDatabaseUsers.keepSynced(true);
+        mDatabaseFindUsers = FirebaseDatabase.getInstance().getReference().child("Icerik").child("Bulunanlar");
+        mDatabaseLostUsers = FirebaseDatabase.getInstance().getReference().child("Icerik").child("Kayıplar");
 
         mSignInButton = (SignInButton) view.findViewById(R.id.sign_in_button);
         mSignInButton.setSize(SignInButton.SIZE_WIDE);
@@ -334,6 +340,7 @@ public class SignIn_Fragment extends Fragment implements OnClickListener,GoogleA
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
                     if(dataSnapshot.hasChild(user_id)){         //kayıt varsa bottombaractivity e
+                        addNewToken();
                         Intent intent = new Intent(getActivity(), BottomBarActivity.class);
                         startActivity(intent);
                     }
@@ -353,6 +360,52 @@ public class SignIn_Fragment extends Fragment implements OnClickListener,GoogleA
             });
 
         }
+    }
+
+    private void addNewToken() {
+        mDatabaseUsers.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                SharedPreferences sharedPreferences = getActivity().getApplicationContext().getSharedPreferences(getString(R.string.FCM_PREF), Context.MODE_PRIVATE);
+                token = sharedPreferences.getString(getString(R.string.FCM_TOKEN), "");
+                user_id = auth.getCurrentUser().getUid();
+
+                current_user_db = mDatabaseUsers.child(user_id);
+                current_user_db.child("token").setValue(token);
+            }
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+            }
+        });
+        FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();                 //postlardaki token güncellemek için
+        final DatabaseReference reference = firebaseDatabase.getReference();
+        mQueryUserTokenFind =  mDatabaseFindUsers.orderByChild("uid").equalTo(user_id);
+        mQueryUserTokenFind.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot tasksSnapshot) {
+                for (DataSnapshot snapshot: tasksSnapshot.getChildren()) {
+                    snapshot.getRef().child("token").setValue(token);
+                }
+            }
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+            }
+
+        });
+        mQueryUserTokenLost =  mDatabaseLostUsers.orderByChild("uid").equalTo(user_id);
+        mQueryUserTokenLost.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot tasksSnapshot) {
+                for (DataSnapshot snapshot: tasksSnapshot.getChildren()) {
+                    snapshot.getRef().child("token").setValue(token);
+                }
+            }
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+            }
+
+        });
+
     }
 
 

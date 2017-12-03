@@ -17,17 +17,21 @@
         android:id="@+id/lostmainfrag"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@+id/appBarLayout">
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/LostappBarLayout">
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/lost_main_list"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_below="@+id/post_titleET"/>
+            android:layout_below="@+id/post_titleET" />
 
     </FrameLayout>
+
     <FrameLayout
+        android:id="@+id/postdetpfr"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id="@+id/postdetpfr"/>
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/LostappBarLayout" />
 </RelativeLayout>

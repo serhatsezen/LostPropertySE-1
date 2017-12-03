@@ -75,6 +75,8 @@ public class UsersProfiFrag extends Fragment {
     private DatabaseReference database,mDatabaseUsers,databaseFollowers,mDatabaseUsersPostNum;
     private DatabaseReference mDatabaseCurrentUsers;
     private Query mQueryUser;
+    private Query mQueryUserLost;
+    private Query mQueryUserFind;
     private DatabaseReference mDatabaseLike;
     private FirebaseAuth.AuthStateListener authListener;
     private FirebaseAuth auth;
@@ -150,7 +152,8 @@ public class UsersProfiFrag extends Fragment {
         currentUserId = auth.getCurrentUser().getUid();
         mDatabaseCurrentUsers = FirebaseDatabase.getInstance().getReference().child("Icerik");
         mQueryUser = mDatabaseCurrentUsers.child("Kayıplar").orderByChild("uid").equalTo(currentUserId);
-
+        mQueryUserLost = mDatabaseCurrentUsers.child("Kayıplar").orderByChild("uid").equalTo(currentUserId);
+        mQueryUserFind = mDatabaseCurrentUsers.child("Bulunanlar").orderByChild("uid").equalTo(currentUserId);
         profileImg = (ImageView) v.findViewById(R.id.ivUserProfilePhoto);
         backgroundImg = (ImageView) v.findViewById(R.id.imageView3);
 
@@ -323,25 +326,33 @@ public class UsersProfiFrag extends Fragment {
                             public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
                                 final String downloadUri = taskSnapshot.getDownloadUrl().toString();
                                 mDatabaseUsers.child("profileImage").setValue(downloadUri);
-                                    FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();                 //postlardaki profil resmini güncellemek için
-                                    final DatabaseReference reference = firebaseDatabase.getReference();
-                                    mQueryUserId = database.orderByChild("uid").equalTo(currentUserId);
-                                    mQueryUserId.addListenerForSingleValueEvent(new ValueEventListener() {
+                                //-----------------------------------------------------------------------------postlardaki profil resmini güncellemek için
+                                mQueryUserLost.addListenerForSingleValueEvent(new ValueEventListener() {
                                         @Override
-                                        public void onDataChange(DataSnapshot dataSnapshot) {
-                                            DataSnapshot nodeDataSnapshot = dataSnapshot.getChildren().iterator().next();
-                                            String key = nodeDataSnapshot.getKey();
-                                            String path = "/" + dataSnapshot.getKey() + "/" + key;
-                                            HashMap<String, Object> result = new HashMap<>();
-                                            result.put("image", downloadUri);
-                                            reference.child(path).updateChildren(result);
+                                        public void onDataChange(DataSnapshot tasksSnapshot) {
+                                            for (DataSnapshot snapshot: tasksSnapshot.getChildren()) {
+                                                snapshot.getRef().child("image").setValue(downloadUri);
+                                            }
                                         }
-
                                         @Override
                                         public void onCancelled(DatabaseError databaseError) {
-
                                         }
+
                                     });
+                                mQueryUserFind.addListenerForSingleValueEvent(new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(DataSnapshot tasksSnapshot) {
+                                        for (DataSnapshot snapshot: tasksSnapshot.getChildren()) {
+                                            snapshot.getRef().child("image").setValue(downloadUri);
+                                        }
+                                    }
+                                    @Override
+                                    public void onCancelled(DatabaseError databaseError) {
+                                    }
+
+                                });
+
+
                             }
                         });
                     }

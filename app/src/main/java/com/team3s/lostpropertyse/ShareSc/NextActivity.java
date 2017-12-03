@@ -112,6 +112,7 @@ public class NextActivity extends AppCompatActivity {
     public String tokenUsers;
     public String bildirimPost;
     public String kategori;
+    public String bildirimBaslik;
 
     public Uri imageUri = null;
 
@@ -282,7 +283,6 @@ public class NextActivity extends AppCompatActivity {
         }
         else if(intent.hasExtra(getString(R.string.selected_bitmap))){
             imageUri = intent.getParcelableExtra(getString(R.string.selected_bitmap));
-
             Glide.with(NextActivity.this.getApplicationContext())
                     .load(imageUri)
                     .centerCrop()
@@ -417,7 +417,7 @@ public class NextActivity extends AppCompatActivity {
                     String myToken = tokenList.get(t);                                                          //sırayla listten çekip php ye göndermek için.
                     String myKm = kmList.get(t);
 
-                    bildirimPost = description + " "+ addressName + " sana "+ myKm + " km uzaklıkta";
+                    bildirimPost = kategori + " "+ addressName + " sana "+ myKm + " km uzaklıkta";
 
                     List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(2);
                     nameValuePairs.add(new BasicNameValuePair("tokendevice", myToken));

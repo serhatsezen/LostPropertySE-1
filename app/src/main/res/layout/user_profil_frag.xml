@@ -94,13 +94,12 @@
 
                     <TextView
                         android:id="@+id/fullnameuser"
-                        android:layout_width="wrap_content"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_alignEnd="@+id/imageView2"
-                        android:layout_alignStart="@+id/edit_prof_btn"
                         android:layout_below="@+id/ivUserProfilePhoto"
                         android:layout_marginTop="14dp"
                         android:gravity="center"
+                        android:maxLines="1"
                         android:text="Aydın Serhat"
                         android:textColor="#ffffff"
                         android:textSize="24sp" />
@@ -109,8 +108,8 @@
                         android:id="@+id/usernameprof"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_alignStart="@+id/fullnameuser"
                         android:layout_below="@+id/fullnameuser"
+                        android:layout_alignStart="@+id/edit_prof_btn"
                         android:layout_marginStart="21dp"
                         android:maxLines="1"
                         android:padding="4dp"
@@ -122,7 +121,7 @@
                         android:id="@+id/city"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_alignEnd="@+id/fullnameuser"
+                        android:layout_alignEnd="@+id/imageView2"
                         android:layout_below="@+id/fullnameuser"
                         android:layout_toEndOf="@+id/usernameprof"
                         android:maxLines="1"
@@ -162,8 +161,11 @@
 
 
     </android.support.design.widget.CoordinatorLayout>
+
     <FrameLayout
+        android:id="@+id/postdetproflost"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id="@+id/postdetproflost"/>
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true" />
 </RelativeLayout>
