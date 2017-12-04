@@ -277,12 +277,12 @@ public class UsersProfiFrag extends Fragment {
                     public void onClick(DialogInterface dialog, int which) {
                         // The 'which' argument contains the index position
                         // of the selected item
-                        System.out.println("*************"+which);
                         switch (which){
                             case 0: changeBackgroundImage();
                                 backgroundImage = true;
                                 break;
-                            case 1: changeProfilePicture();
+                            case 1: /*changeProfilePicture();*/
+                                changeFragment();
                                 profileImage = true;
                                 break;
                             case 2: signOut();
@@ -304,6 +304,13 @@ public class UsersProfiFrag extends Fragment {
         Intent profilePicker = new Intent(Intent.ACTION_PICK);
         profilePicker.setType("image/*");
         startActivityForResult(profilePicker, GALLERY_REQUEST);
+
+    }
+    public void changeFragment(){
+        FragmentManager manager = getFragmentManager();
+        EditProfileFragment editProfileFragment = new EditProfileFragment();
+        editProfileFragment.setArguments();
+        manager.beginTransaction().replace(R.id.frame_fragmentholder, editProfileFragment, "TEST").commit();
 
     }
 

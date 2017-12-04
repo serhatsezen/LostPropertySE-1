@@ -24,7 +24,7 @@
 
     <string-array name="editButtonOptions">
         <item>Arka planı değiştir.</item>
-        <item>Profil resmini değiştir.</item>
+        <item>Profili güncelle.</item>
         <item>Çıkış yap.</item>
     </string-array>
     <string-array name="lostorfind">
