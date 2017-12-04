@@ -46,11 +46,11 @@
 
         <ImageButton
             android:id="@+id/comment_submit"
-            android:layout_width="wrap_content"
+            android:layout_width="40dp"
             android:layout_height="wrap_content"
-            android:layout_alignTop="@+id/edtx_comment"
-            android:layout_marginStart="323dp"
-            android:layout_toEndOf="@+id/news_cevap_progressBar"
+            android:layout_alignParentEnd="true"
+            android:layout_below="@+id/comment_list"
+            android:layout_marginEnd="14dp"
             android:background="@null"
             android:scaleType="centerCrop"
             android:src="@drawable/ic_done_black_36dp" />
