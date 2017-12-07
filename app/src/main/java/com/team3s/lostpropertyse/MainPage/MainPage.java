@@ -85,8 +85,7 @@ public class MainPage extends Fragment {
 
         //get firebase auth instance
         auth = FirebaseAuth.getInstance();
-        String title = getArguments().getString(ARG_TITLE, "");
-        //get current user
+         //get current user
         final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
 
         mDatabaseUsersFilter = FirebaseDatabase.getInstance().getReference().child("Users").child(user.getUid());

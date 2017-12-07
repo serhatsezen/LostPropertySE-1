@@ -22,7 +22,7 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
-import com.team3s.lostpropertyse.Adapter;
+import com.team3s.lostpropertyse.AdapterClass;
 import com.team3s.lostpropertyse.LoginSign.TabsHeaderActivity;
 import com.team3s.lostpropertyse.Post.PostDetailFrag;
 import com.team3s.lostpropertyse.R;
@@ -99,14 +99,14 @@ public class FindProp_Fragment extends Fragment {
     }
     public void onStart(){
         super.onStart();
-        FirebaseRecyclerAdapter<Adapter, ShareViewHolder> firebaseRecyclerAdapter = new FirebaseRecyclerAdapter<Adapter, ShareViewHolder>(
-                Adapter.class,
+        FirebaseRecyclerAdapter<AdapterClass, ShareViewHolder> firebaseRecyclerAdapter = new FirebaseRecyclerAdapter<AdapterClass, ShareViewHolder>(
+                AdapterClass.class,
                 R.layout.profile_row,
                 ShareViewHolder.class,
                 mQueryUser
         ) {
             @Override
-            protected void populateViewHolder(final ShareViewHolder viewHolder, Adapter model, final int position) {
+            protected void populateViewHolder(final ShareViewHolder viewHolder, AdapterClass model, final int position) {
 
                 final String post_key = getRef(position).getKey();
 
@@ -126,7 +126,7 @@ public class FindProp_Fragment extends Fragment {
                         fragmentCom.setArguments(bundlePostDetail);
                         getFragmentManager()
                                 .beginTransaction()
-                                .add(R.id.postdetproflost, fragmentCom)
+                                .add(R.id.another_user_frag, fragmentCom)
                                 .addToBackStack(null)
                                 .commit();
 

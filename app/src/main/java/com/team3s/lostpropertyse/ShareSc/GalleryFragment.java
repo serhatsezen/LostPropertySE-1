@@ -35,12 +35,12 @@ public class GalleryFragment extends Fragment {
 
     //constants
     private static final int NUM_GRID_COLUMNS = 3;
-
+    public TextView nextScreen,noImgTxt;
 
     //widgets
     private GridView gridView;
     private ImageView galleryImage;
-    private ProgressBar mProgressBar;
+    private ProgressBar mProgressBar,nextProgress;
     private Spinner directorySpinner;
 
     //vars
@@ -58,6 +58,11 @@ public class GalleryFragment extends Fragment {
         directorySpinner = (Spinner) view.findViewById(R.id.spinnerDirectory);
         mProgressBar = (ProgressBar) view.findViewById(R.id.progressBar);
         mProgressBar.setVisibility(View.GONE);
+        nextProgress = (ProgressBar) view.findViewById(R.id.nextProgress);
+        nextProgress.setVisibility(View.GONE);
+        nextScreen = (TextView) view.findViewById(R.id.tvNext);
+        noImgTxt = (TextView) view.findViewById(R.id.noImgTxt);
+
         directories = new ArrayList<>();
         Log.d(TAG, "onCreateView: started.");
 
@@ -69,16 +74,18 @@ public class GalleryFragment extends Fragment {
                 getActivity().finish();
             }
         });
+        nextScreen.setText("Devam");
+        nextScreen.setEnabled(true);
 
         imageLoader = ImageLoader.getInstance();
         imageLoader.init(ImageLoaderConfiguration.createDefault(getActivity()));
 
-        TextView nextScreen = (TextView) view.findViewById(R.id.tvNext);
         nextScreen.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Log.d(TAG, "onClick: navigating to the final share screen.");
-
+                nextScreen.setText("Bekleyiniz!");
+                nextScreen.setEnabled(false);
                 if(isRootTask()){
                     Intent intent = new Intent(getActivity(), NextActivity.class);
                     intent.putExtra(getString(R.string.selected_image), mSelectedImage);
@@ -130,7 +137,6 @@ public class GalleryFragment extends Fragment {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 Log.d(TAG, "onItemClick: selected: " + directories.get(position));
-
                 //setup our image grid for the directory chosen
                 setupGridView(directories.get(position));
             }
@@ -140,6 +146,7 @@ public class GalleryFragment extends Fragment {
 
             }
         });
+
     }
 
 
@@ -158,8 +165,13 @@ public class GalleryFragment extends Fragment {
 
         //set the first image to be displayed when the activity fragment view is inflated
         try{
-            setImage(imgURLs.get(0), galleryImage, mAppend);
-            mSelectedImage = imgURLs.get(0);
+            if(imgURLs.size()>0) {
+                setImage(imgURLs.get(0), galleryImage, mAppend);
+                mSelectedImage = imgURLs.get(0);
+            }else{
+                noImgTxt.setVisibility(View.VISIBLE);
+            }
+
         }catch (ArrayIndexOutOfBoundsException e){
             Log.e(TAG, "setupGridView: ArrayIndexOutOfBoundsException: " +e.getMessage() );
         }
@@ -180,26 +192,30 @@ public class GalleryFragment extends Fragment {
     private void setImage(String imgURL, ImageView image, String append){
         Log.d(TAG, "setImage: setting image");
 
-
         imageLoader.displayImage(append + imgURL, image, new ImageLoadingListener() {
+
             @Override
             public void onLoadingStarted(String imageUri, View view) {
                 mProgressBar.setVisibility(View.VISIBLE);
+
             }
 
             @Override
             public void onLoadingFailed(String imageUri, View view, FailReason failReason) {
                 mProgressBar.setVisibility(View.INVISIBLE);
+
             }
 
             @Override
             public void onLoadingComplete(String imageUri, View view, Bitmap loadedImage) {
                 mProgressBar.setVisibility(View.INVISIBLE);
+
             }
 
             @Override
             public void onLoadingCancelled(String imageUri, View view) {
                 mProgressBar.setVisibility(View.INVISIBLE);
+
             }
         });
     }

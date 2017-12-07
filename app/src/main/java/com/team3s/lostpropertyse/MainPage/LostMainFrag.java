@@ -18,7 +18,6 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -33,6 +32,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
+import com.team3s.lostpropertyse.AdapterClass;
 import com.team3s.lostpropertyse.Chat.CommentFrag;
 import com.team3s.lostpropertyse.Utils.CircleTransform;
 import com.team3s.lostpropertyse.LoginSign.TabsHeaderActivity;
@@ -40,7 +40,6 @@ import com.team3s.lostpropertyse.Post.PostDetailFrag;
 import com.team3s.lostpropertyse.Profile.AnotherUsersProfiFrag;
 import com.team3s.lostpropertyse.Profile.UsersProfiFrag;
 import com.team3s.lostpropertyse.R;
-import com.team3s.lostpropertyse.Adapter;
 
 public class LostMainFrag extends Fragment {
 
@@ -62,7 +61,7 @@ public class LostMainFrag extends Fragment {
 
     public static final String ARG_TITLE = "arg_title";
     public String user_key = null;
-    public static String userNames = null;
+    public String userNames;
     public String cityFilter = "Genel";
 
     private String latUsers;
@@ -109,6 +108,8 @@ public class LostMainFrag extends Fragment {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 userNames = (String) dataSnapshot.child("username").getValue();
+                userNames = userNames.toLowerCase();
+
             }
 
             @Override
@@ -126,18 +127,6 @@ public class LostMainFrag extends Fragment {
 
                 latUserL = Double.parseDouble(String.valueOf(latUsers));
                 lngUserL = Double.parseDouble(String.valueOf(lngUsers));
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
-
-        mDatabaseUsersFilter.child("filterCity").addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                userNames = (String) dataSnapshot.child("username").getValue();
             }
 
             @Override
@@ -187,14 +176,14 @@ public class LostMainFrag extends Fragment {
         mQueryIcerik = database.orderByChild("city").equalTo(cityFilter);
 
 
-        FirebaseRecyclerAdapter<Adapter, ShareViewHolder> firebaseRecyclerAdapter = new FirebaseRecyclerAdapter<Adapter, ShareViewHolder>(
-                Adapter.class,
+        FirebaseRecyclerAdapter<AdapterClass, ShareViewHolder> firebaseRecyclerAdapter = new FirebaseRecyclerAdapter<AdapterClass, ShareViewHolder>(
+                AdapterClass.class,
                 R.layout.row,
                 ShareViewHolder.class,
                 database
         ) {
             @Override
-            protected void populateViewHolder(final ShareViewHolder viewHolder, Adapter model, final int position) {
+            protected void populateViewHolder(final ShareViewHolder viewHolder, AdapterClass model, final int position) {
 
                 final String post_key = getRef(position).getKey();
 
@@ -204,7 +193,7 @@ public class LostMainFrag extends Fragment {
                 viewHolder.setName(model.getName());
                 viewHolder.setImage(getActivity().getApplicationContext(), model.getImage());
 
-                viewHolder.setLiikeBtn(post_key);
+                //viewHolder.setLiikeBtn(post_key);
 
                 viewHolder.mView.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -252,6 +241,7 @@ public class LostMainFrag extends Fragment {
                                 user_key = (String) dataSnapshot.child("uid").getValue();
                                 SharedPreferences.Editor editor = sharedpreferences.edit();
                                 editor.putString("USERKEY_SHARED", user_key);
+                                editor.putString("username", userNames);
                                 editor.commit();
 
                                 Bundle bundle = new Bundle();
@@ -266,7 +256,6 @@ public class LostMainFrag extends Fragment {
                                             .commit();
                                 }else {
                                     appBarLayout.setVisibility(View.GONE);
-
                                     AnotherUsersProfiFrag fragment3 = new AnotherUsersProfiFrag();
                                     fragment3.setArguments(bundle);
                                     getFragmentManager()
@@ -300,7 +289,7 @@ public class LostMainFrag extends Fragment {
 
                     }
                 });
-                mDatabaseLikeCounter.child(post_key).addValueEventListener(new ValueEventListener() {
+                /*mDatabaseLikeCounter.child(post_key).addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
 
@@ -351,7 +340,7 @@ public class LostMainFrag extends Fragment {
                             }
                         });
                     }
-                });
+                });*/
 
                 database.child(post_key).child("latlng").addValueEventListener(new ValueEventListener() {       // her postun lat lng değerleri
                     @Override
@@ -399,19 +388,19 @@ public class LostMainFrag extends Fragment {
 
         View mView;
 
-        ImageButton mLikebtn;
         ImageButton commentBtn;
         RelativeLayout profile;
-        LinearLayout likeUsers;
 
         DatabaseReference mDatabaseLike;
         FirebaseAuth mAuth;
 
-        TextView counterLike;
         TextView commentCount;
 
         TextView distanceUser;
 
+       //ImageButton mLikebtn;
+       //LinearLayout likeUsers;
+       //TextView counterLike;
 
 
         public ShareViewHolder(View itemView) {
@@ -419,15 +408,15 @@ public class LostMainFrag extends Fragment {
 
 
             mView = itemView;
-            mLikebtn = (ImageButton) mView.findViewById(R.id.likeBtn);
             commentBtn = (ImageButton) mView.findViewById(R.id.btnComments);
 
-            counterLike = (TextView) mView.findViewById(R.id.counterLike);
             commentCount = (TextView) mView.findViewById(R.id.commentCount);
             distanceUser = (TextView) mView.findViewById(R.id.distanceTxt);
 
             profile = (RelativeLayout) mView.findViewById(R.id.users_info);
-            likeUsers = (LinearLayout) mView.findViewById(R.id.like_users);
+           // likeUsers = (LinearLayout) mView.findViewById(R.id.like_users);
+           // mLikebtn = (ImageButton) mView.findViewById(R.id.likeBtn);
+           // counterLike = (TextView) mView.findViewById(R.id.counterLike);
 
 
 
@@ -436,7 +425,7 @@ public class LostMainFrag extends Fragment {
             mAuth = FirebaseAuth.getInstance();
         }
 
-        public void setLiikeBtn(final String post_key){
+       /* public void setLiikeBtn(final String post_key){
 
             mDatabaseLike.addValueEventListener(new ValueEventListener() {
                 @Override
@@ -455,7 +444,7 @@ public class LostMainFrag extends Fragment {
                 }
             });
         }
-
+*/
 
         public void setQuestions(String questions){
             TextView questions_title = (TextView) mView.findViewById(R.id.question_text);

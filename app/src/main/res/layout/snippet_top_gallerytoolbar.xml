@@ -50,6 +50,14 @@
                     android:id="@+id/tvNext"
                     />
 
+                <ProgressBar
+                    android:id="@+id/nextProgress"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignEnd="@+id/tvNext"
+                    android:visibility="gone"
+                    android:layout_alignParentTop="true" />
+
 
 
 

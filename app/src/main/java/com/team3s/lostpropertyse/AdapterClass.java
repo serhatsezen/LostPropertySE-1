@@ -1,25 +1,28 @@
 package com.team3s.lostpropertyse;
 
-public class Adapter {
+public class AdapterClass {
     public int id = -1;
     public String questions ;
     public String desc;
-    private String post_image;
-    private String name;
-    private String image;
-    private String addressname;
-    private String post_time;
-    private String post_date;
-    private String token;
-    private String commentText;
-    private String commentUsername;
+    public String post_image;
+    public String name;
+    public String image;
+    public String addressname;
+    public String post_time;
+    public String post_date;
+    public String token;
+    public String commentText;
+    public String commentUsername;
+    public String dmtxt;
 
-    private double latMap;
-    private double longMap;
 
-    public Adapter(){
+    public double latMap;
+    public double longMap;
+
+    public AdapterClass(){
     }
-    public Adapter(String questions, String desc, String post_image, String name, String image, String addressname, String post_time, String post_date, String token, String commentText, String commentUsername, double latMap, double longMap){
+
+    public AdapterClass(String questions, String desc, String post_image, String name, String image, String addressname, String post_time, String post_date, String token, String commentText, String commentUsername,String dmtxt, double latMap, double longMap){
         this.questions = questions;
         this.desc = desc;
         this.post_image = post_image;
@@ -31,10 +34,9 @@ public class Adapter {
         this.token = token;
         this.commentText = commentText;
         this.commentUsername = commentUsername;
+        this.dmtxt = dmtxt;
         this.latMap = latMap;
         this.longMap = longMap;
-
-
     }
 
     public String getQuestions() {
@@ -121,6 +123,14 @@ public class Adapter {
 
     public void setcommentUsername(String commentUsername) {
         this.commentUsername = commentUsername;
+    }
+
+    public String getDmtxt() {
+        return dmtxt;
+    }
+
+    public void setDmtxt(String dmtxt) {
+        this.dmtxt = dmtxt;
     }
 
     public Double getLatMap() {

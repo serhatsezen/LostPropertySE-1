@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="10dp">
+
+    <com.github.siyamed.shapeimageview.CircularImageView
+        android:id="@+id/user_profile_dm"
+        app:siBorderColor="@color/black"
+        app:siBorderWidth="8dp"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:layout_alignBottom="@+id/text_dm"
+        android:layout_alignParentStart="true"
+        android:layout_marginBottom="14dp"
+        android:src="@drawable/default_avatar" />
+
+    <TextView
+        android:id="@+id/shaUsername_dm"
+        app:siBorderColor="@color/black"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_toEndOf="@+id/user_profile_dm"
+        android:maxLines="1"
+        android:padding="10dp"
+        android:text="Kullanıcı Adı"
+        android:textColor="#000000"
+        android:textSize="18sp" />
+
+    <TextView
+        android:id="@+id/text_dm"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/shaUsername_dm"
+        android:layout_toEndOf="@+id/user_profile_dm"
+        android:layout_toStartOf="@+id/txt_time"
+        android:maxLines="1"
+        android:padding="10dp"
+        android:text="Mesaj"
+        android:textColor="#000000"
+        android:textSize="18sp"
+        app:siBorderColor="@color/black" />
+
+    <TextView
+        android:id="@+id/txt_time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@+id/text_dm"
+        android:layout_alignBottom="@+id/text_dm"
+        android:layout_alignParentRight="true"
+        android:text="13:32"
+        android:textColor="@color/black" />
+</RelativeLayout>

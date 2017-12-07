@@ -31,7 +31,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.team3s.lostpropertyse.Adapter;
+import com.team3s.lostpropertyse.AdapterClass;
 import com.team3s.lostpropertyse.Utils.CircleTransform;
 import com.team3s.lostpropertyse.R;
 
@@ -162,14 +162,14 @@ public class CommentFrag extends Fragment {
     public void onStart() {         //bu bölümde o postun altında bulunan comment child ına ait cevapları yazdırmak için.
         super.onStart();
 
-        FirebaseRecyclerAdapter<Adapter, ShareViewHolder> firebaseRecyclerAdapter = new FirebaseRecyclerAdapter<Adapter, ShareViewHolder>(
-                Adapter.class,
+        FirebaseRecyclerAdapter<AdapterClass, ShareViewHolder> firebaseRecyclerAdapter = new FirebaseRecyclerAdapter<AdapterClass, ShareViewHolder>(
+                AdapterClass.class,
                 R.layout.comment_row,
                 ShareViewHolder.class,
                 mDatabaseAnswer
         ) {
             @Override
-            protected void populateViewHolder(final ShareViewHolder viewHolder, Adapter model, final int position) {
+            protected void populateViewHolder(final ShareViewHolder viewHolder, AdapterClass model, final int position) {
                 final String post_key = getRef(position).getKey();
                 database.child(post_key).addValueEventListener(new ValueEventListener() {
                     @Override
@@ -198,7 +198,7 @@ public class CommentFrag extends Fragment {
             counterComment = (TextView) mViewRoad.findViewById(R.id.counterLike);
             mAuth = FirebaseAuth.getInstance();
         }
-        public void setcommentText(String commentText) {            //burada bulunan commentText ile firebasedeki child ın altındaki node aynı olmak zorunda ayrıca bunları Adapter.java classında tanımlıyoruz. get fonksiyonları share classdan çekiyoruz.
+        public void setcommentText(String commentText) {            //burada bulunan commentText ile firebasedeki child ın altındaki node aynı olmak zorunda ayrıca bunları AdapterClass.java classında tanımlıyoruz. get fonksiyonları share classdan çekiyoruz.
             TextView mAnswer = (TextView) mViewRoad.findViewById(R.id.commentTxt);
             mAnswer.setText(commentText);
         }

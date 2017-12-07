@@ -6,7 +6,6 @@
     android:layout_height="match_parent"
     android:background="@color/commentBackGround"
     app:layout_constraintBottom_toTopOf="@+id/commentText"
-    tools:context="com.team3s.lostpropertyse.Chat.CommentActivity"
     tools:layout_editor_absoluteX="0dp">
 
   <EditText

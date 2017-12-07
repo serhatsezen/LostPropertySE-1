@@ -71,7 +71,7 @@
                         app:siBorderWidth="9dp" />
 
                     <ImageButton
-                        android:id="@+id/imageView2"
+                        android:id="@+id/dm_imgBtn_another"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_alignBottom="@+id/ivUserProfilePhoto"
@@ -85,7 +85,7 @@
                         android:id="@+id/edit_prof_btn"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_alignBottom="@+id/imageView2"
+                        android:layout_alignBottom="@+id/dm_imgBtn_another"
                         android:layout_marginEnd="26dp"
                         android:layout_toStartOf="@+id/ivUserProfilePhoto"
                         android:background="@null"
@@ -121,7 +121,7 @@
                         android:id="@+id/city"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_alignEnd="@+id/imageView2"
+                        android:layout_alignEnd="@+id/dm_imgBtn_another"
                         android:layout_below="@+id/fullnameuser"
                         android:layout_toEndOf="@+id/usernameprof"
                         android:maxLines="1"
@@ -163,7 +163,7 @@
     </android.support.design.widget.CoordinatorLayout>
 
     <FrameLayout
-        android:id="@+id/postdetproflost"
+        android:id="@+id/another_user_frag"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_alignParentStart="true"

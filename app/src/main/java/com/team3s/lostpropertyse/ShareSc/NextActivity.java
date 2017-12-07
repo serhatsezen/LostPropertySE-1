@@ -447,4 +447,9 @@ public class NextActivity extends AppCompatActivity {
     public void onStop() {
         super.onStop();
     }
+    @Override
+    public void onBackPressed() {
+        Intent intent = new Intent(NextActivity.this, ShareActivity.class);
+        startActivity(intent);
+    }
 }

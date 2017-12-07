@@ -19,7 +19,8 @@
         android:roundIcon="@drawable/ic_launcher"
         android:largeHeap="true"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme.NoActionBar">
+        android:theme="@style/AppTheme.NoActionBar"
+        android:launchMode="singleTop">
         <meta-data
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
@@ -72,6 +73,9 @@
         </service>
         <activity android:name=".ShareSc.ShareActivity"/>
         <activity android:name=".ShareSc.NextActivity"/>
+        <activity android:name=".Chat.Chat" />
+        <activity android:name=".Chat.UsersDMList" />
+
     </application>
 
 </manifest>

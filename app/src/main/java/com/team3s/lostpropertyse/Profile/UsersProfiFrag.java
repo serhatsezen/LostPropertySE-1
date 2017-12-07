@@ -40,6 +40,8 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
+import com.team3s.lostpropertyse.Chat.UsersDMList;
+import com.team3s.lostpropertyse.Post.PostDetailFrag;
 import com.team3s.lostpropertyse.Utils.CircleTransform;
 import com.team3s.lostpropertyse.LoginSign.TabsHeaderActivity;
 import com.team3s.lostpropertyse.R;
@@ -48,7 +50,6 @@ import com.team3s.lostpropertyse.R;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 import static android.app.Activity.RESULT_OK;
@@ -62,7 +63,7 @@ public class UsersProfiFrag extends Fragment {
     private View backgroundView;
     public TextView num_post;
 
-    private ImageButton editprof;
+    private ImageButton editprof,dm_imgBtn;
 
     private StorageReference mStorageImage;
     private StorageReference mStorageImageBack;
@@ -90,7 +91,7 @@ public class UsersProfiFrag extends Fragment {
     private Query mQueryUserId;
     private FirebaseUser user;
     private String currentUserId;
-    public String LostCount;
+    private String LostCount;
 
     public UsersProfiFrag() {
         // Required empty public constructor
@@ -133,38 +134,53 @@ public class UsersProfiFrag extends Fragment {
       tabs.setupWithViewPager(viewPager);
       tabs.setTabGravity(TabLayout.GRAVITY_CENTER);
 
-        database = FirebaseDatabase.getInstance().getReference().child("Icerik");
-        database.keepSynced(true);
-        mDatabaseUsers = FirebaseDatabase.getInstance().getReference().child("Users").child(user.getUid());
-        mDatabaseUsers.keepSynced(true);
-        mDatabaseLike = FirebaseDatabase.getInstance().getReference().child("Likes");
+      database = FirebaseDatabase.getInstance().getReference().child("Icerik");
+      database.keepSynced(true);
+      mDatabaseUsers = FirebaseDatabase.getInstance().getReference().child("Users").child(user.getUid());
+      mDatabaseUsers.keepSynced(true);
+      mDatabaseLike = FirebaseDatabase.getInstance().getReference().child("Likes");
        // databaseFollowers = FirebaseDatabase.getInstance().getReference().child("Users").child(user.getUid()).child("Takip_Edilenler");
-        mDatabaseUsersPostNum = FirebaseDatabase.getInstance().getReference().child("Users").child(user.getUid()).child("PostsId");
-        mStorageImage = FirebaseStorage.getInstance().getReference().child("Profile_images");
-        mStorageImageBack = FirebaseStorage.getInstance().getReference().child("Background_images");
+      mDatabaseUsersPostNum = FirebaseDatabase.getInstance().getReference().child("Users").child(user.getUid()).child("PostsId");
+      mStorageImage = FirebaseStorage.getInstance().getReference().child("Profile_images");
+      mStorageImageBack = FirebaseStorage.getInstance().getReference().child("Background_images");
 
 
-        u_fullname = (TextView) v.findViewById(R.id.fullnameuser);
-        u_username = (TextView) v.findViewById(R.id.usernameprof);
-        u_city = (TextView) v.findViewById(R.id.city);
-        backgroundView = v.findViewById(R.id.background);
+      u_fullname = (TextView) v.findViewById(R.id.fullnameuser);
+      u_username = (TextView) v.findViewById(R.id.usernameprof);
+      u_city = (TextView) v.findViewById(R.id.city);
+      backgroundView = v.findViewById(R.id.background);
 
-        currentUserId = auth.getCurrentUser().getUid();
-        mDatabaseCurrentUsers = FirebaseDatabase.getInstance().getReference().child("Icerik");
-        mQueryUser = mDatabaseCurrentUsers.child("Kayıplar").orderByChild("uid").equalTo(currentUserId);
-        mQueryUserLost = mDatabaseCurrentUsers.child("Kayıplar").orderByChild("uid").equalTo(currentUserId);
-        mQueryUserFind = mDatabaseCurrentUsers.child("Bulunanlar").orderByChild("uid").equalTo(currentUserId);
-        profileImg = (ImageView) v.findViewById(R.id.ivUserProfilePhoto);
-        backgroundImg = (ImageView) v.findViewById(R.id.imageView3);
+      currentUserId = auth.getCurrentUser().getUid();
+      mDatabaseCurrentUsers = FirebaseDatabase.getInstance().getReference().child("Icerik");
+      mQueryUser = mDatabaseCurrentUsers.child("Kayıplar").orderByChild("uid").equalTo(currentUserId);
+      mQueryUserLost = mDatabaseCurrentUsers.child("Kayıplar").orderByChild("uid").equalTo(currentUserId);
+      mQueryUserFind = mDatabaseCurrentUsers.child("Bulunanlar").orderByChild("uid").equalTo(currentUserId);
+      profileImg = (ImageView) v.findViewById(R.id.ivUserProfilePhoto);
+      backgroundImg = (ImageView) v.findViewById(R.id.imageView3);
+      dm_imgBtn = (ImageButton) v.findViewById(R.id.dm_imgBtn_another);
 
 
-        editprof = (ImageButton) v.findViewById(R.id.edit_prof_btn);
-        editprof.setOnClickListener(new OnClickListener() {
+      editprof = (ImageButton) v.findViewById(R.id.edit_prof_btn);
+      editprof.setOnClickListener(new OnClickListener() {
           @Override
           public void onClick(View view) {
             showDialog();
           }
         });
+
+      dm_imgBtn.setOnClickListener(new OnClickListener() {
+          @Override
+          public void onClick(View view) {
+              UsersDMList fragmentD = new UsersDMList();
+              getFragmentManager()
+                      .beginTransaction()
+                      .add(R.id.another_user_frag, fragmentD)
+                      .addToBackStack(null)
+                      .commit();
+          }
+      });
+
+
 
       mDatabaseUsers.child("profileImage").addValueEventListener(new ValueEventListener() {
             @Override
@@ -227,6 +243,8 @@ public class UsersProfiFrag extends Fragment {
             public void onCancelled(DatabaseError databaseError) {
             }
         });
+
+
 
         return v;
     }
@@ -418,7 +436,7 @@ public class UsersProfiFrag extends Fragment {
             @Override
             public boolean onKey(View v, int keyCode, KeyEvent event) {
                 if (event.getAction() == KeyEvent.ACTION_UP && keyCode == KeyEvent.KEYCODE_BACK) {
-                    FrameLayout layout = (FrameLayout) v.findViewById(R.id.postdetproflost);
+                    FrameLayout layout = (FrameLayout) v.findViewById(R.id.another_user_frag);
                     layout.removeAllViewsInLayout();
                     FragmentTransaction ft = getFragmentManager().beginTransaction();
 

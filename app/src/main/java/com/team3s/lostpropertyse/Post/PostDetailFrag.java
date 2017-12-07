@@ -1,9 +1,11 @@
 package com.team3s.lostpropertyse.Post;
 
+import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.PopupMenu;
@@ -14,6 +16,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -21,6 +24,7 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.github.andreilisun.swipedismissdialog.SwipeDismissDialog;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -37,11 +41,14 @@ import com.team3s.lostpropertyse.Utils.UniversalImageLoader;
 
 import java.io.File;
 
+import static android.content.ContentValues.TAG;
+
 public class PostDetailFrag extends Fragment{
 
     private String post_key = null;
     private String post_type = null;
-
+    private String post_img;
+    private String post_desc;
     private DatabaseReference mDatabase;
     private DatabaseReference mDatabaseUsers;
     private DatabaseReference mDatabaseLike;
@@ -59,7 +66,6 @@ public class PostDetailFrag extends Fragment{
     private Button showMap;
 
     private final static String TAG_FRAGMENT = "TAG_FRAGMENT";
-
 
     public PostDetailFrag() {
         // Required empty public constructor
@@ -136,8 +142,8 @@ public class PostDetailFrag extends Fragment{
         mDatabase.child(post_key).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                String post_desc = (String) dataSnapshot.child("questions").getValue();
-                String post_img = (String) dataSnapshot.child("post_image").getValue();
+                post_desc = (String) dataSnapshot.child("questions").getValue();
+                post_img = (String) dataSnapshot.child("post_image").getValue();
                 String post_id = (String) dataSnapshot.child("uid").getValue();
                 String post_city = (String) dataSnapshot.child("city").getValue();
 
@@ -169,17 +175,85 @@ public class PostDetailFrag extends Fragment{
         mPostDelete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mDatabase.child(post_key).removeValue();
-                mDatabaseLike.child(post_key).child(auth.getCurrentUser().getUid()).removeValue();
-                MainPage fragmentMain = new MainPage();
-                getFragmentManager()
-                        .beginTransaction()
-                        .add(R.id.frame_fragmentholder, fragmentMain,TAG_FRAGMENT)
-                        .addToBackStack(null)
-                        .commit();
+                if(post_type == "Kayıplar") {
+                    mDatabase.child(post_key).removeValue();
+                    mDatabaseLike.child(post_key).child(auth.getCurrentUser().getUid()).removeValue();
+                    MainPage fragmentMain = new MainPage();
+                    getFragmentManager()
+                            .beginTransaction()
+                            .add(R.id.postdetpfr, fragmentMain, TAG_FRAGMENT)
+                            .addToBackStack(null)
+                            .commit();
+                }else if(post_type == "Bulunanlar"){
+                    mDatabase.child(post_key).removeValue();
+                    mDatabaseLike.child(post_key).child(auth.getCurrentUser().getUid()).removeValue();
+                    MainPage fragmentMain = new MainPage();
+                    getFragmentManager()
+                            .beginTransaction()
+                            .add(R.id.postdetr, fragmentMain, TAG_FRAGMENT)
+                            .addToBackStack(null)
+                            .commit();
+                }
+            }
+        });
+
+        mPostImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {       /////----------------------Resme tıklayınca resmi büyütüyor ve o resmi kaydırarak kapatabliyorsun
+                View dialog = LayoutInflater.from(getActivity()).inflate(R.layout.custom_image_dialog, null);
+                final SwipeDismissDialog swipeDismissDialog = new SwipeDismissDialog.Builder(getActivity())
+                        .setView(dialog)
+                        .build()
+                        .show();
+                ImageView image = (ImageView) dialog.findViewById(R.id.image);
+                Glide.with(getActivity().getApplicationContext())
+                        .load(post_img)
+                        .diskCacheStrategy(DiskCacheStrategy.ALL)
+                        .into(image);
             }
         });
         return v;
     }
+    public void fullScreen() {          //-----------------------uygulamayı tam ekran yapmak için örnek olarak: bazı telefonlarda alt taraftaki geri gibi butonları gizlemek için.
 
+        // BEGIN_INCLUDE (get_current_ui_flags)
+        // The UI options currently enabled are represented by a bitfield.
+        // getSystemUiVisibility() gives us that bitfield.
+        int uiOptions = getActivity().getWindow().getDecorView().getSystemUiVisibility();
+        int newUiOptions = uiOptions;
+        // END_INCLUDE (get_current_ui_flags)
+        // BEGIN_INCLUDE (toggle_ui_flags)
+        boolean isImmersiveModeEnabled =
+                ((uiOptions | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY) == uiOptions);
+        if (isImmersiveModeEnabled) {
+            Log.i(TAG, "Turning immersive mode mode off. ");
+        } else {
+            Log.i(TAG, "Turning immersive mode mode on.");
+        }
+
+        // Navigation bar hiding:  Backwards compatible to ICS.
+        if (Build.VERSION.SDK_INT >= 14) {
+            newUiOptions ^= View.SYSTEM_UI_FLAG_HIDE_NAVIGATION;
+        }
+
+        // Status bar hiding: Backwards compatible to Jellybean
+        if (Build.VERSION.SDK_INT >= 16) {
+            newUiOptions ^= View.SYSTEM_UI_FLAG_FULLSCREEN;
+        }
+
+        // Immersive mode: Backward compatible to KitKat.
+        // Note that this flag doesn't do anything by itself, it only augments the behavior
+        // of HIDE_NAVIGATION and FLAG_FULLSCREEN.  For the purposes of this sample
+        // all three flags are being toggled together.
+        // Note that there are two immersive mode UI flags, one of which is referred to as "sticky".
+        // Sticky immersive mode differs in that it makes the navigation and status bars
+        // semi-transparent, and the UI flag does not get cleared when the user interacts with
+        // the screen.
+        if (Build.VERSION.SDK_INT >= 18) {
+            newUiOptions ^= View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY;
+        }
+
+        getActivity().getWindow().getDecorView().setSystemUiVisibility(newUiOptions);
+        //END_INCLUDE (set_ui_flags)
+    }
 }
