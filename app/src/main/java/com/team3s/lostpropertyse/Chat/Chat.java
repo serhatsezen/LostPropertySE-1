@@ -20,6 +20,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.team3s.lostpropertyse.R;
 
 import org.apache.http.HttpResponse;
@@ -43,7 +44,7 @@ public class Chat extends AppCompatActivity {
     private EditText messageArea;
     private ScrollView scrollView;
     private TextView dmUserNameTxt;
-    private DatabaseReference reference1,reference2;
+    private DatabaseReference reference1,reference2,mDatabaseToken;
     private String receiver_name;
     private String senderName;
     private String receiver_uid;
@@ -68,12 +69,15 @@ public class Chat extends AppCompatActivity {
         scrollView = (ScrollView)findViewById(R.id.scrollView);
         dmUserNameTxt = (TextView)findViewById(R.id.dmUserNameTxt);
 
+
+
         Intent uids = getIntent();
         sender_uid = uids.getStringExtra("sender_uid");
         receiver_uid = uids.getStringExtra("receiver_uid");
         receiverToken = uids.getStringExtra("receiverToken");
         userschatnamekey = uids.getStringExtra("userschatnamekey");
 
+        mDatabaseToken = FirebaseDatabase.getInstance().getReference().child("Users").child(receiver_uid);
 
 
         if(userschatnamekey == null) {
@@ -98,6 +102,15 @@ public class Chat extends AppCompatActivity {
         }
 
 
+        mDatabaseToken.child("token").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot snapshot) {
+                receiverToken = String.valueOf(snapshot.getValue());
+            }
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+            }
+        });
 
 
         sendButton.setOnClickListener(new View.OnClickListener() {
@@ -189,9 +202,9 @@ public class Chat extends AppCompatActivity {
             try {
                 // Add your data
                 List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(3);
-                nameValuePairs.add(new BasicNameValuePair("tokeNDevice", receiverToken));
                 nameValuePairs.add(new BasicNameValuePair("dm", dmtxt));
                 nameValuePairs.add(new BasicNameValuePair("userName", senderName));
+                nameValuePairs.add(new BasicNameValuePair("tokeNDevice", receiverToken));
                 httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
                 // Execute HTTP Post Request
                 HttpResponse response = httpclient.execute(httppost);
