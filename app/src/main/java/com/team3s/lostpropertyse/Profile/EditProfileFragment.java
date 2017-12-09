@@ -268,7 +268,7 @@ public class EditProfileFragment extends Fragment {
         super.onActivityResult(requestCode, resultCode, data);
         if(data == null ){
             Toast.makeText(getContext(),"Resim Seçmediniz",Toast.LENGTH_LONG).show();
-            Log.i("TESTGALLERY", "NULL ABİSİ");
+            Log.i("TESTGALLERY", "NULL ABİSİ"); /* ****** */
         }
         if(requestCode == IMAGE_PICK_REQUEST && resultCode == RESULT_OK && data != null){
             Log.i("TESTGALLERY", data.getData().toString());
