@@ -111,7 +111,7 @@ public class SignIn_Fragment extends Fragment implements OnClickListener,GoogleA
         mDatabaseUsers = FirebaseDatabase.getInstance().getReference().child("Users");
         mDatabaseUsers.keepSynced(true);
         mDatabaseFindUsers = FirebaseDatabase.getInstance().getReference().child("Icerik").child("Bulunanlar");
-        mDatabaseLostUsers = FirebaseDatabase.getInstance().getReference().child("Icerik").child("Kayıplar");
+        mDatabaseLostUsers = FirebaseDatabase.getInstance().getReference().child("Icerik").child("Kayiplar");
 
         mSignInButton = (SignInButton) view.findViewById(R.id.sign_in_button);
         mSignInButton.setSize(SignInButton.SIZE_WIDE);

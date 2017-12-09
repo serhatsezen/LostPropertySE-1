@@ -175,7 +175,7 @@ public class PostDetailFrag extends Fragment{
         mPostDelete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(post_type == "Kayıplar") {
+                if(post_type == "Kayiplar") {
                     mDatabase.child(post_key).removeValue();
                     mDatabaseLike.child(post_key).child(auth.getCurrentUser().getUid()).removeValue();
                     MainPage fragmentMain = new MainPage();

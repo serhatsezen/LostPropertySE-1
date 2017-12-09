@@ -78,7 +78,7 @@ public class LostProp_Fragment extends Fragment {
         }
 
 
-        mDatabase = FirebaseDatabase.getInstance().getReference().child("Icerik").child("Kayıplar");
+        mDatabase = FirebaseDatabase.getInstance().getReference().child("Icerik").child("Kayiplar");
         mDatabase.keepSynced(true);
         mDatabaseUsers = FirebaseDatabase.getInstance().getReference().child("Users").child(str);
         mDatabaseUsers.keepSynced(true);
@@ -121,7 +121,7 @@ public class LostProp_Fragment extends Fragment {
                     public void onClick(View v) {
                         Bundle bundlePostDetail = new Bundle();
                         bundlePostDetail.putString("post_id",post_key);
-                        bundlePostDetail.putString("post_type","Kayıplar");
+                        bundlePostDetail.putString("post_type","Kayiplar");
 
                         PostDetailFrag fragmentCom = new PostDetailFrag();
                         fragmentCom.setArguments(bundlePostDetail);

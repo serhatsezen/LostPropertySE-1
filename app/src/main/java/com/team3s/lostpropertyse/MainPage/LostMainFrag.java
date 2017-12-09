@@ -172,7 +172,7 @@ public class LostMainFrag extends Fragment {
     public void onStart(){
         super.onStart();
         final String currentUserId = auth.getCurrentUser().getUid();
-        database = FirebaseDatabase.getInstance().getReference().child("Icerik").child("Kayıplar");
+        database = FirebaseDatabase.getInstance().getReference().child("Icerik").child("Kayiplar");
         mQueryIcerik = database.orderByChild("city").equalTo(cityFilter);
 
 
@@ -200,7 +200,7 @@ public class LostMainFrag extends Fragment {
                     public void onClick(View v) {
                         Bundle bundleComment = new Bundle();
                         bundleComment.putString("post_id",post_key);
-                        bundleComment.putString("post_type","Kayıplar");
+                        bundleComment.putString("post_type","Kayiplar");
                         appBarLayout.setVisibility(View.GONE);
 
                         PostDetailFrag fragmentDet = new PostDetailFrag();
@@ -218,7 +218,7 @@ public class LostMainFrag extends Fragment {
                     public void onClick(View v) {
                         Bundle bundleComment = new Bundle();
                         bundleComment.putString("post_id_key",post_key);
-                        bundleComment.putString("post_type","Kayıplar");
+                        bundleComment.putString("post_type","Kayiplar");
                         appBarLayout.setVisibility(View.GONE);
 
                         CommentFrag fragmentCom = new CommentFrag();

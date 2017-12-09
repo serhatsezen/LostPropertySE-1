@@ -226,7 +226,7 @@ public class NextActivity extends AppCompatActivity {
                         switch (which){
                             case 0:
                                 lostOrFind.setText("Kayıp");
-                                kategori = "Kayıplar";
+                                kategori = "Kayiplar";
                                 break;
                             case 1:
                                 lostOrFind.setText("Buldum");

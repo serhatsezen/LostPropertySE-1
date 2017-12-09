@@ -68,6 +68,8 @@ public class AnotherUsersProfiFrag extends Fragment {
 
     private String receiver_name;
     private String senderName;
+    private String receiverToken;
+
     private SharedPreferences sharedpreferences;
     public static final String MyPREFERENCES = "MyPrefs" ;
 
@@ -145,23 +147,24 @@ public class AnotherUsersProfiFrag extends Fragment {
       dm_imgBtn_another.setOnClickListener(new OnClickListener() {
           @Override
           public void onClick(View v) {
-             /* Bundle bundlePostDetail = new Bundle();
-              bundlePostDetail.putString("user_id",post_key_user);
-              bundlePostDetail.putString("receiver_name",receiver_name);*/
               SharedPreferences.Editor editor = sharedpreferences.edit();
               editor.putString("receiver_name", receiver_name);
               editor.commit();
               Intent senddm = new Intent(getActivity(), Chat.class);
               senddm.putExtra("sender_uid",currentUserId);
               senddm.putExtra("receiver_uid",post_key_user);
+              senddm.putExtra("receiverToken",receiverToken);
               startActivity(senddm);
-             /* SendScForDm fragmentDM = new SendScForDm();
-              fragmentDM.setArguments(bundlePostDetail);
-              getFragmentManager()
-                      .beginTransaction()
-                      .add(R.id.another_user_frag, fragmentDM)
-                      .addToBackStack(null)
-                      .commit();*/
+          }
+      });
+
+      mDatabaseUsers.child("token").addValueEventListener(new ValueEventListener() {
+          @Override
+          public void onDataChange(DataSnapshot snapshot) {
+              receiverToken = String.valueOf(snapshot.getValue());
+          }
+          @Override
+          public void onCancelled(DatabaseError databaseError) {
           }
       });
 

@@ -2,6 +2,7 @@ package com.team3s.lostpropertyse.Chat;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Gravity;
@@ -21,9 +22,18 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.team3s.lostpropertyse.R;
 
+import org.apache.http.HttpResponse;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.message.BasicNameValuePair;
 import org.w3c.dom.Text;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class Chat extends AppCompatActivity {
@@ -37,7 +47,13 @@ public class Chat extends AppCompatActivity {
     private String receiver_name;
     private String senderName;
     private String receiver_uid;
+    private String receiverToken;
     private String sender_uid;
+    private String dmtxt;
+
+    private String userkeyfornotif;
+    private String userschatnamekey;
+
     private String MyPREFERENCES = "MyPrefs" ;
     SharedPreferences mPrefs;
 
@@ -55,25 +71,39 @@ public class Chat extends AppCompatActivity {
         Intent uids = getIntent();
         sender_uid = uids.getStringExtra("sender_uid");
         receiver_uid = uids.getStringExtra("receiver_uid");
+        receiverToken = uids.getStringExtra("receiverToken");
+        userschatnamekey = uids.getStringExtra("userschatnamekey");
 
-        mPrefs = getSharedPreferences(MyPREFERENCES,0);
-        senderName = mPrefs.getString("username", "");
-        receiver_name = mPrefs.getString("receiver_name","");
-        receiver_name = receiver_name.replaceAll("\\s+","");
-        receiver_name.toLowerCase();
-        senderName = senderName.replaceAll("\\s+","");
-        senderName.toLowerCase();
 
-        dmUserNameTxt.setText(receiver_name);
 
-        reference1 = FirebaseDatabase.getInstance().getReference().child("messages").child(senderName+"_"+receiver_name);
-        reference2 = FirebaseDatabase.getInstance().getReference().child("messages").child(receiver_name+"_"+senderName);
+        if(userschatnamekey == null) {
+            mPrefs = getSharedPreferences(MyPREFERENCES, 0);
+            senderName = mPrefs.getString("username", "");
+            receiver_name = mPrefs.getString("receiver_name", "");
+            receiver_name = receiver_name.replaceAll("\\s+", "");
+            receiver_name.toLowerCase();
+            senderName = senderName.replaceAll("\\s+", "");
+            senderName.toLowerCase();
+            dmUserNameTxt.setText(receiver_name);
+
+            reference1 = FirebaseDatabase.getInstance().getReference().child("messages").child(senderName+"_"+receiver_name);
+            reference2 = FirebaseDatabase.getInstance().getReference().child("messages").child(receiver_name+"_"+senderName);
+        }else{
+            String splitted_names[] =userschatnamekey.split("_");
+            receiver_name = splitted_names[0];
+            senderName = splitted_names[1];
+
+            reference1 = FirebaseDatabase.getInstance().getReference().child("messages").child(senderName+"_"+receiver_name);
+            reference2 = FirebaseDatabase.getInstance().getReference().child("messages").child(receiver_name+"_"+senderName);
+        }
+
+
 
 
         sendButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String dmtxt = messageArea.getText().toString();
+                dmtxt = messageArea.getText().toString();
                 if(!dmtxt.equals("")){
                     Map<String, String> map = new HashMap<String, String>();
                     map.put("message", dmtxt);
@@ -92,6 +122,8 @@ public class Chat extends AppCompatActivity {
                     reference2.push().setValue(maprece);
                     reference2.child("senderUid").setValue(receiver_uid);
                     reference2.child("receiver_uid").setValue(sender_uid);
+
+                    new Send().execute();                           //başarılı ise notification gönderme
                 }
 
                 messageArea.getText().clear();
@@ -149,5 +181,28 @@ public class Chat extends AppCompatActivity {
         }
         layout.addView(textView);
         scrollView.fullScroll(View.FOCUS_DOWN);
+    }
+    class Send extends AsyncTask<String, Void,Long > {          //burası notification kısmı.
+        protected Long doInBackground(String... urls) {
+            HttpClient httpclient = new DefaultHttpClient();
+            HttpPost httppost = new HttpPost("http://aydinserhatsezen.com/fcm/LostP/lpdm.php");
+            try {
+                // Add your data
+                List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(3);
+                nameValuePairs.add(new BasicNameValuePair("tokeNDevice", receiverToken));
+                nameValuePairs.add(new BasicNameValuePair("dm", dmtxt));
+                nameValuePairs.add(new BasicNameValuePair("userName", senderName));
+                httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
+                // Execute HTTP Post Request
+                HttpResponse response = httpclient.execute(httppost);
+            } catch (Exception e) {
+                // TODO Auto-generated catch block
+            }
+            return null;
+        }
+        protected void onProgressUpdate(Integer... progress) {
+        }
+        protected void onPostExecute(Long result) {
+        }
     }
 }

@@ -152,8 +152,8 @@ public class UsersProfiFrag extends Fragment {
 
       currentUserId = auth.getCurrentUser().getUid();
       mDatabaseCurrentUsers = FirebaseDatabase.getInstance().getReference().child("Icerik");
-      mQueryUser = mDatabaseCurrentUsers.child("Kayıplar").orderByChild("uid").equalTo(currentUserId);
-      mQueryUserLost = mDatabaseCurrentUsers.child("Kayıplar").orderByChild("uid").equalTo(currentUserId);
+      mQueryUser = mDatabaseCurrentUsers.child("Kayiplar").orderByChild("uid").equalTo(currentUserId);
+      mQueryUserLost = mDatabaseCurrentUsers.child("Kayiplar").orderByChild("uid").equalTo(currentUserId);
       mQueryUserFind = mDatabaseCurrentUsers.child("Bulunanlar").orderByChild("uid").equalTo(currentUserId);
       profileImg = (ImageView) v.findViewById(R.id.ivUserProfilePhoto);
       backgroundImg = (ImageView) v.findViewById(R.id.imageView3);
@@ -190,7 +190,6 @@ public class UsersProfiFrag extends Fragment {
                         .centerCrop()
                         .diskCacheStrategy(DiskCacheStrategy.ALL)
                         .transform(new CircleTransform(getActivity()))
-                        .animate(R.anim.shake)
                         .into(profileImg);
             }
             @Override
@@ -300,7 +299,8 @@ public class UsersProfiFrag extends Fragment {
                                 backgroundImage = true;
                                 break;
                             case 1: /*changeProfilePicture();*/
-                                changeFragment();
+                                Intent edtprof = new Intent(getActivity(),EditProfileFragment.class);
+                                startActivity(edtprof);
                                 profileImage = true;
                                 break;
                             case 2: signOut();
@@ -324,13 +324,13 @@ public class UsersProfiFrag extends Fragment {
         startActivityForResult(profilePicker, GALLERY_REQUEST);
 
     }
-    public void changeFragment(){
+    /*public void changeFragment(){
         FragmentManager manager = getFragmentManager();
         EditProfileFragment editProfileFragment = new EditProfileFragment();
         editProfileFragment.setArguments();
         manager.beginTransaction().replace(R.id.frame_fragmentholder, editProfileFragment, "TEST").commit();
 
-    }
+    }*/
 
     @Override
     public void onActivityResult(int reqCode, int resultCode, Intent data) {
@@ -438,6 +438,7 @@ public class UsersProfiFrag extends Fragment {
                 if (event.getAction() == KeyEvent.ACTION_UP && keyCode == KeyEvent.KEYCODE_BACK) {
                     FrameLayout layout = (FrameLayout) v.findViewById(R.id.another_user_frag);
                     layout.removeAllViewsInLayout();
+                    layout.requestLayout();
                     FragmentTransaction ft = getFragmentManager().beginTransaction();
 
                     return true;

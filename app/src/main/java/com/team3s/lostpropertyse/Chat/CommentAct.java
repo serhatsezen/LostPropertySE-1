@@ -2,10 +2,12 @@ package com.team3s.lostpropertyse.Chat;
 
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
@@ -32,8 +34,9 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.team3s.lostpropertyse.AdapterClass;
-import com.team3s.lostpropertyse.Utils.CircleTransform;
+import com.team3s.lostpropertyse.LoginSign.TabsHeaderActivity;
 import com.team3s.lostpropertyse.R;
+import com.team3s.lostpropertyse.Utils.CircleTransform;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
@@ -46,7 +49,7 @@ import org.apache.http.message.BasicNameValuePair;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CommentFrag extends Fragment {
+public class CommentAct extends AppCompatActivity {
     private EditText cevap;
     private ImageButton cevaponay;
     private ProgressBar progressBar;
@@ -58,6 +61,7 @@ public class CommentFrag extends Fragment {
     private DatabaseReference mDatabaseAnswer;
     private DatabaseReference mDatabasePost;
     private DatabaseReference mDatabasePToken;
+    private FirebaseAuth.AuthStateListener authListener;
 
     private RecyclerView cevapList;
 
@@ -72,22 +76,36 @@ public class CommentFrag extends Fragment {
     public String user_key = null;
     public String cevap_val;
 
-    public CommentFrag() {
-        // Required empty public constructor
-    }
+
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        View v =  inflater.inflate(R.layout.fragment_comment, container, false);
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.fragment_comment);
         auth = FirebaseAuth.getInstance();
         currentUser = auth.getCurrentUser();
 
-        Bundle bundlecom = getArguments();                          //mainFragment ten post un keyini çekiyoruz.
-        post_key = bundlecom.getString("post_id_key");
-        post_type = bundlecom.getString("post_type");
+        Intent bundlecom = getIntent();                          //mainFragment ten post un keyini çekiyoruz.
+        post_key = bundlecom.getStringExtra("post_id_key");
+        post_type = bundlecom.getStringExtra("post_type");
 
+        authListener = new FirebaseAuth.AuthStateListener() {
+            @Override
+            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+                FirebaseUser user = firebaseAuth.getCurrentUser();
+                if (user == null) {
+                    // user auth state is changed - user is null
+                    // launch login activity
+                    Intent loginIntent = new Intent(CommentAct.this,TabsHeaderActivity.class);
+                    loginIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    startActivity(loginIntent);
+
+                }
+            }
+        };
+
+
+        System.out.print("-**********************-"+post_key+"-----"+post_type);
         mDatabase = FirebaseDatabase.getInstance().getReference().child("Users").child(currentUser.getUid());
         mDatabaseAnswer = FirebaseDatabase.getInstance().getReference().child("Icerik").child(post_type).child(post_key).child("Comments");
         database = FirebaseDatabase.getInstance().getReference().child("Icerik");
@@ -102,11 +120,11 @@ public class CommentFrag extends Fragment {
             public void onCancelled(DatabaseError databaseError) {
             }
         });
-        cevapList = (RecyclerView) v.findViewById(R.id.comment_list);
-        cevap = (EditText) v.findViewById(R.id.edtx_comment);
-        cevaponay = (ImageButton) v.findViewById(R.id.comment_submit);
-        progressBar = (ProgressBar) v.findViewById(R.id.news_cevap_progressBar);
-        LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
+        cevapList = (RecyclerView) findViewById(R.id.comment_list);
+        cevap = (EditText) findViewById(R.id.edtx_comment);
+        cevaponay = (ImageButton) findViewById(R.id.comment_submit);
+        progressBar = (ProgressBar) findViewById(R.id.news_cevap_progressBar);
+        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         cevapList.setLayoutManager(layoutManager);
         cevaponay.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -116,7 +134,6 @@ public class CommentFrag extends Fragment {
                 startPosting();
             }
         });
-        return v;
     }
 
     private void startPosting() {
@@ -139,8 +156,9 @@ public class CommentFrag extends Fragment {
                         @Override
                         public void onComplete(@NonNull Task<Void> task) {
                             if (task.isSuccessful()) {
-                                cevap_val = post_key+"/"+post_type+"/"+cevap_val;
-                                new Send().execute();                           //başarılı ise notification gönderme
+                                if(!mUID.equals(currentUID)) {
+                                    new Send().execute();                           //başarılı ise notification gönderme
+                                }
                                 cevap.getText().clear();
                             }
                         }
@@ -181,7 +199,7 @@ public class CommentFrag extends Fragment {
                 });
                 viewHolder.setcommentText(model.getcommentText());          //comment text
                 viewHolder.setcommentUsername(model.getcommentUsername());  //comment user name
-                viewHolder.setImage(getActivity().getApplicationContext(), model.getImage());   //comment user image
+                viewHolder.setImage(getApplicationContext(), model.getImage());   //comment user image
             }
         };
         cevapList.setAdapter(firebaseRecyclerAdapter);
@@ -212,6 +230,7 @@ public class CommentFrag extends Fragment {
                     .centerCrop()
                     .diskCacheStrategy(DiskCacheStrategy.ALL)
                     .transform(new CircleTransform(ctx))
+                    .animate(R.anim.shake)
                     .into(user_Pic);
         }
     }
@@ -230,10 +249,8 @@ public class CommentFrag extends Fragment {
                 // Add your data
                 List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(3);
                 nameValuePairs.add(new BasicNameValuePair("tokendevice", tokenUser));
-                nameValuePairs.add(new BasicNameValuePair("comment", cevap_val));
+                nameValuePairs.add(new BasicNameValuePair("cevap", cevap_val));
                 nameValuePairs.add(new BasicNameValuePair("userName", nameFuser));
-
-
                 httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
                 // Execute HTTP Post Request
                 HttpResponse response = httpclient.execute(httppost);

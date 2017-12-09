@@ -87,7 +87,7 @@ public class PropMaps extends FragmentActivity implements OnMapReadyCallback, Go
             mDatabaseShowMap = FirebaseDatabase.getInstance().getReference().child("Icerik").child(post_type).child(post_key).child("latlng");
         }
 
-        mDatabaseLostMap = FirebaseDatabase.getInstance().getReference().child("Icerik").child("Kayıplar");
+        mDatabaseLostMap = FirebaseDatabase.getInstance().getReference().child("Icerik").child("Kayiplar");
         mDatabaseFindMap = FirebaseDatabase.getInstance().getReference().child("Icerik").child("Bulunanlar");
         //get firebase auth instance
         auth = FirebaseAuth.getInstance();

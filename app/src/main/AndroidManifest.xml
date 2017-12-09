@@ -58,6 +58,11 @@
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>
         </service>
+
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_color"
+            android:resource="@color/colorAccent" />
+
         <service android:name=".services.FirebaseInstanceIDService">
             <intent-filter>
                 <action android:name="com.google.firebase.INSTANCE_ID_EVENT" />
@@ -73,8 +78,21 @@
         </service>
         <activity android:name=".ShareSc.ShareActivity"/>
         <activity android:name=".ShareSc.NextActivity"/>
-        <activity android:name=".Chat.Chat" />
-        <activity android:name=".Chat.UsersDMList" />
+        <activity android:name=".Profile.EditProfileFragment"/>
+
+        <activity android:name=".Chat.Chat">
+            <intent-filter>
+                <action android:name="Chat"></action>
+                <category android:name="android.intent.category.DEFAULT"></category>
+            </intent-filter>
+        </activity>
+        <activity android:name=".Chat.CommentAct">
+            <intent-filter>
+                <action android:name="Comment"></action>
+                <category android:name="android.intent.category.DEFAULT"></category>
+            </intent-filter>
+        </activity>
+
 
     </application>
 

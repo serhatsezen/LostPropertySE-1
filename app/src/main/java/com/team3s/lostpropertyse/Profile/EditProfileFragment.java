@@ -2,17 +2,23 @@ package com.team3s.lostpropertyse.Profile;
 
 import android.Manifest;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
@@ -24,6 +30,7 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -32,9 +39,18 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 import com.team3s.lostpropertyse.R;
+import com.team3s.lostpropertyse.Utils.CircleTransform;
 
-public class EditProfileFragment extends Fragment {
+import java.io.IOException;
+import java.sql.SQLOutput;
+
+import static android.app.Activity.RESULT_OK;
+
+public class EditProfileFragment extends AppCompatActivity {
 
     private EditText AdSoyad;
     private EditText Sehir;
@@ -42,63 +58,83 @@ public class EditProfileFragment extends Fragment {
     private ImageView profileİmg;
     private MapView mapView;
     private GoogleMap myGoogleMap;
-
-
+    Button kaydetButton;
+    Uri newImageUri;
+    private StorageReference imgStorageRef;
     private FirebaseUser currentUser;
     private DatabaseReference curentUserRef;
     double latMarkers;
     double lngMarkers;
+    String imgUrl;
     public LatLng user;
-
-    public EditProfileFragment() {
-        // Required empty public constructor
-    }
+    private static final int IMAGE_PICK_REQUEST = 888;
 
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-    }
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        View v = inflater.inflate(R.layout.fragment_edit_profile, container, false);
+        setContentView(R.layout.fragment_edit_profile);
 
 
         FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
         Uid = currentUser.getUid();
-        profileİmg = (ImageView) v.findViewById(R.id.EditPP);
+        profileİmg = (ImageView) findViewById(R.id.EditPP);
         curentUserRef = FirebaseDatabase.getInstance().getReference("Users").child(Uid /* şuanki kullanıcının idsi */);
+        imgStorageRef = FirebaseStorage.getInstance().getReference("Profile_images");
 
-        AdSoyad = (EditText) v.findViewById(R.id.editTextAdSoyad);
-        Sehir = (EditText) v.findViewById(R.id.editTextSehir);
-        mapView = (MapView) v.findViewById(R.id.mapView);
-
-
+        AdSoyad = (EditText) findViewById(R.id.editTextAdSoyad);
+        Sehir = (EditText) findViewById(R.id.editTextSehir);
+        kaydetButton = (Button) findViewById(R.id.kaydetButon);
+        mapView = (MapView) findViewById(R.id.mapView);
+        kaydetButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                writeNewDatasToDB();
+            }
+        });
         mapView.onCreate(savedInstanceState);
 
         mapView.onResume(); // needed to get the map to display immediately
 
+        setProfileİmg();
+        getLocation();
 
-        curentUserRef.child("latLng").addValueEventListener(new ValueEventListener() {
+        profileİmg.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onDataChange(DataSnapshot snapshot) {
-                latMarkers = (double) snapshot.child("latitude").getValue();
-                lngMarkers = (double) snapshot.child("longitude").getValue();
-                user = new LatLng(latMarkers, lngMarkers);
+            public void onClick(View view) {
+                pickImage();
+            }
+        });
+        curentUserRef.child("namesurname").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                AdSoyad.setHint(String.valueOf(dataSnapshot.getValue()));
             }
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
+        curentUserRef.child("cityName").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                Sehir.setHint(String.valueOf(dataSnapshot.getValue()));
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
             }
         });
 
 
+
+
+
         try {
-            MapsInitializer.initialize(getActivity().getApplicationContext());
+            MapsInitializer.initialize(this.getApplicationContext());
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -109,7 +145,7 @@ public class EditProfileFragment extends Fragment {
                 myGoogleMap = mMap;
 
                 // For showing a move to my location button
-                if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                if (ActivityCompat.checkSelfPermission(EditProfileFragment.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(EditProfileFragment.this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
                     // TODO: Consider calling
                     //    ActivityCompat#requestPermissions
                     // here to request the missing permissions, and then overriding
@@ -122,12 +158,21 @@ public class EditProfileFragment extends Fragment {
                 myGoogleMap.setMyLocationEnabled(true);
 
                 // For dropping a marker at a point on the Map
-                LatLng sydney = new LatLng(-34, 151);
-                myGoogleMap.addMarker(new MarkerOptions().position(user).title("Bulundugunuz yer").snippet(""));
+                if(user==null){
+                    getLocation();
+                    myGoogleMap.addMarker(new MarkerOptions().position(user).title("Bulundugunuz yer").snippet(""));
+                    // For zooming automatically to the location of the marker
+                    CameraPosition cameraPosition = new CameraPosition.Builder().target(user).zoom(12).build();
+                    myGoogleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+                }else {
+                    myGoogleMap.addMarker(new MarkerOptions().position(user).title("Bulundugunuz yer").snippet(""));
+                    // For zooming automatically to the location of the marker
+                    CameraPosition cameraPosition = new CameraPosition.Builder().target(user).zoom(12).build();
+                    myGoogleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+                }
 
-                // For zooming automatically to the location of the marker
-                CameraPosition cameraPosition = new CameraPosition.Builder().target(user).zoom(12).build();
-                myGoogleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+
+
             }
         });
 
@@ -137,19 +182,107 @@ public class EditProfileFragment extends Fragment {
         mapView.getMapAsync(new OnMapReadyCallback() {
             @Override
             public void onMapReady(GoogleMap googleMap) {
-                    myGoogleMap = googleMap;
-                    myGoogleMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
-                    
+                myGoogleMap = googleMap;
+                myGoogleMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
+
 
             }
         });
-        return  v;
+    }
+
+    public void setProfileİmg(){
+
+
+        curentUserRef.child("profileImage").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                Glide.with(getApplicationContext())
+                        .load(String.valueOf(dataSnapshot.getValue()))
+                        .centerCrop()
+                        .diskCacheStrategy(DiskCacheStrategy.ALL)
+                        .transform(new CircleTransform(EditProfileFragment.this))
+                        .into(profileİmg);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
+    }
+
+    public void writeNewDatasToDB(){
+        String newName = AdSoyad.getText().toString();
+        String newCity = Sehir.getText().toString();
+
+
+        //gözlemlemek için yazdım
+        Log.i("newDatas", "writeNewDatasToDB: " + newName +" - " + newName.isEmpty());
+        Log.i("newDatas", "writeNewDatasToDB: " + newCity +" - " + newCity.isEmpty());
+
+        if(!newName.isEmpty()){
+            curentUserRef.child("namesurname").setValue(newName);
+        }
+        if(!newCity.isEmpty()){
+            curentUserRef.child("cityName").setValue(newCity);
+        }
+        if(newImageUri != null){
+            StorageReference filePath = imgStorageRef.child(newImageUri.getLastPathSegment());
+            filePath.putFile(newImageUri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                @Override
+                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                    String downloadUri = taskSnapshot.getDownloadUrl().toString();
+                    curentUserRef.child("profileImage").setValue(downloadUri);
+                }
+            });
+
+        }
+    }
+
+    public void getLocation(){
+        curentUserRef.child("latLng").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot snapshot) {
+                latMarkers = (double) snapshot.child("latitude").getValue();
+                lngMarkers = (double) snapshot.child("longitude").getValue();
+                user = new LatLng(latMarkers, lngMarkers);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+            }
+        });
+    }
+
+    public void pickImage(){
+        Intent imagepick = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.INTERNAL_CONTENT_URI);
+        startActivityForResult(imagepick, IMAGE_PICK_REQUEST);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if(data == null ){
+            Toast.makeText(this,"Resim Seçmediniz",Toast.LENGTH_LONG).show();
+            Log.i("TESTGALLERY", "NULL ABİSİ"); /* ****** */
+        }
+        if(requestCode == IMAGE_PICK_REQUEST && resultCode == RESULT_OK && data != null){
+            Log.i("TESTGALLERY", data.getData().toString());
+            newImageUri = data.getData();
+
+            try {
+                Bitmap bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), newImageUri);
+                profileİmg.setImageBitmap(bitmap);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     public void setArguments(){
-        Log.i("SetArguments","Set");
-    }
 
+    }
 
 
 
