@@ -3,18 +3,16 @@ package com.team3s.lostpropertyse.Profile;
 import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -46,9 +44,6 @@ import com.team3s.lostpropertyse.R;
 import com.team3s.lostpropertyse.Utils.CircleTransform;
 
 import java.io.IOException;
-import java.sql.SQLOutput;
-
-import static android.app.Activity.RESULT_OK;
 
 public class EditProfileFragment extends AppCompatActivity {
 
@@ -68,7 +63,11 @@ public class EditProfileFragment extends AppCompatActivity {
     String imgUrl;
     public LatLng user;
     private static final int IMAGE_PICK_REQUEST = 888;
-
+    private SharedPreferences sharedpreferences;
+    public static final String MyPREFERENCES = "MyPrefs" ;
+    SharedPreferences.Editor editor;
+    double latMarkerss;
+    double lngMarkerss;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -95,6 +94,8 @@ public class EditProfileFragment extends AppCompatActivity {
         mapView.onCreate(savedInstanceState);
 
         mapView.onResume(); // needed to get the map to display immediately
+        sharedpreferences = getSharedPreferences(MyPREFERENCES, Context.MODE_PRIVATE);
+
 
         setProfileİmg();
         getLocation();
@@ -130,9 +131,6 @@ public class EditProfileFragment extends AppCompatActivity {
         });
 
 
-
-
-
         try {
             MapsInitializer.initialize(this.getApplicationContext());
         } catch (Exception e) {
@@ -158,12 +156,13 @@ public class EditProfileFragment extends AppCompatActivity {
                 myGoogleMap.setMyLocationEnabled(true);
 
                 // For dropping a marker at a point on the Map
-                if(user==null){
-                    getLocation();
+                if(user==null){         //latlng boş ise
+                    getLocationFromShared();    //sharedprefence de kayıtlı olan latlng değerlerini çek
                     myGoogleMap.addMarker(new MarkerOptions().position(user).title("Bulundugunuz yer").snippet(""));
                     // For zooming automatically to the location of the marker
                     CameraPosition cameraPosition = new CameraPosition.Builder().target(user).zoom(12).build();
                     myGoogleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+
                 }else {
                     myGoogleMap.addMarker(new MarkerOptions().position(user).title("Bulundugunuz yer").snippet(""));
                     // For zooming automatically to the location of the marker
@@ -247,12 +246,28 @@ public class EditProfileFragment extends AppCompatActivity {
                 latMarkers = (double) snapshot.child("latitude").getValue();
                 lngMarkers = (double) snapshot.child("longitude").getValue();
                 user = new LatLng(latMarkers, lngMarkers);
+                saveLocationToShared();                     //çekilen lat lng değerlerinin kaydı için
             }
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
             }
         });
+    }
+    // veritabanından çekilen locationın lat lng değerlerinin sharedprefences ile kayıtlı tutlması
+    private void saveLocationToShared() {
+        SharedPreferences.Editor editor = sharedpreferences.edit();
+        editor.putFloat("position_lat", (float) user.latitude );
+        editor.putFloat("position_lon", (float) user.longitude);
+        editor.commit();
+    }
+
+    // son kayıtlı olan location bilgisini sharedprefences yardımıyla çekme
+    private void getLocationFromShared() {
+        sharedpreferences = getSharedPreferences(MyPREFERENCES,0);
+        latMarkerss = sharedpreferences.getFloat("position_lat", 39f);          //eğer null ise lat degeri 39f
+        lngMarkerss = sharedpreferences.getFloat("position_lon", 30f);          //eğer null ise lng değeri 30f
+        user = new LatLng(latMarkerss, lngMarkerss);
     }
 
     public void pickImage(){

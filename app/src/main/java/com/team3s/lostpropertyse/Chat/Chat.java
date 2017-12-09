@@ -6,6 +6,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Gravity;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
@@ -21,6 +22,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.team3s.lostpropertyse.MainPage.BottomBarActivity;
 import com.team3s.lostpropertyse.R;
 
 import org.apache.http.HttpResponse;
@@ -77,8 +79,18 @@ public class Chat extends AppCompatActivity {
         receiverToken = uids.getStringExtra("receiverToken");
         userschatnamekey = uids.getStringExtra("userschatnamekey");
 
-        mDatabaseToken = FirebaseDatabase.getInstance().getReference().child("Users").child(receiver_uid);
-
+        if(receiverToken != null) {
+            mDatabaseToken = FirebaseDatabase.getInstance().getReference().child("Users").child(receiver_uid);
+            mDatabaseToken.child("token").addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot snapshot) {
+                    receiverToken = String.valueOf(snapshot.getValue());
+                }
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+                }
+            });
+        }
 
         if(userschatnamekey == null) {
             mPrefs = getSharedPreferences(MyPREFERENCES, 0);
@@ -102,15 +114,6 @@ public class Chat extends AppCompatActivity {
         }
 
 
-        mDatabaseToken.child("token").addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot snapshot) {
-                receiverToken = String.valueOf(snapshot.getValue());
-            }
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-            }
-        });
 
 
         sendButton.setOnClickListener(new View.OnClickListener() {
@@ -217,5 +220,20 @@ public class Chat extends AppCompatActivity {
         }
         protected void onPostExecute(Long result) {
         }
+    }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event)  {
+        if (Integer.parseInt(android.os.Build.VERSION.SDK) > 5
+                && keyCode == KeyEvent.KEYCODE_BACK
+                && event.getRepeatCount() == 0) {
+
+            Intent intent = new Intent(Chat.this, BottomBarActivity.class);
+            intent.putExtra("usersDMlist","chatsc");
+            startActivity(intent);
+
+            return true;
+        }
+        return super.onKeyDown(keyCode, event);
     }
 }

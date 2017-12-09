@@ -49,6 +49,8 @@ public class BottomBarActivity extends AppCompatActivity {
     private SharedPreferences sharedpreferences;
     public static final String MyPREFERENCES = "MyPrefs" ;
 
+    public String usersdmlist;
+
     @Override
     protected void onStart() {
         checkPermissions();
@@ -62,6 +64,9 @@ public class BottomBarActivity extends AppCompatActivity {
 
         Intent servIntent = new Intent(BottomBarActivity.this, MyService.class);
         startService(servIntent);
+
+        Intent pages = getIntent();
+        usersdmlist = pages.getStringExtra("chatsc");
 
         auth = FirebaseAuth.getInstance();
 
