@@ -56,42 +56,41 @@ import static android.app.Activity.RESULT_OK;
 
 public class UsersProfiFrag extends Fragment {
 
-    private StorageReference storageReference;
-    private StorageReference backgroundStorageReference;
-    private TextView u_fullname,u_username,u_city;
-    private ImageView profileImg,backgroundImg;
-    private View backgroundView;
+    public StorageReference storageReference;
+    public StorageReference backgroundStorageReference;
+    public TextView u_fullname,u_username,u_city;
+    public ImageView profileImg,backgroundImg;
+    public View backgroundView;
     public TextView num_post;
+    public ImageButton editprof,dm_imgBtn;
 
-    private ImageButton editprof,dm_imgBtn;
+    public StorageReference mStorageImage;
+    public StorageReference mStorageImageBack;
 
-    private StorageReference mStorageImage;
-    private StorageReference mStorageImageBack;
+    public static final int GALLERY_REQUEST = 1;
+    public static final int CAMERA_REQUEST_CODE = 2;
 
-    private static final int GALLERY_REQUEST = 1;
-    private static final int CAMERA_REQUEST_CODE = 2;
+    public RecyclerView profileList;
 
-    private RecyclerView profileList;
+    public DatabaseReference database,mDatabaseUsers,databaseFollowers,mDatabaseUsersPostNum;
+    public DatabaseReference mDatabaseCurrentUsers;
+    public Query mQueryUser;
+    public Query mQueryUserLost;
+    public Query mQueryUserFind;
+    public DatabaseReference mDatabaseLike;
+    public FirebaseAuth.AuthStateListener authListener;
+    public FirebaseAuth auth;
 
-    private DatabaseReference database,mDatabaseUsers,databaseFollowers,mDatabaseUsersPostNum;
-    private DatabaseReference mDatabaseCurrentUsers;
-    private Query mQueryUser;
-    private Query mQueryUserLost;
-    private Query mQueryUserFind;
-    private DatabaseReference mDatabaseLike;
-    private FirebaseAuth.AuthStateListener authListener;
-    private FirebaseAuth auth;
+    public Uri mProfImageUri = null;
+    public Uri mBackImageUri = null;
 
-    private Uri mProfImageUri = null;
-    private Uri mBackImageUri = null;
-
-    TabLayout tlUserProfileTabs;
-    private boolean backgroundImage = false;
-    private boolean profileImage = false;
-    private Query mQueryUserId;
-    private FirebaseUser user;
-    private String currentUserId;
-    private String LostCount;
+    public TabLayout tlUserProfileTabs;
+    public boolean backgroundImage = false;
+    public boolean profileImage = false;
+    public Query mQueryUserId;
+    public FirebaseUser user;
+    public String currentUserId;
+    public String LostCount;
 
     public UsersProfiFrag() {
         // Required empty public constructor

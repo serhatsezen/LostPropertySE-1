@@ -68,7 +68,7 @@ public class EditProfileFragment extends AppCompatActivity {
     public LatLng user;
     private static final int IMAGE_PICK_REQUEST = 888;
     private SharedPreferences sharedpreferences;
-    public static final String MyPREFERENCES = "MyPrefs" ;
+    public static final String PREFS = "MyPrefs" ;
     SharedPreferences.Editor editor;
     double latMarkerss;
     double lngMarkerss;
@@ -100,7 +100,7 @@ public class EditProfileFragment extends AppCompatActivity {
         mapView.onCreate(savedInstanceState);
 
         mapView.onResume(); // needed to get the map to display immediately
-        sharedpreferences = getSharedPreferences(MyPREFERENCES, Context.MODE_PRIVATE);
+        sharedpreferences = getSharedPreferences(PREFS, Context.MODE_PRIVATE);
 
 
         setProfileİmg();
@@ -218,7 +218,7 @@ public class EditProfileFragment extends AppCompatActivity {
     }
 
     public void writeNewDatasToDB(){
-        String newName = AdSoyad.getText().toString();
+        final String newName = AdSoyad.getText().toString();
         String newCity = Sehir.getText().toString();
 
 
@@ -228,6 +228,30 @@ public class EditProfileFragment extends AppCompatActivity {
 
         if(!newName.isEmpty()){
             curentUserRef.child("namesurname").setValue(newName);
+            mQueryUserLost.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot tasksSnapshot) {
+                    for (DataSnapshot snapshot: tasksSnapshot.getChildren()) {
+                        snapshot.getRef().child("name").setValue(newName);
+                    }
+                }
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+                }
+
+            });
+            mQueryUserFind.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot tasksSnapshot) {
+                    for (DataSnapshot snapshot: tasksSnapshot.getChildren()) {
+                        snapshot.getRef().child("name").setValue(newName);
+                    }
+                }
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+                }
+
+            });
         }
         if(!newCity.isEmpty()){
             curentUserRef.child("cityName").setValue(newCity);
@@ -270,7 +294,7 @@ public class EditProfileFragment extends AppCompatActivity {
         }
     }
 
-    private class UpdateDB extends AsyncTask<String, String, String> {
+    private class UpdateDB extends AsyncTask<String, String, String> {      // update işlemini asynctask ile gerçekleştiriyoruz.
 
         @Override
         protected String doInBackground(String... params) {
@@ -305,7 +329,7 @@ public class EditProfileFragment extends AppCompatActivity {
 
     // son kayıtlı olan location bilgisini sharedprefences yardımıyla çekme
     private void getLocationFromShared() {
-        sharedpreferences = getSharedPreferences(MyPREFERENCES,0);
+        sharedpreferences = getSharedPreferences(PREFS,0);
         latMarkerss = sharedpreferences.getFloat("position_lat", 39f);          //eğer null ise lat degeri 39f
         lngMarkerss = sharedpreferences.getFloat("position_lon", 30f);          //eğer null ise lng değeri 30f
         user = new LatLng(latMarkerss, lngMarkerss);

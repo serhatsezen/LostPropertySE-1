@@ -419,7 +419,7 @@ public class NextActivity extends AppCompatActivity {
 
                     bildirimPost = kategori + " "+ addressName + " sana "+ myKm + " km uzaklıkta";
 
-                    List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(2);
+                    List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(3);
                     nameValuePairs.add(new BasicNameValuePair("tokendevice", myToken));
                     nameValuePairs.add(new BasicNameValuePair("bildirimPost", bildirimPost));
                     nameValuePairs.add(new BasicNameValuePair("userName", userNameU));

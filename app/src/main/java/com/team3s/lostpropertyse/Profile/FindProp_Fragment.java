@@ -29,16 +29,16 @@ import com.team3s.lostpropertyse.R;
 
 public class FindProp_Fragment extends Fragment {
 
-    private RecyclerView findPropList;
-    private Query mQueryUser;
-    private DatabaseReference mDatabase;
-    private FirebaseAuth.AuthStateListener authListener;
-    private FirebaseAuth auth;
-    private FirebaseUser user;
-    private DatabaseReference mDatabaseUsers;
-    private String currentUserId;
-    private String str;
-    public static final String MyPREFERENCES = "MyPrefs" ;
+    public RecyclerView findPropList;
+    public Query mQueryUser;
+    public DatabaseReference mDatabase;
+    public FirebaseAuth.AuthStateListener authListener;
+    public FirebaseAuth auth;
+    public FirebaseUser user;
+    public DatabaseReference mDatabaseUsers;
+    public String currentUserId;
+    public String str;
+    public static final String PREFS = "MyPrefs" ;
 
 
     public FindProp_Fragment() {
@@ -70,7 +70,7 @@ public class FindProp_Fragment extends Fragment {
         };
 
         try {
-            SharedPreferences mPrefs = getActivity().getSharedPreferences(MyPREFERENCES,0);
+            SharedPreferences mPrefs = getActivity().getSharedPreferences(PREFS,0);
             str = mPrefs.getString("USERKEY_SHARED", "");
         }catch (Exception e){
 
@@ -184,7 +184,7 @@ public class FindProp_Fragment extends Fragment {
             //Picasso.with(ctx).load(post_image).networkPolicy(NetworkPolicy.OFFLINE).fit().centerCrop().into(post_img);
             Glide.with(ctx)
                     .load(post_image)
-                    .centerCrop()
+                    .fitCenter()
                     .diskCacheStrategy(DiskCacheStrategy.ALL)
                     .animate(R.anim.shake)
                     .into(post_img);

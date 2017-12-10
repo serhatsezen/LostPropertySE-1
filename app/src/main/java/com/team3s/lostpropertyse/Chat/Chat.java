@@ -57,7 +57,7 @@ public class Chat extends AppCompatActivity {
     private String userkeyfornotif;
     private String userschatnamekey;
 
-    private String MyPREFERENCES = "MyPrefs" ;
+    private String PREFS = "MyPrefs" ;
     SharedPreferences mPrefs;
 
     @Override
@@ -95,7 +95,7 @@ public class Chat extends AppCompatActivity {
         }
 
         if(senderName == null) {
-            mPrefs = getSharedPreferences(MyPREFERENCES, 0);
+            mPrefs = getSharedPreferences(PREFS, 0);
             senderName = mPrefs.getString("username", "");
             receiver_name = mPrefs.getString("receiver_name", "");
             receiver_name = receiver_name.replaceAll("\\s+", "");

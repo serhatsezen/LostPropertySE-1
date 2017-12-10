@@ -96,7 +96,7 @@ public class UsersDMList extends Fragment {
     ArrayList<String> al = new ArrayList<>();
     int totalUsers = 0;
     ProgressDialog pd;
-    public static final String MyPREFERENCES = "MyPrefs" ;
+    public static final String PREFS = "MyPrefs" ;
     SharedPreferences mPrefs;
     DatabaseReference reference1,reference2,userDB;
     Query dmRefQuery;
@@ -133,7 +133,7 @@ public class UsersDMList extends Fragment {
 
         cevapList = (ListView) v.findViewById(R.id.usersList);
 
-        mPrefs = getActivity().getSharedPreferences(MyPREFERENCES,0);
+        mPrefs = getActivity().getSharedPreferences(PREFS,0);
         senderName = mPrefs.getString("username", "");
         receiver_name = mPrefs.getString("receiver_name","");
         currentUid = mPrefs.getString("USERKEY_SHARED","");

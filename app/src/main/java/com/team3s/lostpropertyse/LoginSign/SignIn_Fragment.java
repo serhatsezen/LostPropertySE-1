@@ -99,6 +99,10 @@ public class SignIn_Fragment extends Fragment implements OnClickListener,GoogleA
     private Uri photoUri;
     private boolean loginsign = false;
 
+    private SharedPreferences sharedpreferences;
+    private static final String PREFS = "MyPrefs";
+
+
     public SignIn_Fragment() {
 
     }
@@ -117,6 +121,9 @@ public class SignIn_Fragment extends Fragment implements OnClickListener,GoogleA
         mSignInButton.setSize(SignInButton.SIZE_WIDE);
 
         mSignInButton.setOnClickListener(this);
+
+        sharedpreferences = getActivity().getSharedPreferences(PREFS, Context.MODE_PRIVATE);
+
 
         configureSignIn();                  //Google giriş ayarları
 
@@ -199,6 +206,9 @@ public class SignIn_Fragment extends Fragment implements OnClickListener,GoogleA
                         }else {
                             checkUser();            //daha önce bu gmail hesabıyma kayıtlı kullanıcı varmı kontrol ediyoruz.
                             loginsign = true;
+                            SharedPreferences.Editor editor = sharedpreferences.edit();
+                            editor.putString("GoogleSign", "googlesign" );
+                            editor.commit();
                             Intent intent = new Intent(getActivity(), BottomBarActivity.class);
                             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                             startActivity(intent);

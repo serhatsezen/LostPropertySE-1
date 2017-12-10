@@ -1,11 +1,16 @@
 package com.team3s.lostpropertyse.MainPage;
 
 import android.Manifest.permission;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.location.LocationManager;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.ActivityCompat;
@@ -36,7 +41,7 @@ public class BottomBarActivity extends AppCompatActivity {
 
     private SharedPreferences preferences;
     private SharedPreferences.Editor editor;
-    private static final String PREFS = "prefs";
+    private static final String PREFS = "MyPrefs";
 
 
     private BottomNavigationView bottomNavigationView;
@@ -52,6 +57,8 @@ public class BottomBarActivity extends AppCompatActivity {
     private String currentUserId;
 
     public String usersdmlist;
+    public String googlesign;
+
 
     @Override
     protected void onStart() {
@@ -75,6 +82,7 @@ public class BottomBarActivity extends AppCompatActivity {
         currentUserId = auth.getCurrentUser().getUid();
         preferences = getSharedPreferences(PREFS, Context.MODE_PRIVATE);
 
+
         bottomNavigationView = (BottomNavigationView) findViewById(R.id.bottom_nav);
 
         bottomNavigationView.setOnNavigationItemSelectedListener(
@@ -95,9 +103,6 @@ public class BottomBarActivity extends AppCompatActivity {
                                 startActivity(shareint);
                                 return true;
                             case R.id.action_bottombar_profil:
-                                SharedPreferences.Editor editor = preferences.edit();
-                                editor.putString("USERKEY_SHARED", currentUserId);
-                                editor.commit();
                                 switchFragment2(0, TAG_FRAGMENT_PROFILE);
                                 return true;
                         }
@@ -107,6 +112,17 @@ public class BottomBarActivity extends AppCompatActivity {
         preferences = getSharedPreferences(PREFS,0);
         editor = preferences.edit();
 
+        googlesign = preferences.getString("GoogleSign","");
+
+        if(googlesign.equals("")){
+            editor.putString("USERKEY_SHARED", currentUserId);
+
+        }else if(googlesign.equals("googlesign")){
+            askLocation();
+            editor.putString("GoogleSign", "");
+            editor.putString("USERKEY_SHARED", currentUserId);
+            editor.commit();
+        }
 
         buildFragmentsList();
 
@@ -114,6 +130,33 @@ public class BottomBarActivity extends AppCompatActivity {
         switchFragment(0, TAG_FRAGMENT_NEWS);
 
     }
+
+    private void askLocation() {
+        final LocationManager manager = (LocationManager) getSystemService( Context.LOCATION_SERVICE );
+
+        if ( !manager.isProviderEnabled( LocationManager.GPS_PROVIDER ) ) {
+            buildAlertMessageNoGps();
+        }
+    }
+    private void buildAlertMessageNoGps() {
+        final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage("Konumu açıp yerinizi güncellemeniz sizin için daha faydalı olacaktır.")
+                .setCancelable(false)
+                .setPositiveButton("Tamam", new DialogInterface.OnClickListener() {
+                    public void onClick(@SuppressWarnings("unused") final DialogInterface dialog, @SuppressWarnings("unused") final int id) {
+                        startActivity(new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS));
+                    }
+                })
+                .setNegativeButton("İptal", new DialogInterface.OnClickListener() {
+                    public void onClick(final DialogInterface dialog, @SuppressWarnings("unused") final int id) {
+                        dialog.cancel();
+                    }
+                });
+        final AlertDialog alert = builder.create();
+        alert.show();
+    }
+
+
     private void switchFragment(int pos, String tag) {
         getSupportFragmentManager()
                 .beginTransaction()

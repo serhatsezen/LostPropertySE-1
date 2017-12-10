@@ -22,7 +22,7 @@
            android:layout_height="wrap_content"
            android:src="@drawable/back"
            android:id="@+id/post_img"
-           android:scaleType="centerCrop"/>
+           android:scaleType="fitXY"/>
 
         <View
             android:id="@+id/view4"

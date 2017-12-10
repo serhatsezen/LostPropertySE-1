@@ -21,6 +21,7 @@ import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
@@ -56,9 +57,7 @@ public class PostDetailFrag extends Fragment{
     private TextView mPostDesc;
     private TextView mPostCity;
     private TextView mPostCommentCounter;
-    private Button mPostDelete;
-    private Button mPostUpdate;
-    private ImageButton comments;
+    private ImageButton comments,popupMenuBTN;
     private Intent intent;
 
     private FirebaseAuth auth;
@@ -92,9 +91,8 @@ public class PostDetailFrag extends Fragment{
         mPostDesc = (TextView) v.findViewById(R.id.post_descET);
         mPostCity = (TextView) v.findViewById(R.id.post_cityName);
         mPostCommentCounter = (TextView) v.findViewById(R.id.commentArticleCounter);
-        mPostDelete = (Button) v.findViewById(R.id.deleteBtnSc);
-        mPostUpdate = (Button) v.findViewById(R.id.editBtnSc);
         comments = (ImageButton) v.findViewById(R.id.btnArticleComments);
+        popupMenuBTN = (ImageButton) v.findViewById(R.id.popupMenuBTN);
         showMap = (Button) v.findViewById(R.id.showMap);
 
         comments.setOnClickListener(new View.OnClickListener() {
@@ -124,8 +122,7 @@ public class PostDetailFrag extends Fragment{
             }
         });
 
-        mPostDelete.setVisibility(View.GONE);
-        mPostUpdate.setVisibility(View.GONE);
+        popupMenuBTN.setVisibility(View.GONE);
         mDatabase.child(post_key).child("Comments").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -160,8 +157,7 @@ public class PostDetailFrag extends Fragment{
 
 
                 if(auth.getCurrentUser().getUid().equals(post_id)){
-                    mPostDelete.setVisibility(View.VISIBLE);
-                    mPostUpdate.setVisibility(View.VISIBLE);
+                    popupMenuBTN.setVisibility(View.VISIBLE);
                 }
 
             }
@@ -172,28 +168,45 @@ public class PostDetailFrag extends Fragment{
             }
         });
 
-        mPostDelete.setOnClickListener(new View.OnClickListener() {
+        popupMenuBTN.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(post_type == "Kayiplar") {
-                    mDatabase.child(post_key).removeValue();
-                    mDatabaseLike.child(post_key).child(auth.getCurrentUser().getUid()).removeValue();
-                    MainPage fragmentMain = new MainPage();
-                    getFragmentManager()
-                            .beginTransaction()
-                            .add(R.id.postdetpfr, fragmentMain, TAG_FRAGMENT)
-                            .addToBackStack(null)
-                            .commit();
-                }else if(post_type == "Bulunanlar"){
-                    mDatabase.child(post_key).removeValue();
-                    mDatabaseLike.child(post_key).child(auth.getCurrentUser().getUid()).removeValue();
-                    MainPage fragmentMain = new MainPage();
-                    getFragmentManager()
-                            .beginTransaction()
-                            .add(R.id.postdetr, fragmentMain, TAG_FRAGMENT)
-                            .addToBackStack(null)
-                            .commit();
-                }
+                PopupMenu popup = new PopupMenu(getActivity(), popupMenuBTN);
+                //Inflating the Popup using xml file
+                popup.getMenuInflater().inflate(R.menu.poupup_menu, popup.getMenu());
+
+                //registering popup with OnMenuItemClickListener
+                popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                    public boolean onMenuItemClick(MenuItem item) {
+                        switch (item.getItemId()) {
+                            case R.id.deleteBtn:
+                                if(post_type == "Kayiplar") {
+                                    mDatabase.child(post_key).removeValue();
+                                    mDatabaseLike.child(post_key).child(auth.getCurrentUser().getUid()).removeValue();
+                                    MainPage fragmentMain = new MainPage();
+                                    getFragmentManager()
+                                            .beginTransaction()
+                                            .add(R.id.postdetpfr, fragmentMain, TAG_FRAGMENT)
+                                            .addToBackStack(null)
+                                            .commit();
+                                }else if(post_type == "Bulunanlar"){
+                                    mDatabase.child(post_key).removeValue();
+                                    mDatabaseLike.child(post_key).child(auth.getCurrentUser().getUid()).removeValue();
+                                    MainPage fragmentMain = new MainPage();
+                                    getFragmentManager()
+                                            .beginTransaction()
+                                            .add(R.id.postdetr, fragmentMain, TAG_FRAGMENT)
+                                            .addToBackStack(null)
+                                            .commit();
+                                }
+                                return true;
+
+                        }
+                        return true;
+                    }
+                });
+
+                popup.show();//showing popup menu
             }
         });
 

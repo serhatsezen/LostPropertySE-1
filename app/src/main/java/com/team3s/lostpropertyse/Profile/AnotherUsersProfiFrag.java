@@ -71,7 +71,7 @@ public class AnotherUsersProfiFrag extends Fragment {
     private String receiverToken;
 
     private SharedPreferences sharedpreferences;
-    public static final String MyPREFERENCES = "MyPrefs" ;
+    public static final String PREFS = "MyPrefs" ;
 
     public AnotherUsersProfiFrag() {
         // Required empty public constructor
@@ -119,7 +119,7 @@ public class AnotherUsersProfiFrag extends Fragment {
       mDatabaseLike = FirebaseDatabase.getInstance().getReference().child("Likes");
       mDatabaseUsersPostNum = FirebaseDatabase.getInstance().getReference().child("Users").child(post_key_user).child("PostsId");
 
-      sharedpreferences = getActivity().getSharedPreferences(MyPREFERENCES, Context.MODE_PRIVATE);
+      sharedpreferences = getActivity().getSharedPreferences(PREFS, Context.MODE_PRIVATE);
 
 
       u_fullname = (TextView) v.findViewById(R.id.fullnameuser);

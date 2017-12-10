@@ -39,7 +39,8 @@ public class LostProp_Fragment extends Fragment {
     private DatabaseReference mDatabaseUsers;
     private String currentUserId;
     private String str;
-    public static final String MyPREFERENCES = "MyPrefs" ;
+    public static final String PREFS = "MyPrefs" ;
+
     public LostProp_Fragment() {
         // Required empty public constructor
     }
@@ -71,11 +72,9 @@ public class LostProp_Fragment extends Fragment {
         };
 
         try {
-            SharedPreferences mPrefs = getActivity().getSharedPreferences(MyPREFERENCES,0);
+            SharedPreferences mPrefs = getActivity().getSharedPreferences(PREFS,0);
             str = mPrefs.getString("USERKEY_SHARED", "");
-        }catch (Exception e){
-
-        }
+        }catch (Exception e){}
 
 
         mDatabase = FirebaseDatabase.getInstance().getReference().child("Icerik").child("Kayiplar");
@@ -176,7 +175,7 @@ public class LostProp_Fragment extends Fragment {
             //Picasso.with(ctx).load(post_image).networkPolicy(NetworkPolicy.OFFLINE).fit().centerCrop().into(post_img);
             Glide.with(ctx)
                     .load(post_image)
-                    .centerCrop()
+                    .fitCenter()
                     .diskCacheStrategy(DiskCacheStrategy.ALL)
                     .animate(R.anim.shake)
                     .into(post_img);

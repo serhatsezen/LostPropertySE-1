@@ -80,7 +80,7 @@ public class LostMainFrag extends Fragment {
     SharedPreferences sharedpreferences;
 
     private final static String TAG_FRAGMENT = "TAG_FRAGMENT";
-    public static final String MyPREFERENCES = "MyPrefs" ;
+    public static final String PREFS = "MyPrefs" ;
 
     public LostMainFrag() {
         // Required empty public constructor
@@ -98,7 +98,7 @@ public class LostMainFrag extends Fragment {
         final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         appBarLayout = (AppBarLayout) v.findViewById(R.id.LostappBarLayout);
 
-        sharedpreferences = getActivity().getSharedPreferences(MyPREFERENCES, Context.MODE_PRIVATE);
+        sharedpreferences = getActivity().getSharedPreferences(PREFS, Context.MODE_PRIVATE);
 
 
         mDatabaseUsersFilter = FirebaseDatabase.getInstance().getReference().child("Users").child(user.getUid());
@@ -487,7 +487,7 @@ public class LostMainFrag extends Fragment {
             ImageView share_img = (ImageView) mView.findViewById(R.id.share_img);
             Glide.with(ctx)
                     .load(post_image)
-                    .centerCrop()
+                    .fitCenter()
                     .diskCacheStrategy(DiskCacheStrategy.ALL)
                     .into(share_img);
 
