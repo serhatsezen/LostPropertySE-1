@@ -31,6 +31,8 @@ public class FCMessagingService extends com.google.firebase.messaging.FirebaseMe
     String postKey;
     String postType;
     String messagee;
+    String user_name;
+    String receiver_name;
 
     public FCMessagingService() {
     }
@@ -42,9 +44,10 @@ public class FCMessagingService extends com.google.firebase.messaging.FirebaseMe
             Log.d(TAG, "Message data payload: " + remoteMessage.getData());
             try {
                 JSONObject data = new JSONObject(remoteMessage.getData());
-                String jsonMessage = data.getString("extra_information");
+                user_name = data.getString("sender_name");
+                receiver_name = data.getString("receiver_name");
                 Log.d(TAG, "onMessageReceived: \n" +
-                        "Extra Information: " + jsonMessage);
+                        "Extra Information: " + user_name);
             } catch (JSONException e) {
                 e.printStackTrace();
             }
@@ -74,7 +77,10 @@ public class FCMessagingService extends com.google.firebase.messaging.FirebaseMe
         Intent intent;
         if (click_action.equals("Chat")) {
             intent = new Intent(this, Chat.class);
+            intent.putExtra("userschatnamekey",user_name);
+            intent.putExtra("receiverchatnamekey",receiver_name);
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            startActivity(intent);
         } else if (click_action.equals("Comment")) {
             intent = new Intent(this, CommentAct.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);

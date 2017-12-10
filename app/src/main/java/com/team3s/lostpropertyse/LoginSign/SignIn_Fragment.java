@@ -218,14 +218,17 @@ public class SignIn_Fragment extends Fragment implements OnClickListener,GoogleA
                 final String token = sharedPreferences.getString(getString(R.string.FCM_TOKEN), "");
                 user_id = auth.getCurrentUser().getUid();
 
+                double lat = 39.500;
+                double lng = 30.500;
+
                 current_user_db = mDatabaseUsers.child(user_id);
 
                 current_user_db.child("namesurname").setValue(name);
                 current_user_db.child("username").setValue(username);
                 current_user_db.child("cityName").setValue(addressName);
                 current_user_db.child("fullAddress").setValue(addressName);
-                current_user_db.child("latLng").child("latitude").setValue(0);
-                current_user_db.child("latLng").child("longitude").setValue(0);
+                current_user_db.child("latLng").child("latitude").setValue(lat);
+                current_user_db.child("latLng").child("longitude").setValue(lng);
                 current_user_db.child("backgroundImage").setValue("https://firebasestorage.googleapis.com/v0/b/lostpro-776a5.appspot.com/o/Background_images%2F2142120171?alt=media&token=95caf486-3a0c-4dc8-947d-69385b54ffa1");
                 current_user_db.child("token").setValue(token);
                 current_user_db.child("profileImage").setValue(photo);

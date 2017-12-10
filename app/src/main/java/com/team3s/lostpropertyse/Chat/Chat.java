@@ -77,7 +77,9 @@ public class Chat extends AppCompatActivity {
         sender_uid = uids.getStringExtra("sender_uid");
         receiver_uid = uids.getStringExtra("receiver_uid");
         receiverToken = uids.getStringExtra("receiverToken");
-        userschatnamekey = uids.getStringExtra("userschatnamekey");
+        senderName = uids.getStringExtra("userschatnamekey");
+        receiver_name = uids.getStringExtra("receiverchatnamekey");
+
 
         if(receiverToken != null) {
             mDatabaseToken = FirebaseDatabase.getInstance().getReference().child("Users").child(receiver_uid);
@@ -92,7 +94,7 @@ public class Chat extends AppCompatActivity {
             });
         }
 
-        if(userschatnamekey == null) {
+        if(senderName == null) {
             mPrefs = getSharedPreferences(MyPREFERENCES, 0);
             senderName = mPrefs.getString("username", "");
             receiver_name = mPrefs.getString("receiver_name", "");
@@ -208,6 +210,9 @@ public class Chat extends AppCompatActivity {
                 nameValuePairs.add(new BasicNameValuePair("dm", dmtxt));
                 nameValuePairs.add(new BasicNameValuePair("userName", senderName));
                 nameValuePairs.add(new BasicNameValuePair("tokeNDevice", receiverToken));
+                nameValuePairs.add(new BasicNameValuePair("sender_name", senderName));
+                nameValuePairs.add(new BasicNameValuePair("user_name", receiver_name));
+
                 httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
                 // Execute HTTP Post Request
                 HttpResponse response = httpclient.execute(httppost);

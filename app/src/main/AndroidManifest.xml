@@ -73,7 +73,7 @@
             android:enabled="true"
             android:exported="true">
             <intent-filter>
-                <action android:name="com.example.serha.thinkit.LONGRUNSERVICE" />
+                <action android:name="com.team3s.lostpropertyse.LONGRUNSERVICE" />
             </intent-filter>
         </service>
         <activity android:name=".ShareSc.ShareActivity"/>

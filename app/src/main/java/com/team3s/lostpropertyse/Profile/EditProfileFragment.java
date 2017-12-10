@@ -7,6 +7,7 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.v4.app.ActivityCompat;
@@ -35,6 +36,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 import com.google.firebase.storage.FirebaseStorage;
@@ -58,6 +60,8 @@ public class EditProfileFragment extends AppCompatActivity {
     private StorageReference imgStorageRef;
     private FirebaseUser currentUser;
     private DatabaseReference curentUserRef;
+    private Query mQueryUserLost;
+    private Query mQueryUserFind;
     double latMarkers;
     double lngMarkers;
     String imgUrl;
@@ -80,7 +84,8 @@ public class EditProfileFragment extends AppCompatActivity {
         profileİmg = (ImageView) findViewById(R.id.EditPP);
         curentUserRef = FirebaseDatabase.getInstance().getReference("Users").child(Uid /* şuanki kullanıcının idsi */);
         imgStorageRef = FirebaseStorage.getInstance().getReference("Profile_images");
-
+        mQueryUserLost = FirebaseDatabase.getInstance().getReference("Icerik").child("Kayiplar").orderByChild("uid").equalTo(Uid);
+        mQueryUserFind = FirebaseDatabase.getInstance().getReference("Icerik").child("Bulunanlar").orderByChild("uid").equalTo(Uid);
         AdSoyad = (EditText) findViewById(R.id.editTextAdSoyad);
         Sehir = (EditText) findViewById(R.id.editTextSehir);
         kaydetButton = (Button) findViewById(R.id.kaydetButon);
@@ -88,7 +93,8 @@ public class EditProfileFragment extends AppCompatActivity {
         kaydetButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                writeNewDatasToDB();
+                new UpdateDB().execute();
+
             }
         });
         mapView.onCreate(savedInstanceState);
@@ -231,10 +237,45 @@ public class EditProfileFragment extends AppCompatActivity {
             filePath.putFile(newImageUri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                 @Override
                 public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                    String downloadUri = taskSnapshot.getDownloadUrl().toString();
+                    final String downloadUri = taskSnapshot.getDownloadUrl().toString();
                     curentUserRef.child("profileImage").setValue(downloadUri);
+                    //-----------------------------------------------------------------------------postlardaki profil resmini güncellemek için
+                    mQueryUserLost.addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot tasksSnapshot) {
+                            for (DataSnapshot snapshot: tasksSnapshot.getChildren()) {
+                                snapshot.getRef().child("image").setValue(downloadUri);
+                            }
+                        }
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+                        }
+
+                    });
+                    mQueryUserFind.addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot tasksSnapshot) {
+                            for (DataSnapshot snapshot: tasksSnapshot.getChildren()) {
+                                snapshot.getRef().child("image").setValue(downloadUri);
+                            }
+                        }
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+                        }
+
+                    });
                 }
             });
+
+        }
+    }
+
+    private class UpdateDB extends AsyncTask<String, String, String> {
+
+        @Override
+        protected String doInBackground(String... params) {
+            writeNewDatasToDB();
+            return null;
 
         }
     }

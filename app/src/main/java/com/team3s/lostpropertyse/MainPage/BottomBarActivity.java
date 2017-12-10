@@ -16,6 +16,7 @@ import android.view.View;
 import android.widget.ProgressBar;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.team3s.lostpropertyse.Chat.UsersDMList;
 import com.team3s.lostpropertyse.Maps.PropMaps;
 import com.team3s.lostpropertyse.Profile.UsersProfiFrag;
 import com.team3s.lostpropertyse.R;
@@ -29,6 +30,7 @@ public class BottomBarActivity extends AppCompatActivity {
     private static final String TAG_FRAGMENT_NEWS = "tag_frag_news";
     private static final String TAG_FRAGMENT_SHARE = "tag_frag_share";
     private static final String TAG_FRAGMENT_PROFILE = "tag_frag_profile";
+    private static final String TAG_FRAGMENT_DM_LIST = "tag_frag_dm_list";
 
     Context ctx;
 
@@ -44,10 +46,10 @@ public class BottomBarActivity extends AppCompatActivity {
      */
     private List<MainPage> fragments = new ArrayList<>(1);
     private List<UsersProfiFrag> fragmentsPro = new ArrayList<>(1);
+    private List<UsersDMList> fragmentsDmList = new ArrayList<>(1);
+
     private FirebaseAuth auth;
     private String currentUserId;
-    private SharedPreferences sharedpreferences;
-    public static final String MyPREFERENCES = "MyPrefs" ;
 
     public String usersdmlist;
 
@@ -66,12 +68,12 @@ public class BottomBarActivity extends AppCompatActivity {
         startService(servIntent);
 
         Intent pages = getIntent();
-        usersdmlist = pages.getStringExtra("chatsc");
+        usersdmlist = pages.getStringExtra("usersDMlist");
 
         auth = FirebaseAuth.getInstance();
 
         currentUserId = auth.getCurrentUser().getUid();
-        sharedpreferences = getSharedPreferences(MyPREFERENCES, Context.MODE_PRIVATE);
+        preferences = getSharedPreferences(PREFS, Context.MODE_PRIVATE);
 
         bottomNavigationView = (BottomNavigationView) findViewById(R.id.bottom_nav);
 
@@ -93,7 +95,7 @@ public class BottomBarActivity extends AppCompatActivity {
                                 startActivity(shareint);
                                 return true;
                             case R.id.action_bottombar_profil:
-                                SharedPreferences.Editor editor = sharedpreferences.edit();
+                                SharedPreferences.Editor editor = preferences.edit();
                                 editor.putString("USERKEY_SHARED", currentUserId);
                                 editor.commit();
                                 switchFragment2(0, TAG_FRAGMENT_PROFILE);
@@ -116,21 +118,31 @@ public class BottomBarActivity extends AppCompatActivity {
         getSupportFragmentManager()
                 .beginTransaction()
                 .replace(R.id.frame_fragmentholder, fragments.get(pos), tag)
+                .addToBackStack(null)
                 .commit();
     }
     private void switchFragment2(int pos, String tag) {
         getSupportFragmentManager()
                 .beginTransaction()
                 .replace(R.id.frame_fragmentholder, fragmentsPro.get(pos), tag)
+                .addToBackStack(null)
                 .commit();
     }
-
+    private void switchFragment3(int pos, String tag) {
+        getSupportFragmentManager()
+                .beginTransaction()
+                .add(R.id.frame_fragmentholder, fragmentsDmList.get(pos), tag)
+                .addToBackStack(null)
+                .commit();
+    }
     private void buildFragmentsList() {
         MainPage mainScreen = buildFragment();
         UsersProfiFrag profileScreen = buildFragmentt();
+        UsersDMList dmlistScreen = buildFragmentDmList();
 
         fragments.add(mainScreen);
         fragmentsPro.add(profileScreen);
+        fragmentsDmList.add(dmlistScreen);
 
     }
 
@@ -145,6 +157,12 @@ public class BottomBarActivity extends AppCompatActivity {
 
     private UsersProfiFrag buildFragmentt() {
         UsersProfiFrag fragment = new UsersProfiFrag();
+        Bundle bundle = new Bundle();
+        fragment.setArguments(bundle);
+        return fragment;
+    }
+    private UsersDMList buildFragmentDmList() {
+        UsersDMList fragment = new UsersDMList();
         Bundle bundle = new Bundle();
         fragment.setArguments(bundle);
         return fragment;

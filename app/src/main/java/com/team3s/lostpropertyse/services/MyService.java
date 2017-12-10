@@ -167,6 +167,7 @@ public class MyService extends Service {
         int j = 0;
         double lat;
         double lng;
+        boolean firsTime = true;
         public void onLocationChanged(final Location loc)
         {
 
@@ -185,17 +186,24 @@ public class MyService extends Service {
                     if(j == 10){
                         lat = loc.getLatitude();
                         lng = loc.getLongitude();
+                    }else if(j==1){
+                        lat = loc.getLatitude();
+                        lng = loc.getLongitude();
+                        firsTime = true;
                     }
 
                 database.addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
                         if (i % 10 == 0) {
-                            Toast.makeText(MyService.this, "location", Toast.LENGTH_LONG).show();
                             database.child("latitude").setValue(lat);
                             database.child("longitude").setValue(lng);
                             i = 0;
                             j = 0;
+                        }else if(firsTime == true){
+                            database.child("latitude").setValue(lat);
+                            database.child("longitude").setValue(lng);
+                            firsTime = false;
                         }
                     }
 
