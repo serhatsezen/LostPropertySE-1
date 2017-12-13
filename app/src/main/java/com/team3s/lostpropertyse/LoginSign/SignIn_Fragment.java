@@ -94,7 +94,7 @@ public class SignIn_Fragment extends Fragment implements OnClickListener,GoogleA
     public GoogleApiClient mGoogleApiClient ;
     private final Context mContext = getActivity();
     private LatLng addressLatLng;
-    private String name, email,username,addressName,fulladdress;
+    private String name, email,username,usernamee,addressName,fulladdress;
     private String photo;
     private Uri photoUri;
     private boolean loginsign = false;
@@ -175,10 +175,10 @@ public class SignIn_Fragment extends Fragment implements OnClickListener,GoogleA
 
                 name = account.getDisplayName();
                 email = account.getEmail();
+                usernamee = account.getGivenName();
                 photoUri = account.getPhotoUrl();
                 photo = photoUri.toString();
-                username=name.replaceAll("\\s+","");
-                username.toLowerCase();
+                username = usernamee.replaceAll(" ","").toLowerCase();
                 addressName = "Türkiye";
 
 

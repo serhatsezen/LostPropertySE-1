@@ -22,6 +22,8 @@ import com.team3s.lostpropertyse.R;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.Map;
 
 import static android.content.ContentValues.TAG;
@@ -30,9 +32,10 @@ public class FCMessagingService extends com.google.firebase.messaging.FirebaseMe
     private static final String TAG = "FirebaseMessagingServic";
     String postKey;
     String postType;
-    String messagee;
-    String user_name;
+    String sender_name;
     String receiver_name;
+    String datamsg;
+    String names;
 
     public FCMessagingService() {
     }
@@ -42,15 +45,11 @@ public class FCMessagingService extends com.google.firebase.messaging.FirebaseMe
         // Check if message contains a data payload.
         if (remoteMessage.getData().size() > 0) {
             Log.d(TAG, "Message data payload: " + remoteMessage.getData());
-            try {
-                JSONObject data = new JSONObject(remoteMessage.getData());
-                user_name = data.getString("sender_name");
-                receiver_name = data.getString("receiver_name");
-                Log.d(TAG, "onMessageReceived: \n" +
-                        "Extra Information: " + user_name);
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
+            JSONObject data = new JSONObject(remoteMessage.getData());
+            //datamsg = data.getString("serhat");
+            //receiver_name = data.getString("receiver_name");
+            //Log.d(TAG, "onMessageReceived: \n" +
+            //      "Extra Information: " + user_name);
         }
 
         // Check if message contains a notification payload.
@@ -58,7 +57,6 @@ public class FCMessagingService extends com.google.firebase.messaging.FirebaseMe
             String title = remoteMessage.getNotification().getTitle(); //get title
             String message = remoteMessage.getNotification().getBody(); //get message
             String click_action = remoteMessage.getNotification().getClickAction(); //get click_action
-
 
             Log.d(TAG, "Message Notification Title: " + title);
             Log.d(TAG, "Message Notification Body: " + message);
@@ -77,9 +75,9 @@ public class FCMessagingService extends com.google.firebase.messaging.FirebaseMe
         Intent intent;
         if (click_action.equals("Chat")) {
             intent = new Intent(this, Chat.class);
-            intent.putExtra("userschatnamekey",user_name);
-            intent.putExtra("receiverchatnamekey",receiver_name);
-            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            intent.putExtra("sender_name",sender_name);
+            intent.putExtra("receiver_name",receiver_name);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(intent);
         } else if (click_action.equals("Comment")) {
             intent = new Intent(this, CommentAct.class);
@@ -95,10 +93,11 @@ public class FCMessagingService extends com.google.firebase.messaging.FirebaseMe
 
 
         Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-        NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this)
+        NotificationCompat.Builder notificationBuilder = null;
+        notificationBuilder = new NotificationCompat.Builder(this)
                 .setSmallIcon(R.drawable.ic_launcher)
                 .setContentTitle(title)
-                .setContentText(messagee)
+                .setContentText(messageBody)
                 .setAutoCancel(true)
                 .setSound(defaultSoundUri)
                 .setContentIntent(pendingIntent);

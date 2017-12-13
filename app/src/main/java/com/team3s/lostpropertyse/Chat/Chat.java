@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Base64;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.View;
@@ -14,6 +15,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 
 import com.google.firebase.database.ChildEventListener;
@@ -24,6 +26,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.team3s.lostpropertyse.MainPage.BottomBarActivity;
 import com.team3s.lostpropertyse.R;
+import com.team3s.lostpropertyse.ShareSc.NextActivity;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
@@ -32,8 +35,10 @@ import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.protocol.HTTP;
 import org.w3c.dom.Text;
 
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -77,9 +82,10 @@ public class Chat extends AppCompatActivity {
         sender_uid = uids.getStringExtra("sender_uid");
         receiver_uid = uids.getStringExtra("receiver_uid");
         receiverToken = uids.getStringExtra("receiverToken");
-        senderName = uids.getStringExtra("userschatnamekey");
-        receiver_name = uids.getStringExtra("receiverchatnamekey");
+        senderName = uids.getStringExtra("sender_name");
+        receiver_name = uids.getStringExtra("receiver_name");
 
+        Toast.makeText(Chat.this, senderName, Toast.LENGTH_LONG).show();
 
         if(receiverToken != null) {
             mDatabaseToken = FirebaseDatabase.getInstance().getReference().child("Users").child(receiver_uid);
@@ -107,9 +113,9 @@ public class Chat extends AppCompatActivity {
             reference1 = FirebaseDatabase.getInstance().getReference().child("messages").child(senderName+"_"+receiver_name);
             reference2 = FirebaseDatabase.getInstance().getReference().child("messages").child(receiver_name+"_"+senderName);
         }else{
-            String splitted_names[] =userschatnamekey.split("_");
+            /*String splitted_names[] =userschatnamekey.split("_");
             receiver_name = splitted_names[0];
-            senderName = splitted_names[1];
+            senderName = splitted_names[1];*/
 
             reference1 = FirebaseDatabase.getInstance().getReference().child("messages").child(senderName+"_"+receiver_name);
             reference2 = FirebaseDatabase.getInstance().getReference().child("messages").child(receiver_name+"_"+senderName);
@@ -204,16 +210,18 @@ public class Chat extends AppCompatActivity {
         protected Long doInBackground(String... urls) {
             HttpClient httpclient = new DefaultHttpClient();
             HttpPost httppost = new HttpPost("http://aydinserhatsezen.com/fcm/LostP/lpdm.php");
+
             try {
+
                 // Add your data
                 List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(3);
                 nameValuePairs.add(new BasicNameValuePair("dm", dmtxt));
                 nameValuePairs.add(new BasicNameValuePair("userName", senderName));
                 nameValuePairs.add(new BasicNameValuePair("tokeNDevice", receiverToken));
                 nameValuePairs.add(new BasicNameValuePair("sender_name", senderName));
-                nameValuePairs.add(new BasicNameValuePair("user_name", receiver_name));
+                nameValuePairs.add(new BasicNameValuePair("receiver_name", receiver_name));
 
-                httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
+                httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs, HTTP.UTF_8));
                 // Execute HTTP Post Request
                 HttpResponse response = httpclient.execute(httppost);
             } catch (Exception e) {

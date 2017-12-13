@@ -299,9 +299,14 @@ public class AnotherUsersProfiFrag extends Fragment {
             @Override
             public boolean onKey(View v, int keyCode, KeyEvent event) {
                 if (event.getAction() == KeyEvent.ACTION_UP && keyCode == KeyEvent.KEYCODE_BACK) {
-                    FrameLayout layout = (FrameLayout) v.findViewById(R.id.another_user_frag);
-                    layout.removeAllViewsInLayout();
-                    FragmentTransaction ft = getFragmentManager().beginTransaction();
+                    int backStackEntryCount = getFragmentManager().getBackStackEntryCount();
+
+                    if(backStackEntryCount >= 1){
+                        getFragmentManager().popBackStack();
+                    }else{
+                        FrameLayout layout = (FrameLayout) v.findViewById(R.id.another_user_frag);
+                        layout.removeAllViewsInLayout();
+                    }
 
                     return true;
                 }

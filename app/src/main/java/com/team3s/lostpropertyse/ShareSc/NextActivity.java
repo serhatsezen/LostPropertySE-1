@@ -11,11 +11,15 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.text.format.Time;
 import android.util.Base64;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -53,6 +57,7 @@ import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.protocol.HTTP;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -99,9 +104,11 @@ public class NextActivity extends AppCompatActivity {
     private DatabaseReference mDatabaseNotificationFTokenValue;
 
 
-    public int rangeDest = 5;
+    public int rangeDest;
     public double dist;
     public String distStr;
+    public String rangeDestStr;
+
     public int z = 0;
     public int m = 0;
 
@@ -118,6 +125,10 @@ public class NextActivity extends AppCompatActivity {
 
     ArrayList<String> tokenList = new ArrayList<String>();
     ArrayList<String> kmList = new ArrayList<String>();
+
+    private RecyclerView horizontal_recycler_view;
+    private ArrayList<String> horizontalList;
+    private HorizontalAdapter horizontalAdapter;
 
 
     @Override
@@ -152,6 +163,23 @@ public class NextActivity extends AppCompatActivity {
 
 
         //------------------FIREBASE END-------------------------------------
+
+        horizontal_recycler_view= (RecyclerView) findViewById(R.id.horizontal_recycler_view);
+
+        horizontalList=new ArrayList<>();
+        horizontalList.add("1");
+        horizontalList.add("5");
+        horizontalList.add("10");
+        horizontalList.add("15");
+        horizontalList.add("20");
+
+        horizontalAdapter=new HorizontalAdapter(horizontalList);
+
+        LinearLayoutManager horizontalLayoutManagaer
+                = new LinearLayoutManager(NextActivity.this, LinearLayoutManager.HORIZONTAL, false);
+        horizontal_recycler_view.setLayoutManager(horizontalLayoutManagaer);
+
+        horizontal_recycler_view.setAdapter(horizontalAdapter);
 
         mCaption = (EditText) findViewById(R.id.caption) ;
         ImageView backArrow = (ImageView) findViewById(R.id.ivBackArrow);
@@ -217,7 +245,52 @@ public class NextActivity extends AppCompatActivity {
 
 
     }
+    public class HorizontalAdapter extends RecyclerView.Adapter<HorizontalAdapter.MyViewHolder> {
 
+        private List<String> horizontalList;
+
+        public class MyViewHolder extends RecyclerView.ViewHolder {
+            public TextView txtView;
+
+            public MyViewHolder(View view) {
+                super(view);
+                txtView = (TextView) view.findViewById(R.id.txtView);
+
+            }
+        }
+
+
+        public HorizontalAdapter(List<String> horizontalList) {
+            this.horizontalList = horizontalList;
+        }
+
+        @Override
+        public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+            View itemView = LayoutInflater.from(parent.getContext())
+                    .inflate(R.layout.horizontal_item_view, parent, false);
+
+            return new MyViewHolder(itemView);
+        }
+
+        @Override
+        public void onBindViewHolder(final MyViewHolder holder, final int position) {
+            holder.txtView.setText(horizontalList.get(position));
+
+            holder.txtView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Toast.makeText(NextActivity.this,holder.txtView.getText().toString(),Toast.LENGTH_SHORT).show();
+                    rangeDestStr = holder.txtView.getText().toString();
+
+                }
+            });
+        }
+
+        @Override
+        public int getItemCount() {
+            return horizontalList.size();
+        }
+    }
     public void lostOrFindMethod() {
         AlertDialog.Builder builder = new AlertDialog.Builder(NextActivity.this);
         builder.setTitle("Kategori seç")
@@ -371,9 +444,9 @@ public class NextActivity extends AppCompatActivity {
 
                     dist = current.distanceTo(destination) / 1000;
                     distStr = String.format("%.2f", dist );
-
+                    rangeDest = Integer.parseInt(rangeDestStr);
                     m++;                                                                                        // user kontrol değeri
-                    if(dist <= rangeDest) {                                                                     // eğer 5km içindeyse notificaion gönder
+                    if(dist <= rangeDest) {                                                                     // eğer Kullanıcının belirttiği Xkm içindeyse notificaion gönder
                         tokenUsers = String.valueOf(data.child("token").getValue());
                         tokenList.add(tokenUsers);
                         kmList.add(distStr);
@@ -423,7 +496,7 @@ public class NextActivity extends AppCompatActivity {
                     nameValuePairs.add(new BasicNameValuePair("tokendevice", myToken));
                     nameValuePairs.add(new BasicNameValuePair("bildirimPost", bildirimPost));
                     nameValuePairs.add(new BasicNameValuePair("userName", userNameU));
-                    httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
+                    httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs, HTTP.UTF_8));
                     HttpResponse response = httpclient.execute(httppost);
                 }
 

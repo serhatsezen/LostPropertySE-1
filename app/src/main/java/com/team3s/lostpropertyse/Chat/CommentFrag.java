@@ -42,6 +42,7 @@ import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.protocol.HTTP;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -139,7 +140,6 @@ public class CommentFrag extends Fragment {
                         @Override
                         public void onComplete(@NonNull Task<Void> task) {
                             if (task.isSuccessful()) {
-                                cevap_val = post_key+"/"+post_type+"/"+cevap_val;
                                 new Send().execute();                           //başarılı ise notification gönderme
                                 cevap.getText().clear();
                             }
@@ -234,7 +234,7 @@ public class CommentFrag extends Fragment {
                 nameValuePairs.add(new BasicNameValuePair("userName", nameFuser));
 
 
-                httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
+                httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs, HTTP.UTF_8));
                 // Execute HTTP Post Request
                 HttpResponse response = httpclient.execute(httppost);
             } catch (Exception e) {

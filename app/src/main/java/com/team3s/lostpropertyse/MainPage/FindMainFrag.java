@@ -6,20 +6,32 @@ import android.content.SharedPreferences;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.design.widget.AppBarLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.view.MenuItemCompat;
+import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
+import android.widget.Spinner;
+import android.widget.SpinnerAdapter;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
@@ -40,6 +52,8 @@ import com.team3s.lostpropertyse.Post.PostDetailFrag;
 import com.team3s.lostpropertyse.Profile.AnotherUsersProfiFrag;
 import com.team3s.lostpropertyse.Profile.UsersProfiFrag;
 import com.team3s.lostpropertyse.R;
+
+import java.util.ArrayList;
 
 public class FindMainFrag extends Fragment {
 
@@ -82,8 +96,7 @@ public class FindMainFrag extends Fragment {
     public static final String PREFS = "MyPrefs" ;
 
     SharedPreferences sharedpreferences;
-
-
+    private String[] kms=null;      // spinner için km degerleri
     public FindMainFrag() {
         // Required empty public constructor
     }
@@ -94,6 +107,33 @@ public class FindMainFrag extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View v = inflater.inflate(R.layout.fragment_find_main, container, false);
+
+        kms = getResources().getStringArray(R.array.kms);
+
+        Toolbar toolbar = (Toolbar) v.findViewById(R.id.toolbar);
+
+        AppCompatActivity activity = (AppCompatActivity) getActivity();    //-------------------------------------------actionbar spinner eklemek için
+        activity.setSupportActionBar(toolbar);
+
+        SpinnerAdapter spinnerAdapter = ArrayAdapter.createFromResource(getActivity().getApplicationContext(), R.array.kms, R.layout.spinner_dropdown_item);        //km degerlerini string.xml içindeki kms arrayinden çekiyor
+        Spinner navigationSpinner = new Spinner(activity.getSupportActionBar().getThemedContext());
+        navigationSpinner.setAdapter(spinnerAdapter);
+        toolbar.addView(navigationSpinner, 0);
+
+        navigationSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                Toast.makeText(getActivity(),"you selected: " + kms[position],
+                        Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+
+
         //get firebase auth instance
         auth = FirebaseAuth.getInstance();
         //get current user
@@ -103,6 +143,7 @@ public class FindMainFrag extends Fragment {
         appBarLayout = (AppBarLayout) v.findViewById(R.id.findappBarLayout);
         mDatabaseUsersFilter = FirebaseDatabase.getInstance().getReference().child("Users").child(user.getUid());
         mDatabaseDistance = FirebaseDatabase.getInstance().getReference().child("Users").child(user.getUid()).child("latLng");
+
 
         mDatabaseUsersFilter.addValueEventListener(new ValueEventListener() {
             @Override
@@ -119,6 +160,7 @@ public class FindMainFrag extends Fragment {
 
             }
         });
+        appBarLayout.setVisibility(View.VISIBLE);
 
         mDatabaseDistance.addValueEventListener(new ValueEventListener() {      //kullanıcının lat lng değerleri
             @Override
@@ -207,6 +249,8 @@ public class FindMainFrag extends Fragment {
                 viewHolder.setImage(getActivity().getApplicationContext(), model.getImage());
 
                 //viewHolder.setLiikeBtn(post_key);
+                final FindMainFrag fragmentF = new FindMainFrag();
+
 
                 viewHolder.mView.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -221,7 +265,7 @@ public class FindMainFrag extends Fragment {
                         fragmentD.setArguments(bundleComment);
                         getFragmentManager()
                                 .beginTransaction()
-                                .add(R.id.postdetr, fragmentD, TAG_FRAGMENT)
+                                .add(R.id.mainfragsc, fragmentD)
                                 .addToBackStack(null)
                                 .commit();
 
@@ -239,7 +283,7 @@ public class FindMainFrag extends Fragment {
                         fragmentCom.setArguments(bundleComment);
                         getFragmentManager()
                                 .beginTransaction()
-                                .add(R.id.postdetr, fragmentCom, TAG_FRAGMENT)
+                                .add(R.id.mainfragsc, fragmentCom)
                                 .addToBackStack(null)
                                 .commit();
 
@@ -267,7 +311,7 @@ public class FindMainFrag extends Fragment {
                                     UsersProfiFrag fragment2 = new UsersProfiFrag();
                                     getFragmentManager()
                                             .beginTransaction()
-                                            .add(R.id.postdetr, fragment2,TAG_FRAGMENT)
+                                            .add(R.id.mainfragsc, fragment2)
                                             .addToBackStack(null)
                                             .commit();
 
@@ -283,7 +327,7 @@ public class FindMainFrag extends Fragment {
                                     fragment2.setArguments(bundleAnother);
                                     getFragmentManager()
                                             .beginTransaction()
-                                            .add(R.id.postdetr, fragment2, TAG_FRAGMENT)
+                                            .add(R.id.mainfragsc, fragment2)
                                             .addToBackStack(null)
                                             .commit();
                                 }
@@ -413,16 +457,12 @@ public class FindMainFrag extends Fragment {
         ImageButton commentBtn;
         RelativeLayout profile;
 
-        DatabaseReference mDatabaseLike;
         FirebaseAuth mAuth;
 
         TextView commentCount;
 
         TextView distanceUser;
 
-        //ImageButton mLikebtn;
-        //LinearLayout likeUsers;
-        //TextView counterLike;
 
         public ShareViewHolder(View itemView) {
             super(itemView);
@@ -435,36 +475,8 @@ public class FindMainFrag extends Fragment {
             distanceUser = (TextView) mView.findViewById(R.id.distanceTxt);
 
             profile = (RelativeLayout) mView.findViewById(R.id.users_info);
-            // likeUsers = (LinearLayout) mView.findViewById(R.id.like_users);
-            // mLikebtn = (ImageButton) mView.findViewById(R.id.likeBtn);
-            //counterLike = (TextView) mView.findViewById(R.id.counterLike);
-
-
-
-
-            mDatabaseLike = FirebaseDatabase.getInstance().getReference().child("Likes");
             mAuth = FirebaseAuth.getInstance();
         }
-
-        /*public void setLiikeBtn(final String post_key){
-
-            mDatabaseLike.addValueEventListener(new ValueEventListener() {
-                @Override
-                public void onDataChange(DataSnapshot dataSnapshot) {
-                    if(dataSnapshot.child(post_key).hasChild(mAuth.getCurrentUser().getUid())){
-                        mLikebtn.setImageResource(R.drawable.ic_heart_red);
-
-                    }else{
-                        mLikebtn.setImageResource(R.drawable.ic_heart_outline_grey);
-                    }
-                }
-
-                @Override
-                public void onCancelled(DatabaseError databaseError) {
-
-                }
-            });
-        }*/
 
 
         public void setQuestions(String questions){
@@ -516,27 +528,6 @@ public class FindMainFrag extends Fragment {
         }
 
     }
-    @Override
-    public void onResume() {
-        super.onResume();
 
-        getView().setFocusableInTouchMode(true);
-        getView().requestFocus();
-        getView().setOnKeyListener(new View.OnKeyListener() {
-            @Override
-            public boolean onKey(View v, int keyCode, KeyEvent event) {
-                if (event.getAction() == KeyEvent.ACTION_UP && keyCode == KeyEvent.KEYCODE_BACK) {
-                    FrameLayout layoutt = (FrameLayout) v.findViewById(R.id.postdetr);
-                    layoutt.removeAllViewsInLayout();
-                    FragmentTransaction ft = getFragmentManager().beginTransaction();
-                    appBarLayout.setVisibility(View.VISIBLE);
-
-                    return true;
-                }
-                return false;
-            }
-        });
-
-    }
 
 }

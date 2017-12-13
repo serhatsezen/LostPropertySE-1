@@ -119,9 +119,7 @@ public class BottomBarActivity extends AppCompatActivity {
 
         }else if(googlesign.equals("googlesign")){
             askLocation();
-            editor.putString("GoogleSign", "");
-            editor.putString("USERKEY_SHARED", currentUserId);
-            editor.commit();
+
         }
 
         buildFragmentsList();
@@ -137,6 +135,7 @@ public class BottomBarActivity extends AppCompatActivity {
         if ( !manager.isProviderEnabled( LocationManager.GPS_PROVIDER ) ) {
             buildAlertMessageNoGps();
         }
+
     }
     private void buildAlertMessageNoGps() {
         final AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -144,11 +143,17 @@ public class BottomBarActivity extends AppCompatActivity {
                 .setCancelable(false)
                 .setPositiveButton("Tamam", new DialogInterface.OnClickListener() {
                     public void onClick(@SuppressWarnings("unused") final DialogInterface dialog, @SuppressWarnings("unused") final int id) {
+                        editor.putString("GoogleSign", "");
+                        editor.putString("USERKEY_SHARED", currentUserId);
+                        editor.commit();
                         startActivity(new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS));
                     }
                 })
                 .setNegativeButton("İptal", new DialogInterface.OnClickListener() {
                     public void onClick(final DialogInterface dialog, @SuppressWarnings("unused") final int id) {
+                        editor.putString("GoogleSign", "");
+                        editor.putString("USERKEY_SHARED", currentUserId);
+                        editor.commit();
                         dialog.cancel();
                     }
                 });
@@ -163,6 +168,8 @@ public class BottomBarActivity extends AppCompatActivity {
                 .replace(R.id.frame_fragmentholder, fragments.get(pos), tag)
                 .addToBackStack(null)
                 .commit();
+        editor.putString("USERKEY_SHARED", currentUserId);
+        editor.commit();
     }
     private void switchFragment2(int pos, String tag) {
         getSupportFragmentManager()
@@ -170,11 +177,13 @@ public class BottomBarActivity extends AppCompatActivity {
                 .replace(R.id.frame_fragmentholder, fragmentsPro.get(pos), tag)
                 .addToBackStack(null)
                 .commit();
+        editor.putString("USERKEY_SHARED", currentUserId);
+        editor.commit();
     }
     private void switchFragment3(int pos, String tag) {
         getSupportFragmentManager()
                 .beginTransaction()
-                .add(R.id.frame_fragmentholder, fragmentsDmList.get(pos), tag)
+                .replace(R.id.frame_fragmentholder, fragmentsDmList.get(pos), tag)
                 .addToBackStack(null)
                 .commit();
     }
@@ -215,7 +224,13 @@ public class BottomBarActivity extends AppCompatActivity {
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {     //backpress
         if (keyCode == KeyEvent.KEYCODE_BACK) {
-            moveTaskToBack(false);
+            if (getFragmentManager().getBackStackEntryCount() > 0) {
+                getFragmentManager().popBackStack();
+                super.onBackPressed();
+            } else {
+                moveTaskToBack(false);
+
+            }
             return true;
         }
         return super.onKeyDown(keyCode, event);

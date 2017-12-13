@@ -13,5 +13,4 @@
         android:textColor="@color/black"
         android:textSize="25sp"
         android:gravity="center"/>
-
 </android.support.v7.widget.Toolbar>

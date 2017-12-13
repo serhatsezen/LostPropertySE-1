@@ -9,17 +9,24 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.AppBarLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
+import android.widget.Spinner;
+import android.widget.SpinnerAdapter;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
@@ -82,6 +89,8 @@ public class LostMainFrag extends Fragment {
     private final static String TAG_FRAGMENT = "TAG_FRAGMENT";
     public static final String PREFS = "MyPrefs" ;
 
+    private String[] kms=null;
+
     public LostMainFrag() {
         // Required empty public constructor
     }
@@ -92,6 +101,32 @@ public class LostMainFrag extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View v = inflater.inflate(R.layout.fragment_lost_main, container, false);
+
+        kms = getResources().getStringArray(R.array.kms);
+
+        Toolbar toolbar = (Toolbar) v.findViewById(R.id.toolbar);
+
+        //for crate home button
+        AppCompatActivity activity = (AppCompatActivity) getActivity();
+        activity.setSupportActionBar(toolbar);
+
+        SpinnerAdapter spinnerAdapter = ArrayAdapter.createFromResource(getActivity().getApplicationContext(), R.array.kms, R.layout.spinner_dropdown_item);
+        Spinner navigationSpinner = new Spinner(activity.getSupportActionBar().getThemedContext());
+        navigationSpinner.setAdapter(spinnerAdapter);
+        toolbar.addView(navigationSpinner, 0);
+
+        navigationSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                Toast.makeText(getActivity(),"you selected: " + kms[position],
+                        Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
         //get firebase auth instance
         auth = FirebaseAuth.getInstance();
         //get current user
@@ -100,6 +135,7 @@ public class LostMainFrag extends Fragment {
 
         sharedpreferences = getActivity().getSharedPreferences(PREFS, Context.MODE_PRIVATE);
 
+        appBarLayout.setVisibility(View.VISIBLE);
 
         mDatabaseUsersFilter = FirebaseDatabase.getInstance().getReference().child("Users").child(user.getUid());
         mDatabaseDistance = FirebaseDatabase.getInstance().getReference().child("Users").child(user.getUid()).child("latLng");
@@ -193,6 +229,8 @@ public class LostMainFrag extends Fragment {
                 viewHolder.setName(model.getName());
                 viewHolder.setImage(getActivity().getApplicationContext(), model.getImage());
 
+                final LostMainFrag fragmentA = new LostMainFrag();
+
                 //viewHolder.setLiikeBtn(post_key);
 
                 viewHolder.mView.setOnClickListener(new View.OnClickListener() {
@@ -207,7 +245,7 @@ public class LostMainFrag extends Fragment {
                         fragmentDet.setArguments(bundleComment);
                         getFragmentManager()
                                 .beginTransaction()
-                                .add(R.id.postdetpfr, fragmentDet, TAG_FRAGMENT)
+                                .add(R.id.mainfragsc, fragmentDet)
                                 .addToBackStack(null)
                                 .commit();
 
@@ -225,7 +263,7 @@ public class LostMainFrag extends Fragment {
                         fragmentCom.setArguments(bundleComment);
                         getFragmentManager()
                                 .beginTransaction()
-                                .replace(R.id.postdetpfr, fragmentCom, TAG_FRAGMENT)
+                                .add(R.id.mainfragsc, fragmentCom )
                                 .addToBackStack(null)
                                 .commit();
 
@@ -251,7 +289,7 @@ public class LostMainFrag extends Fragment {
                                     UsersProfiFrag fragment2 = new UsersProfiFrag();
                                     getFragmentManager()
                                             .beginTransaction()
-                                            .replace(R.id.postdetpfr, fragment2,TAG_FRAGMENT)
+                                            .add(R.id.mainfragsc, fragment2)
                                             .addToBackStack(null)
                                             .commit();
                                 }else {
@@ -260,7 +298,7 @@ public class LostMainFrag extends Fragment {
                                     fragment3.setArguments(bundle);
                                     getFragmentManager()
                                             .beginTransaction()
-                                            .replace(R.id.postdetpfr, fragment3, TAG_FRAGMENT)
+                                            .add(R.id.mainfragsc, fragment3)
                                             .addToBackStack(null)
                                             .commit();
                                 }
@@ -490,31 +528,7 @@ public class LostMainFrag extends Fragment {
                     .fitCenter()
                     .diskCacheStrategy(DiskCacheStrategy.ALL)
                     .into(share_img);
-
-
         }
-
-    }
-    @Override
-    public void onResume() {
-        super.onResume();
-
-        getView().setFocusableInTouchMode(true);
-        getView().requestFocus();
-        getView().setOnKeyListener(new View.OnKeyListener() {
-            @Override
-            public boolean onKey(View v, int keyCode, KeyEvent event) {
-                if (event.getAction() == KeyEvent.ACTION_UP && keyCode == KeyEvent.KEYCODE_BACK) {
-                    FrameLayout layout = (FrameLayout) v.findViewById(R.id.postdetpfr);
-                    layout.removeAllViewsInLayout();
-                    FragmentTransaction ft = getFragmentManager().beginTransaction();
-                    appBarLayout.setVisibility(View.VISIBLE);
-
-                    return true;
-                }
-                return false;
-            }
-        });
 
     }
 }

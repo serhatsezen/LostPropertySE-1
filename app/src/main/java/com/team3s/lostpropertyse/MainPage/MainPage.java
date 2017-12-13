@@ -7,12 +7,14 @@ import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
 import android.support.v7.widget.RecyclerView;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ProgressBar;
 
@@ -119,9 +121,6 @@ public class MainPage extends Fragment {
         tabs.setupWithViewPager(viewPager);
         tabs.setTabGravity(TabLayout.GRAVITY_CENTER);
 
-
-        checkUser();
-
         return v;
     }
 
@@ -162,7 +161,7 @@ public class MainPage extends Fragment {
         }
     }
     @Override
-    public void onResume() {        // backpress
+    public void onResume() {        // click back button
 
         super.onResume();
 
@@ -172,34 +171,16 @@ public class MainPage extends Fragment {
             @Override
             public boolean onKey(View v, int keyCode, KeyEvent event) {
                 if (event.getAction() == KeyEvent.ACTION_UP && keyCode == KeyEvent.KEYCODE_BACK){
-                    getActivity().getSupportFragmentManager().popBackStack();
+
+                    FrameLayout layout = (FrameLayout) v.findViewById(R.id.mainfragsc);
+                    layout.removeAllViewsInLayout();
+                    layout.requestLayout();                                 // mainfragsc üstündeki fragmentları kaldırıyor.
+                    FragmentTransaction ft = getFragmentManager().beginTransaction();
+
                     return true;
                 }
                 return false;
             }
         });
     }
-
-    private void checkUser() {
-
-        final String user_id = auth.getCurrentUser().getUid();
-
-        mDatabaseUsers.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                if (!dataSnapshot.hasChild(user_id)) {
-                   /* Intent setupIntent = new Intent(getActivity(), ProfileActivity.class);
-                    setupIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                    startActivity(setupIntent);*/
-                }
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
-    }
-
-
 }

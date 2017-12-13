@@ -317,12 +317,6 @@ public class UsersProfiFrag extends Fragment {
         backgroundPicker.setType("image/*");
         startActivityForResult(backgroundPicker, GALLERY_REQUEST);
     }
-    public void changeProfilePicture(){
-        Intent profilePicker = new Intent(Intent.ACTION_PICK);
-        profilePicker.setType("image/*");
-        startActivityForResult(profilePicker, GALLERY_REQUEST);
-
-    }
     /*public void changeFragment(){
         FragmentManager manager = getFragmentManager();
         EditProfileFragment editProfileFragment = new EditProfileFragment();
@@ -336,7 +330,7 @@ public class UsersProfiFrag extends Fragment {
         super.onActivityResult(reqCode, resultCode, data);
         if (resultCode == RESULT_OK) {
 
-            if(profileImage==true) {
+            /*if(profileImage==true) {
                 try {
                     mProfImageUri = data.getData();
                     final InputStream imageStream = getActivity().getContentResolver().openInputStream(mProfImageUri);
@@ -386,7 +380,7 @@ public class UsersProfiFrag extends Fragment {
                     e.printStackTrace();
                     Toast.makeText(getActivity(), "Bir sorun oluştu", Toast.LENGTH_LONG).show();
                 }
-            }
+            }*/
             if(backgroundImage==true) {
                 try {
                     mBackImageUri = data.getData();
@@ -413,7 +407,6 @@ public class UsersProfiFrag extends Fragment {
 
         }else {
             backgroundImage = false;
-            profileImage=false;
             Toast.makeText(getActivity(), "Resim Seçmedin",Toast.LENGTH_LONG).show();
         }
     }
