@@ -27,10 +27,14 @@ import android.widget.Spinner;
 import android.widget.SpinnerAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.app.ActionBar;
+import android.app.ActionBar.OnNavigationListener;
+import android.app.Activity;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
+import com.github.andreilisun.swipedismissdialog.SwipeDismissDialog;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -83,6 +87,8 @@ public class LostMainFrag extends Fragment {
     double latUserL;
     double lngUserL;
     double dist;
+    double distanceUserSelection;
+
     String distStr;
     SharedPreferences sharedpreferences;
 
@@ -90,6 +96,8 @@ public class LostMainFrag extends Fragment {
     public static final String PREFS = "MyPrefs" ;
 
     private String[] kms=null;
+    public String distance = "5";
+    private boolean showPost;
 
     public LostMainFrag() {
         // Required empty public constructor
@@ -109,8 +117,7 @@ public class LostMainFrag extends Fragment {
         //for crate home button
         AppCompatActivity activity = (AppCompatActivity) getActivity();
         activity.setSupportActionBar(toolbar);
-
-        SpinnerAdapter spinnerAdapter = ArrayAdapter.createFromResource(getActivity().getApplicationContext(), R.array.kms, R.layout.spinner_dropdown_item);
+        SpinnerAdapter spinnerAdapter = ArrayAdapter.createFromResource(getActivity().getApplicationContext(), R.array.kms, R.layout.spinner_dropdown_item);        //km degerlerini string.xml içindeki kms arrayinden çekiyor
         Spinner navigationSpinner = new Spinner(activity.getSupportActionBar().getThemedContext());
         navigationSpinner.setAdapter(spinnerAdapter);
         toolbar.addView(navigationSpinner, 0);
@@ -118,8 +125,7 @@ public class LostMainFrag extends Fragment {
         navigationSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                Toast.makeText(getActivity(),"you selected: " + kms[position],
-                        Toast.LENGTH_SHORT).show();
+                distance = kms[position];
             }
 
             @Override
@@ -214,24 +220,87 @@ public class LostMainFrag extends Fragment {
 
         FirebaseRecyclerAdapter<AdapterClass, ShareViewHolder> firebaseRecyclerAdapter = new FirebaseRecyclerAdapter<AdapterClass, ShareViewHolder>(
                 AdapterClass.class,
-                R.layout.row,
+                R.layout.list,
                 ShareViewHolder.class,
                 database
         ) {
             @Override
-            protected void populateViewHolder(final ShareViewHolder viewHolder, AdapterClass model, final int position) {
+            protected void populateViewHolder(final ShareViewHolder viewHolder, final AdapterClass model, final int position) {
 
                 final String post_key = getRef(position).getKey();
+                 viewHolder.setQuestions(model.getQuestions());
+                 viewHolder.setCity(model.getaddressname());
+                 viewHolder.setPost_image(getActivity().getApplicationContext(), model.getPost_image());
+                 viewHolder.setName(model.getName());
+                 viewHolder.setImage(getActivity().getApplicationContext(), model.getImage());
+                viewHolder.setDate(model.getPost_date());
 
-                viewHolder.setQuestions(model.getQuestions());
-                viewHolder.setCity(model.getaddressname());
-                viewHolder.setPost_image(getActivity().getApplicationContext(), model.getPost_image());
-                viewHolder.setName(model.getName());
-                viewHolder.setImage(getActivity().getApplicationContext(), model.getImage());
 
-                final LostMainFrag fragmentA = new LostMainFrag();
+                database.child(post_key).child("latlng").addValueEventListener(new ValueEventListener() {       // her postun lat lng değerleri
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
 
-                //viewHolder.setLiikeBtn(post_key);
+                        for (DataSnapshot childDataSnapshot : dataSnapshot.getChildren()) {
+
+
+                            Location destination = new Location("destination");
+                            destination.setLatitude(latUserL);
+                            destination.setLongitude(lngUserL);
+
+
+                            latPost = dataSnapshot.child("latitude").getValue().toString();
+                            lngPost = dataSnapshot.child("longitude").getValue().toString();
+
+
+                            latPostL = Double.parseDouble(String.valueOf(latPost));
+                            lngPostL = Double.parseDouble(String.valueOf(lngPost));
+
+
+                            Location current = new Location("destination");
+                            current.setLatitude(latPostL);
+                            current.setLongitude(lngPostL);
+
+                            dist = current.distanceTo(destination) / 1000;                      //kullanıcının lat lng değerleri ile posttaki lat lng değerlerinin karşılarştırılması ve km olarak hesaplanması
+                            distStr = String.format("%.2f", dist );
+
+                            distance.split(" ");
+                            String[] parts = distance.split(" ");
+                            String part1 = parts[0]; // 004
+
+                            distanceUserSelection = Double.parseDouble(part1);
+
+                            if(dist<=distanceUserSelection){
+                                showPost = true;
+                                viewHolder.distanceUser.setText(distStr+" km");
+
+                            }else{
+                                showPost = false;
+                            }
+
+
+                        }
+                    }
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                });
+                viewHolder.postImg.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        View dialog = LayoutInflater.from(getActivity()).inflate(R.layout.custom_image_dialog, null);
+                        final SwipeDismissDialog swipeDismissDialog = new SwipeDismissDialog.Builder(getActivity())
+                                .setView(dialog)
+                                .build()
+                                .show();
+                        ImageView image = (ImageView) dialog.findViewById(R.id.image);
+                        Glide.with(getActivity().getApplicationContext())
+                                .load(model.getPost_image())
+                                .diskCacheStrategy(DiskCacheStrategy.ALL)
+                                .into(image);
+
+                    }
+                });
 
                 viewHolder.mView.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -327,95 +396,8 @@ public class LostMainFrag extends Fragment {
 
                     }
                 });
-                /*mDatabaseLikeCounter.child(post_key).addValueEventListener(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-
-                        for (DataSnapshot childDataSnapshot : dataSnapshot.getChildren()) {
-                            viewHolder.counterLike.setText(String.valueOf(dataSnapshot.getChildrenCount()));  //displays the key for the node
 
 
-                        }
-                    }
-
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
-
-                    }
-                });
-
-                viewHolder.mLikebtn.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        mProcessLike = true;
-                        database.addValueEventListener(new ValueEventListener() {
-                            @Override
-                            public void onDataChange(DataSnapshot dataSnapshot) {
-                                tokenUser = (String) dataSnapshot.child(post_key).child("token").getValue();
-                                questionName = (String) dataSnapshot.child(post_key).child("questions").getValue();
-
-                            }
-                            @Override
-                            public void onCancelled(DatabaseError databaseError) {
-
-                            }
-                        });
-                        mDatabaseLike.addValueEventListener(new ValueEventListener() {
-                            @Override
-                            public void onDataChange(DataSnapshot dataSnapshot) {
-                                if (mProcessLike) {
-                                    if (dataSnapshot.child(post_key).hasChild(auth.getCurrentUser().getUid())) {
-                                        mDatabaseLike.child(post_key).child(auth.getCurrentUser().getUid()).removeValue();
-                                        mProcessLike = false;
-                                    } else {
-                                        mDatabaseLike.child(post_key).child(auth.getCurrentUser().getUid()).setValue(userNames);
-                                        mProcessLike = false;
-                                    }
-                                }
-                            }
-                            @Override
-                            public void onCancelled(DatabaseError databaseError) {
-                            }
-                        });
-                    }
-                });*/
-
-                database.child(post_key).child("latlng").addValueEventListener(new ValueEventListener() {       // her postun lat lng değerleri
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-
-                        for (DataSnapshot childDataSnapshot : dataSnapshot.getChildren()) {
-
-
-                            Location destination = new Location("destination");
-                            destination.setLatitude(latUserL);
-                            destination.setLongitude(lngUserL);
-
-
-                            latPost = dataSnapshot.child("latitude").getValue().toString();
-                            lngPost = dataSnapshot.child("longitude").getValue().toString();
-
-
-                            latPostL = Double.parseDouble(String.valueOf(latPost));
-                            lngPostL = Double.parseDouble(String.valueOf(lngPost));
-
-
-                            Location current = new Location("destination");
-                            current.setLatitude(latPostL);
-                            current.setLongitude(lngPostL);
-
-                            dist = current.distanceTo(destination) / 1000;                      //kullanıcının lat lng değerleri ile posttaki lat lng değerlerinin karşılarştırılması ve km olarak hesaplanması
-                            distStr = String.format("%.2f", dist );
-
-                            viewHolder.distanceUser.setText(distStr+" km");
-
-                        }
-                    }
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
-
-                    }
-                });
             }
         };
         lost_main_list.setAdapter(firebaseRecyclerAdapter);
@@ -427,18 +409,16 @@ public class LostMainFrag extends Fragment {
         View mView;
 
         ImageButton commentBtn;
-        RelativeLayout profile;
+
+        ImageView profile;
+        ImageView postImg;
+
+        TextView commentCount;
+        TextView distanceUser;
 
         DatabaseReference mDatabaseLike;
         FirebaseAuth mAuth;
 
-        TextView commentCount;
-
-        TextView distanceUser;
-
-       //ImageButton mLikebtn;
-       //LinearLayout likeUsers;
-       //TextView counterLike;
 
 
         public ShareViewHolder(View itemView) {
@@ -451,38 +431,12 @@ public class LostMainFrag extends Fragment {
             commentCount = (TextView) mView.findViewById(R.id.commentCount);
             distanceUser = (TextView) mView.findViewById(R.id.distanceTxt);
 
-            profile = (RelativeLayout) mView.findViewById(R.id.users_info);
-           // likeUsers = (LinearLayout) mView.findViewById(R.id.like_users);
-           // mLikebtn = (ImageButton) mView.findViewById(R.id.likeBtn);
-           // counterLike = (TextView) mView.findViewById(R.id.counterLike);
-
-
-
+            profile = (ImageView) mView.findViewById(R.id.user_profile);
+            postImg = (ImageView) mView.findViewById(R.id.share_img);
 
             mDatabaseLike = FirebaseDatabase.getInstance().getReference().child("Likes");
             mAuth = FirebaseAuth.getInstance();
         }
-
-       /* public void setLiikeBtn(final String post_key){
-
-            mDatabaseLike.addValueEventListener(new ValueEventListener() {
-                @Override
-                public void onDataChange(DataSnapshot dataSnapshot) {
-                    if(dataSnapshot.child(post_key).hasChild(mAuth.getCurrentUser().getUid())){
-                        mLikebtn.setImageResource(R.drawable.ic_heart_red);
-
-                    }else{
-                        mLikebtn.setImageResource(R.drawable.ic_heart_outline_grey);
-                    }
-                }
-
-                @Override
-                public void onCancelled(DatabaseError databaseError) {
-
-                }
-            });
-        }
-*/
 
         public void setQuestions(String questions){
             TextView questions_title = (TextView) mView.findViewById(R.id.question_text);
@@ -502,7 +456,12 @@ public class LostMainFrag extends Fragment {
             city_name.setText(city);
 
         }
+        public void setDate(String date){
 
+            TextView date_yy = (TextView) mView.findViewById(R.id.time);
+            date_yy.setText(date);
+
+        }
         public void setName(String name){
             TextView shaUsername = (TextView) mView.findViewById(R.id.shaUsername);
 

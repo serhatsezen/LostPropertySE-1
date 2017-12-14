@@ -36,6 +36,7 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
+import com.github.andreilisun.swipedismissdialog.SwipeDismissDialog;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -123,8 +124,7 @@ public class FindMainFrag extends Fragment {
         navigationSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                Toast.makeText(getActivity(),"you selected: " + kms[position],
-                        Toast.LENGTH_SHORT).show();
+
             }
 
             @Override
@@ -224,6 +224,8 @@ public class FindMainFrag extends Fragment {
         return v;
     }
 
+
+
     public void onStart(){
         super.onStart();
         final String currentUserId = auth.getCurrentUser().getUid();
@@ -233,12 +235,12 @@ public class FindMainFrag extends Fragment {
 
         FirebaseRecyclerAdapter<AdapterClass, ShareViewHolder> firebaseRecyclerAdapter = new FirebaseRecyclerAdapter<AdapterClass, ShareViewHolder>(
                 AdapterClass.class,
-                R.layout.row,
+                R.layout.list,
                 ShareViewHolder.class,
                 database
         ) {
             @Override
-            protected void populateViewHolder(final ShareViewHolder viewHolder, AdapterClass model, final int position) {
+            protected void populateViewHolder(final ShareViewHolder viewHolder, final AdapterClass model, final int position) {
 
                 final String post_key = getRef(position).getKey();
 
@@ -248,9 +250,22 @@ public class FindMainFrag extends Fragment {
                 viewHolder.setName(model.getName());
                 viewHolder.setImage(getActivity().getApplicationContext(), model.getImage());
 
-                //viewHolder.setLiikeBtn(post_key);
-                final FindMainFrag fragmentF = new FindMainFrag();
+                viewHolder.postImg.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        View dialog = LayoutInflater.from(getActivity()).inflate(R.layout.custom_image_dialog, null);
+                        final SwipeDismissDialog swipeDismissDialog = new SwipeDismissDialog.Builder(getActivity())
+                                .setView(dialog)
+                                .build()
+                                .show();
+                        ImageView image = (ImageView) dialog.findViewById(R.id.image);
+                        Glide.with(getActivity().getApplicationContext())
+                                .load(model.getPost_image())
+                                .diskCacheStrategy(DiskCacheStrategy.ALL)
+                                .into(image);
 
+                    }
+                });
 
                 viewHolder.mView.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -286,10 +301,6 @@ public class FindMainFrag extends Fragment {
                                 .add(R.id.mainfragsc, fragmentCom)
                                 .addToBackStack(null)
                                 .commit();
-
-                           /*Intent editActivity = new Intent(getActivity(), CommentActivity.class);
-                            editActivity.putExtra("post_id", post_key);
-                            startActivity(editActivity);*/
                     }
                 });
                 viewHolder.profile.setOnClickListener(new View.OnClickListener() {
@@ -356,58 +367,6 @@ public class FindMainFrag extends Fragment {
 
                     }
                 });
-                /*mDatabaseLikeCounter.child(post_key).addValueEventListener(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-
-                        for (DataSnapshot childDataSnapshot : dataSnapshot.getChildren()) {
-                            viewHolder.counterLike.setText(String.valueOf(dataSnapshot.getChildrenCount()));  //displays the key for the node
-
-
-                        }
-                    }
-
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
-
-                    }
-                });
-
-                viewHolder.mLikebtn.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        mProcessLike = true;
-                        database.addValueEventListener(new ValueEventListener() {
-                            @Override
-                            public void onDataChange(DataSnapshot dataSnapshot) {
-                                tokenUser = (String) dataSnapshot.child(post_key).child("token").getValue();
-                                questionName = (String) dataSnapshot.child(post_key).child("questions").getValue();
-
-                            }
-                            @Override
-                            public void onCancelled(DatabaseError databaseError) {
-
-                            }
-                        });
-                        mDatabaseLike.addValueEventListener(new ValueEventListener() {
-                            @Override
-                            public void onDataChange(DataSnapshot dataSnapshot) {
-                                if (mProcessLike) {
-                                    if (dataSnapshot.child(post_key).hasChild(auth.getCurrentUser().getUid())) {
-                                        mDatabaseLike.child(post_key).child(auth.getCurrentUser().getUid()).removeValue();
-                                        mProcessLike = false;
-                                    } else {
-                                        mDatabaseLike.child(post_key).child(auth.getCurrentUser().getUid()).setValue(userNames);
-                                        mProcessLike = false;
-                                    }
-                                }
-                            }
-                            @Override
-                            public void onCancelled(DatabaseError databaseError) {
-                            }
-                        });
-                    }
-                });*/
 
                 database.child(post_key).child("latlng").addValueEventListener(new ValueEventListener() {       // her postun lat lng değerleri
                     @Override
@@ -455,7 +414,8 @@ public class FindMainFrag extends Fragment {
 
 
         ImageButton commentBtn;
-        RelativeLayout profile;
+        ImageView postImg;
+        ImageView profile;
 
         FirebaseAuth mAuth;
 
@@ -474,7 +434,8 @@ public class FindMainFrag extends Fragment {
             commentCount = (TextView) mView.findViewById(R.id.commentCount);
             distanceUser = (TextView) mView.findViewById(R.id.distanceTxt);
 
-            profile = (RelativeLayout) mView.findViewById(R.id.users_info);
+            profile = (ImageView) mView.findViewById(R.id.user_profile);
+            postImg = (ImageView) mView.findViewById(R.id.share_img);
             mAuth = FirebaseAuth.getInstance();
         }
 

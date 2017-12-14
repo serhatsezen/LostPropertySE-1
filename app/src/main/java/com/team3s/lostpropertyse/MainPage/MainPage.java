@@ -175,7 +175,6 @@ public class MainPage extends Fragment {
                     FrameLayout layout = (FrameLayout) v.findViewById(R.id.mainfragsc);
                     layout.removeAllViewsInLayout();
                     layout.requestLayout();                                 // mainfragsc üstündeki fragmentları kaldırıyor.
-                    FragmentTransaction ft = getFragmentManager().beginTransaction();
 
                     return true;
                 }
