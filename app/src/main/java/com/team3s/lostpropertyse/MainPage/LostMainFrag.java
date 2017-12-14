@@ -269,13 +269,8 @@ public class LostMainFrag extends Fragment {
 
                             distanceUserSelection = Double.parseDouble(part1);
 
-                            if(dist<=distanceUserSelection){
-                                showPost = true;
-                                viewHolder.distanceUser.setText(distStr+" km");
+                            viewHolder.distanceUser.setText(distStr+" km");
 
-                            }else{
-                                showPost = false;
-                            }
 
 
                         }
