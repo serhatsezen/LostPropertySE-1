@@ -33,8 +33,9 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:layout_behavior="@string/appbar_scrolling_view_behavior" />
-    <FrameLayout
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id="@+id/mainfragsc"/>
+        android:id="@+id/mainfragsc"
+        android:orientation="vertical" />
 </RelativeLayout>

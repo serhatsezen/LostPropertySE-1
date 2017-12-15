@@ -24,14 +24,16 @@
             android:id="@+id/lost_main_list"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:background="#142634"
             android:layout_below="@+id/post_titleET" />
 
     </FrameLayout>
 
-    <FrameLayout
+    <LinearLayout
         android:id="@+id/postdetpfr"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_alignParentStart="true"
-        android:layout_below="@+id/LostappBarLayout" />
+        android:layout_below="@+id/LostappBarLayout"
+        android:orientation="vertical" />
 </RelativeLayout>

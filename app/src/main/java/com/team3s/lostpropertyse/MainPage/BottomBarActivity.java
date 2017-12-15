@@ -165,8 +165,8 @@ public class BottomBarActivity extends AppCompatActivity {
     private void switchFragment(int pos, String tag) {
         getSupportFragmentManager()
                 .beginTransaction()
-                .replace(R.id.frame_fragmentholder, fragments.get(pos), tag)
-                .addToBackStack(null)
+                .replace(R.id.group, fragments.get(pos), "tag_frag_main")
+                .addToBackStack("addmain")
                 .commit();
         editor.putString("USERKEY_SHARED", currentUserId);
         editor.commit();
@@ -174,8 +174,8 @@ public class BottomBarActivity extends AppCompatActivity {
     private void switchFragment2(int pos, String tag) {
         getSupportFragmentManager()
                 .beginTransaction()
-                .replace(R.id.frame_fragmentholder, fragmentsPro.get(pos), tag)
-                .addToBackStack(null)
+                .replace(R.id.group, fragmentsPro.get(pos), "tag_frag_profile")
+                .addToBackStack("addprof")
                 .commit();
         editor.putString("USERKEY_SHARED", currentUserId);
         editor.commit();

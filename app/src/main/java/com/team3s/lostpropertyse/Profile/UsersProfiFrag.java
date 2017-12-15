@@ -317,13 +317,6 @@ public class UsersProfiFrag extends Fragment {
         backgroundPicker.setType("image/*");
         startActivityForResult(backgroundPicker, GALLERY_REQUEST);
     }
-    /*public void changeFragment(){
-        FragmentManager manager = getFragmentManager();
-        EditProfileFragment editProfileFragment = new EditProfileFragment();
-        editProfileFragment.setArguments();
-        manager.beginTransaction().replace(R.id.frame_fragmentholder, editProfileFragment, "TEST").commit();
-
-    }*/
 
     @Override
     public void onActivityResult(int reqCode, int resultCode, Intent data) {
@@ -418,28 +411,4 @@ public class UsersProfiFrag extends Fragment {
         Intent intent = new Intent(getActivity(), TabsHeaderActivity.class);
         startActivity(intent);
     }
-    @Override
-    public void onResume() {
-        super.onResume();
-
-        getView().setFocusableInTouchMode(true);
-        getView().requestFocus();
-        getView().setOnKeyListener(new View.OnKeyListener() {
-            @Override
-            public boolean onKey(View v, int keyCode, KeyEvent event) {
-                if (event.getAction() == KeyEvent.ACTION_UP && keyCode == KeyEvent.KEYCODE_BACK) {
-                    FrameLayout layout = (FrameLayout) v.findViewById(R.id.another_user_frag);
-                    layout.removeAllViewsInLayout();
-                    layout.requestLayout();
-                    FragmentTransaction ft = getFragmentManager().beginTransaction();
-
-                    return true;
-                }
-                return false;
-            }
-        });
-
-    }
-
-
 }

@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.AppBarLayout;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -94,10 +95,8 @@ public class LostMainFrag extends Fragment {
 
     private final static String TAG_FRAGMENT = "TAG_FRAGMENT";
     public static final String PREFS = "MyPrefs" ;
-
-    private String[] kms=null;
-    public String distance = "5";
     private boolean showPost;
+    FragmentManager manager;
 
     public LostMainFrag() {
         // Required empty public constructor
@@ -109,15 +108,15 @@ public class LostMainFrag extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View v = inflater.inflate(R.layout.fragment_lost_main, container, false);
+        manager = getFragmentManager();
 
-        kms = getResources().getStringArray(R.array.kms);
 
         Toolbar toolbar = (Toolbar) v.findViewById(R.id.toolbar);
 
         //for crate home button
         AppCompatActivity activity = (AppCompatActivity) getActivity();
         activity.setSupportActionBar(toolbar);
-        SpinnerAdapter spinnerAdapter = ArrayAdapter.createFromResource(getActivity().getApplicationContext(), R.array.kms, R.layout.spinner_dropdown_item);        //km degerlerini string.xml içindeki kms arrayinden çekiyor
+        /*SpinnerAdapter spinnerAdapter = ArrayAdapter.createFromResource(getActivity().getApplicationContext(), R.array.kms, R.layout.spinner_dropdown_item);        //km degerlerini string.xml içindeki kms arrayinden çekiyor
         Spinner navigationSpinner = new Spinner(activity.getSupportActionBar().getThemedContext());
         navigationSpinner.setAdapter(spinnerAdapter);
         toolbar.addView(navigationSpinner, 0);
@@ -132,7 +131,7 @@ public class LostMainFrag extends Fragment {
             public void onNothingSelected(AdapterView<?> parent) {
 
             }
-        });
+        });*/
         //get firebase auth instance
         auth = FirebaseAuth.getInstance();
         //get current user
@@ -263,12 +262,6 @@ public class LostMainFrag extends Fragment {
                             dist = current.distanceTo(destination) / 1000;                      //kullanıcının lat lng değerleri ile posttaki lat lng değerlerinin karşılarştırılması ve km olarak hesaplanması
                             distStr = String.format("%.2f", dist );
 
-                            distance.split(" ");
-                            String[] parts = distance.split(" ");
-                            String part1 = parts[0]; // 004
-
-                            distanceUserSelection = Double.parseDouble(part1);
-
                             viewHolder.distanceUser.setText(distStr+" km");
 
 
@@ -309,7 +302,7 @@ public class LostMainFrag extends Fragment {
                         fragmentDet.setArguments(bundleComment);
                         getFragmentManager()
                                 .beginTransaction()
-                                .add(R.id.mainfragsc, fragmentDet)
+                                .add(R.id.postdetpfr, fragmentDet,"addPostDetail")
                                 .addToBackStack(null)
                                 .commit();
 
@@ -327,7 +320,7 @@ public class LostMainFrag extends Fragment {
                         fragmentCom.setArguments(bundleComment);
                         getFragmentManager()
                                 .beginTransaction()
-                                .add(R.id.mainfragsc, fragmentCom )
+                                .add(R.id.postdetpfr, fragmentCom,"addPostComment")
                                 .addToBackStack(null)
                                 .commit();
 
@@ -353,7 +346,7 @@ public class LostMainFrag extends Fragment {
                                     UsersProfiFrag fragment2 = new UsersProfiFrag();
                                     getFragmentManager()
                                             .beginTransaction()
-                                            .add(R.id.mainfragsc, fragment2)
+                                            .add(R.id.postdetpfr, fragment2,"addUserProfile")
                                             .addToBackStack(null)
                                             .commit();
                                 }else {
@@ -362,7 +355,7 @@ public class LostMainFrag extends Fragment {
                                     fragment3.setArguments(bundle);
                                     getFragmentManager()
                                             .beginTransaction()
-                                            .add(R.id.mainfragsc, fragment3)
+                                            .add(R.id.postdetpfr, fragment3,"addAnotherProfile")
                                             .addToBackStack(null)
                                             .commit();
                                 }
@@ -484,5 +477,48 @@ public class LostMainFrag extends Fragment {
                     .into(share_img);
         }
 
+    }
+    @Override
+    public void onResume() {        // click back button
+
+        super.onResume();
+
+        getView().setFocusableInTouchMode(true);
+        getView().requestFocus();
+        getView().setOnKeyListener(new View.OnKeyListener() {
+            @Override
+            public boolean onKey(View v, int keyCode, KeyEvent event) {
+                if (event.getAction() == KeyEvent.ACTION_UP && keyCode == KeyEvent.KEYCODE_BACK){
+
+
+                    AnotherUsersProfiFrag fragmentAnother = (AnotherUsersProfiFrag) manager.findFragmentByTag("addAnotherProfile");
+                    FragmentTransaction transaction = manager.beginTransaction();
+                    if(fragmentAnother != null){
+                        transaction.remove(fragmentAnother);
+                        transaction.commit();
+                    }
+                    PostDetailFrag fragmentPostDetail = (PostDetailFrag) manager.findFragmentByTag("addPostDetail");
+                    FragmentTransaction transactionPostDet = manager.beginTransaction();
+                    if(fragmentPostDetail != null){
+                        transactionPostDet.remove(fragmentPostDetail);
+                        transactionPostDet.commit();
+                    }
+                    CommentFrag fragmentPostComment = (CommentFrag) manager.findFragmentByTag("addPostComment");
+                    FragmentTransaction transactionPostComment = manager.beginTransaction();
+                    if(fragmentPostComment != null){
+                        transactionPostComment.remove(fragmentPostComment);
+                        transactionPostComment.commit();
+                    }
+                    UsersProfiFrag fragmentUserProfile = (UsersProfiFrag) manager.findFragmentByTag("addUserProfile");
+                    FragmentTransaction transactionUserProfile = manager.beginTransaction();
+                    if(fragmentUserProfile != null){
+                        transactionUserProfile.remove(fragmentUserProfile);
+                        transactionUserProfile.commit();
+                    }
+
+                }
+                return false;
+            }
+        });
     }
 }

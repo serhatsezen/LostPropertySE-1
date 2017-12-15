@@ -97,7 +97,6 @@ public class FindMainFrag extends Fragment {
     public static final String PREFS = "MyPrefs" ;
 
     SharedPreferences sharedpreferences;
-    private String[] kms=null;      // spinner için km degerleri
     public FindMainFrag() {
         // Required empty public constructor
     }
@@ -109,29 +108,10 @@ public class FindMainFrag extends Fragment {
         // Inflate the layout for this fragment
         View v = inflater.inflate(R.layout.fragment_find_main, container, false);
 
-        kms = getResources().getStringArray(R.array.kms);
-
         Toolbar toolbar = (Toolbar) v.findViewById(R.id.toolbar);
 
         AppCompatActivity activity = (AppCompatActivity) getActivity();    //-------------------------------------------actionbar spinner eklemek için
         activity.setSupportActionBar(toolbar);
-
-        SpinnerAdapter spinnerAdapter = ArrayAdapter.createFromResource(getActivity().getApplicationContext(), R.array.kms, R.layout.spinner_dropdown_item);        //km degerlerini string.xml içindeki kms arrayinden çekiyor
-        Spinner navigationSpinner = new Spinner(activity.getSupportActionBar().getThemedContext());
-        navigationSpinner.setAdapter(spinnerAdapter);
-        toolbar.addView(navigationSpinner, 0);
-
-        navigationSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-
-            }
-        });
 
 
         //get firebase auth instance
@@ -280,7 +260,7 @@ public class FindMainFrag extends Fragment {
                         fragmentD.setArguments(bundleComment);
                         getFragmentManager()
                                 .beginTransaction()
-                                .add(R.id.mainfragsc, fragmentD)
+                                .add(R.id.group, fragmentD,"addPostDetail")
                                 .addToBackStack(null)
                                 .commit();
 
@@ -298,7 +278,7 @@ public class FindMainFrag extends Fragment {
                         fragmentCom.setArguments(bundleComment);
                         getFragmentManager()
                                 .beginTransaction()
-                                .add(R.id.mainfragsc, fragmentCom)
+                                .add(R.id.group, fragmentCom,"addPostComment")
                                 .addToBackStack(null)
                                 .commit();
                     }
@@ -322,7 +302,7 @@ public class FindMainFrag extends Fragment {
                                     UsersProfiFrag fragment2 = new UsersProfiFrag();
                                     getFragmentManager()
                                             .beginTransaction()
-                                            .add(R.id.mainfragsc, fragment2)
+                                            .add(R.id.group, fragment2,"addUserProfile")
                                             .addToBackStack(null)
                                             .commit();
 
@@ -338,7 +318,7 @@ public class FindMainFrag extends Fragment {
                                     fragment2.setArguments(bundleAnother);
                                     getFragmentManager()
                                             .beginTransaction()
-                                            .add(R.id.mainfragsc, fragment2)
+                                            .add(R.id.group, fragment2,"addAnotherProfile")
                                             .addToBackStack(null)
                                             .commit();
                                 }

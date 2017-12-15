@@ -10,6 +10,15 @@
   <RelativeLayout
       android:layout_width="match_parent"
       android:layout_height="match_parent">
+      <LinearLayout
+          android:layout_width="match_parent"
+          android:layout_height="match_parent"
+          android:layout_below="@+id/appBarLayout"
+          android:id="@+id/group"
+          android:gravity="center"
+          android:layout_marginBottom="?attr/actionBarSize"
+          android:orientation="vertical">
+      </LinearLayout>
 
       <FrameLayout
           android:id="@+id/frame_fragmentholder"
@@ -24,7 +33,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
         android:layout_alignParentBottom="true"
-        android:background="#7e7e7e"
+        android:background="#142629"
         app:itemIconTint="@drawable/selector_bottombar_item"
         app:itemTextColor="@drawable/selector_bottombar_text"
         app:menu="@menu/bottombar_menu"/>

@@ -73,7 +73,7 @@ public class MainPage extends Fragment {
     String distStr;
 
     private final static String TAG_FRAGMENT = "TAG_FRAGMENT";
-
+    FragmentManager manager;
 
     public MainPage() {
         // Required empty public constructor
@@ -85,6 +85,7 @@ public class MainPage extends Fragment {
         // Inflate the layout for this fragment
         View v = inflater.inflate(R.layout.fragment_main_screen, container, false);
 
+        manager = getFragmentManager();
         //get firebase auth instance
         auth = FirebaseAuth.getInstance();
          //get current user
@@ -172,11 +173,11 @@ public class MainPage extends Fragment {
             public boolean onKey(View v, int keyCode, KeyEvent event) {
                 if (event.getAction() == KeyEvent.ACTION_UP && keyCode == KeyEvent.KEYCODE_BACK){
 
-                    FrameLayout layout = (FrameLayout) v.findViewById(R.id.mainfragsc);
-                    layout.removeAllViewsInLayout();
-                    layout.requestLayout();                                 // mainfragsc üstündeki fragmentları kaldırıyor.
-
-                    return true;
+                    MainPage fragmentMain = (MainPage) manager.findFragmentByTag(getTag());
+                    getFragmentManager()
+                            .beginTransaction()
+                            .remove(fragmentMain)
+                            .commit();
                 }
                 return false;
             }

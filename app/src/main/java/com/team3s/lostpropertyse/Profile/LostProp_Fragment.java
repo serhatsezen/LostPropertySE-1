@@ -6,8 +6,11 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -40,6 +43,7 @@ public class LostProp_Fragment extends Fragment {
     private String currentUserId;
     private String str;
     public static final String PREFS = "MyPrefs" ;
+    FragmentManager manager;
 
     public LostProp_Fragment() {
         // Required empty public constructor
@@ -53,6 +57,7 @@ public class LostProp_Fragment extends Fragment {
         View v = inflater.inflate(R.layout.fragment_losted_prop_, container, false);
 
         lostPropList = (RecyclerView) v.findViewById(R.id.rvLostProp);
+        manager = getFragmentManager();
 
         auth = FirebaseAuth.getInstance();
         user = FirebaseAuth.getInstance().getCurrentUser();
@@ -122,11 +127,11 @@ public class LostProp_Fragment extends Fragment {
                         bundlePostDetail.putString("post_id",post_key);
                         bundlePostDetail.putString("post_type","Kayiplar");
 
-                        PostDetailFrag fragmentCom = new PostDetailFrag();
-                        fragmentCom.setArguments(bundlePostDetail);
+                        PostDetailFrag fragmentDetail = new PostDetailFrag();
+                        fragmentDetail.setArguments(bundlePostDetail);
                         getFragmentManager()
                                 .beginTransaction()
-                                .add(R.id.another_user_frag, fragmentCom)
+                                .add(R.id.another_user_frag, fragmentDetail,"PostDetail")
                                 .addToBackStack(null)
                                 .commit();
 
@@ -178,5 +183,31 @@ public class LostProp_Fragment extends Fragment {
                     .into(post_img);
         }
 
+    }
+    @Override
+    public void onResume() {        // click back button
+
+        super.onResume();
+
+        getView().setFocusableInTouchMode(true);
+        getView().requestFocus();
+        getView().setOnKeyListener(new View.OnKeyListener() {
+            @Override
+            public boolean onKey(View v, int keyCode, KeyEvent event) {
+                if (event.getAction() == KeyEvent.ACTION_UP && keyCode == KeyEvent.KEYCODE_BACK){
+
+                    PostDetailFrag fragmentPostDetail = (PostDetailFrag) manager.findFragmentByTag("PostDetail");
+                    FragmentTransaction transactionPostDet = manager.beginTransaction();
+                    if(fragmentPostDetail != null){
+                        transactionPostDet.remove(fragmentPostDetail);
+                        transactionPostDet.commit();
+                    }
+
+
+
+                }
+                return false;
+            }
+        });
     }
 }

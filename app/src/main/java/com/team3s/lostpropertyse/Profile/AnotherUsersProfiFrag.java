@@ -35,6 +35,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.team3s.lostpropertyse.Chat.Chat;
+import com.team3s.lostpropertyse.Post.PostDetailFrag;
 import com.team3s.lostpropertyse.Utils.CircleTransform;
 import com.team3s.lostpropertyse.LoginSign.TabsHeaderActivity;
 import com.team3s.lostpropertyse.R;
@@ -72,7 +73,7 @@ public class AnotherUsersProfiFrag extends Fragment {
 
     private SharedPreferences sharedpreferences;
     public static final String PREFS = "MyPrefs" ;
-
+    FragmentManager manager;
     public AnotherUsersProfiFrag() {
         // Required empty public constructor
     }
@@ -85,6 +86,7 @@ public class AnotherUsersProfiFrag extends Fragment {
         // Inflate the layout for this fragment
       View v = inflater.inflate(R.layout.user_profil_frag, container, false);
 
+      manager = getFragmentManager();
       Bundle bundle = getArguments();
       post_key_user = bundle.getString("key");
       senderName = bundle.getString("username");
@@ -288,31 +290,5 @@ public class AnotherUsersProfiFrag extends Fragment {
                 });
         builder.create();
         builder.show();
-    }
-    @Override
-    public void onResume() {
-        super.onResume();
-
-        getView().setFocusableInTouchMode(true);
-        getView().requestFocus();
-        getView().setOnKeyListener(new View.OnKeyListener() {
-            @Override
-            public boolean onKey(View v, int keyCode, KeyEvent event) {
-                if (event.getAction() == KeyEvent.ACTION_UP && keyCode == KeyEvent.KEYCODE_BACK) {
-                    int backStackEntryCount = getFragmentManager().getBackStackEntryCount();
-
-                    if(backStackEntryCount >= 1){
-                        getFragmentManager().popBackStack();
-                    }else{
-                        FrameLayout layout = (FrameLayout) v.findViewById(R.id.another_user_frag);
-                        layout.removeAllViewsInLayout();
-                    }
-
-                    return true;
-                }
-                return false;
-            }
-        });
-
     }
 }
