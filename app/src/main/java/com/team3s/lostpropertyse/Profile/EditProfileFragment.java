@@ -6,11 +6,15 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.provider.Settings;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -57,6 +61,7 @@ public class EditProfileFragment extends AppCompatActivity {
     private GoogleMap myGoogleMap;
     Button kaydetButton;
     Uri newImageUri;
+    private boolean mLocationPermissionGranted;
     private StorageReference imgStorageRef;
     private FirebaseUser currentUser;
     private DatabaseReference curentUserRef;
@@ -67,17 +72,21 @@ public class EditProfileFragment extends AppCompatActivity {
     String imgUrl;
     public LatLng user;
     private static final int IMAGE_PICK_REQUEST = 888;
+    private static final int PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 999;
     private SharedPreferences sharedpreferences;
     public static final String PREFS = "MyPrefs" ;
     SharedPreferences.Editor editor;
     double latMarkerss;
     double lngMarkerss;
+    LocationManager locationManager;
+    LocationListener locationListener;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.fragment_edit_profile);
-
+        locationManager = (LocationManager) getSystemService( Context.LOCATION_SERVICE );
 
         FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
         Uid = currentUser.getUid();
@@ -183,16 +192,33 @@ public class EditProfileFragment extends AppCompatActivity {
 
 
 
-
         mapView.getMapAsync(new OnMapReadyCallback() {
             @Override
             public void onMapReady(GoogleMap googleMap) {
                 myGoogleMap = googleMap;
                 myGoogleMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
 
+                myGoogleMap.setOnMyLocationButtonClickListener(new GoogleMap.OnMyLocationButtonClickListener() {
+                    @Override
+                    public boolean onMyLocationButtonClick() {
+                        if(!locationManager.isProviderEnabled(Context.LOCATION_SERVICE)){
+                            Toast.makeText(getApplicationContext(),"Konumunuzu güncellemek için GPS açmalısınız.", Toast.LENGTH_LONG).show();
+                            startActivity(new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS));
+                            return  false;
+                        }
+                        else {
 
+                            Toast.makeText(getApplicationContext(),"KAYITLI KONUM GÜNCEL", Toast.LENGTH_LONG).show();
+                        }
+                        return  false;
+                    }
+                });
             }
         });
+
+
+
+
     }
 
     public void setProfileİmg(){
