@@ -201,16 +201,16 @@ public class EditProfileFragment extends AppCompatActivity {
                 myGoogleMap.setOnMyLocationButtonClickListener(new GoogleMap.OnMyLocationButtonClickListener() {
                     @Override
                     public boolean onMyLocationButtonClick() {
-                        if(!locationManager.isProviderEnabled(Context.LOCATION_SERVICE)){
+                        if(locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)){
+                            Toast.makeText(getApplicationContext(),"KAYITLI KONUM GÜNCELLENİYOR!", Toast.LENGTH_LONG).show();
+                            myGoogleMap.addMarker(new MarkerOptions().position(user).title("Bulunduğunuz yer").snippet(""));
+                            return true;
+                        } else {
                             Toast.makeText(getApplicationContext(),"Konumunuzu güncellemek için GPS açmalısınız.", Toast.LENGTH_LONG).show();
                             startActivity(new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS));
-                            return  false;
+                            return  true;
                         }
-                        else {
 
-                            Toast.makeText(getApplicationContext(),"KAYITLI KONUM GÜNCEL", Toast.LENGTH_LONG).show();
-                        }
-                        return  false;
                     }
                 });
             }
