@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.TabLayout;
@@ -22,6 +23,7 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
@@ -35,6 +37,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.team3s.lostpropertyse.Chat.Chat;
+import com.team3s.lostpropertyse.MainPage.MainPage;
 import com.team3s.lostpropertyse.Post.PostDetailFrag;
 import com.team3s.lostpropertyse.Utils.CircleTransform;
 import com.team3s.lostpropertyse.LoginSign.TabsHeaderActivity;
@@ -73,6 +76,9 @@ public class AnotherUsersProfiFrag extends Fragment {
 
     private SharedPreferences sharedpreferences;
     public static final String PREFS = "MyPrefs" ;
+    public String themeStr;
+    public RelativeLayout tlUserProfileTabsAn;
+
     FragmentManager manager;
     public AnotherUsersProfiFrag() {
         // Required empty public constructor
@@ -122,6 +128,8 @@ public class AnotherUsersProfiFrag extends Fragment {
       mDatabaseUsersPostNum = FirebaseDatabase.getInstance().getReference().child("Users").child(post_key_user).child("PostsId");
 
       sharedpreferences = getActivity().getSharedPreferences(PREFS, Context.MODE_PRIVATE);
+      themeStr = sharedpreferences.getString("theme", "DayTheme");          //eğer null ise DayTheme
+      tlUserProfileTabsAn = (RelativeLayout) v.findViewById(R.id.tlUserProfileTabs);
 
 
       u_fullname = (TextView) v.findViewById(R.id.fullnameuser);
@@ -234,11 +242,21 @@ public class AnotherUsersProfiFrag extends Fragment {
           public void onCancelled(DatabaseError databaseError) {
           }
       });
+      if(themeStr.equals("NightTheme")){
+          tlUserProfileTabsAn.setBackgroundColor(Color.parseColor("#142634"));
+          viewPager.setBackgroundColor(Color.parseColor("#142634"));
+
+
+      }else if(themeStr.equals("DayTheme")){
+          tlUserProfileTabsAn.setBackgroundColor(Color.parseColor("#9E9E9E"));
+          viewPager.setBackgroundColor(Color.parseColor("#EEEEEE"));
+
+      }
       return v;
     }
     private void setupViewPager(ViewPager viewPager) {
         UsersProfiFrag.Adapter adapter = new UsersProfiFrag.Adapter(getChildFragmentManager());
-        adapter.addFragment(new LostProp_Fragment(), "\nKaybettiklerim");
+        adapter.addFragment(new LostProp_Fragment(), "Kaybettiklerim");
         adapter.addFragment(new FindProp_Fragment(), "Bulduklarım");
         viewPager.setAdapter(adapter);
     }
@@ -291,4 +309,6 @@ public class AnotherUsersProfiFrag extends Fragment {
         builder.create();
         builder.show();
     }
+
+
 }

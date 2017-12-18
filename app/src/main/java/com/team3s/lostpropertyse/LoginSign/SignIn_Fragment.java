@@ -28,6 +28,7 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -74,7 +75,6 @@ public class SignIn_Fragment extends Fragment implements OnClickListener,GoogleA
     private static Button loginButton;
     private static TextView forgotPassword, signUp;
     private static CheckBox show_hide_password;
-    private static LinearLayout loginLayout;
     private static Animation shakeAnimation;
     private static FragmentManager fragmentManager;
 
@@ -89,7 +89,7 @@ public class SignIn_Fragment extends Fragment implements OnClickListener,GoogleA
     private static final String TAG = "MainActivity";
     private String idToken;
 
-    private SignInButton mSignInButton;
+    private ImageView mSignInButton;
 
     public GoogleApiClient mGoogleApiClient ;
     private final Context mContext = getActivity();
@@ -117,8 +117,8 @@ public class SignIn_Fragment extends Fragment implements OnClickListener,GoogleA
         mDatabaseFindUsers = FirebaseDatabase.getInstance().getReference().child("Icerik").child("Bulunanlar");
         mDatabaseLostUsers = FirebaseDatabase.getInstance().getReference().child("Icerik").child("Kayiplar");
 
-        mSignInButton = (SignInButton) view.findViewById(R.id.sign_in_button);
-        mSignInButton.setSize(SignInButton.SIZE_WIDE);
+        mSignInButton = (ImageView) view.findViewById(R.id.sign_in_button);
+        //mSignInButton.setSize(SignInButton.SIZE_WIDE);
 
         mSignInButton.setOnClickListener(this);
 
@@ -266,23 +266,12 @@ public class SignIn_Fragment extends Fragment implements OnClickListener,GoogleA
         forgotPassword = (TextView) view.findViewById(R.id.forgot_password);
         show_hide_password = (CheckBox) view
                 .findViewById(R.id.show_hide_password);
-        loginLayout = (LinearLayout) view.findViewById(R.id.login_layout);
 
         // Load ShakeAnimation
         shakeAnimation = AnimationUtils.loadAnimation(getActivity(),
                 R.anim.shake);
 
         // Setting text selector over textviews
-        @SuppressLint("ResourceType") XmlResourceParser xrp = getResources().getXml(R.drawable.text_selector);
-        try {
-            ColorStateList csl = ColorStateList.createFromXml(getResources(),
-                    xrp);
-
-            forgotPassword.setTextColor(csl);
-            show_hide_password.setTextColor(csl);
-            signUp.setTextColor(csl);
-        } catch (Exception e) {
-        }
     }
 
     // Set Listeners

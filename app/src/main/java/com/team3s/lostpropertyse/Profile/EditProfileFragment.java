@@ -1,21 +1,29 @@
 package com.team3s.lostpropertyse.Profile;
 
 import android.Manifest;
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.provider.MediaStore;
+import android.provider.Settings;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.app.AppCompatDelegate;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.Toast;
 
@@ -51,12 +59,13 @@ public class EditProfileFragment extends AppCompatActivity {
 
     private EditText AdSoyad;
     private EditText Sehir;
-    private String Uid;
+    private String Uid,themeStr;
     private ImageView profileİmg;
     private MapView mapView;
     private GoogleMap myGoogleMap;
-    Button kaydetButton;
+    Button kaydetButton,themaNightBtn,themaDayBtn;
     Uri newImageUri;
+    private boolean mLocationPermissionGranted;
     private StorageReference imgStorageRef;
     private FirebaseUser currentUser;
     private DatabaseReference curentUserRef;
@@ -67,17 +76,23 @@ public class EditProfileFragment extends AppCompatActivity {
     String imgUrl;
     public LatLng user;
     private static final int IMAGE_PICK_REQUEST = 888;
+    private static final int PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 999;
     private SharedPreferences sharedpreferences;
     public static final String PREFS = "MyPrefs" ;
     SharedPreferences.Editor editor;
     double latMarkerss;
     double lngMarkerss;
+    LocationManager locationManager;
+    LocationListener locationListener;
+    Handler handler;
+    Runnable runnable;
+    FrameLayout frameLayout ;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.fragment_edit_profile);
-
+        locationManager = (LocationManager) getSystemService( Context.LOCATION_SERVICE );
 
         FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
         Uid = currentUser.getUid();
@@ -89,6 +104,8 @@ public class EditProfileFragment extends AppCompatActivity {
         AdSoyad = (EditText) findViewById(R.id.editTextAdSoyad);
         Sehir = (EditText) findViewById(R.id.editTextSehir);
         kaydetButton = (Button) findViewById(R.id.kaydetButon);
+        themaNightBtn = (Button) findViewById(R.id.themeNightBtn);
+        themaDayBtn = (Button) findViewById(R.id.themeDayBtn);
         mapView = (MapView) findViewById(R.id.mapView);
         kaydetButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -101,10 +118,41 @@ public class EditProfileFragment extends AppCompatActivity {
 
         mapView.onResume(); // needed to get the map to display immediately
         sharedpreferences = getSharedPreferences(PREFS, Context.MODE_PRIVATE);
+        themeStr = sharedpreferences.getString("theme", "DayTheme");          //eğer null ise DayTheme
 
+        frameLayout = (FrameLayout) findViewById(R.id.activity_bottom_bar);
 
         setProfileİmg();
         getLocation();
+
+        if(themeStr.equals("DayTheme")){
+            themaNightBtn.setVisibility(View.VISIBLE);
+            themaDayBtn.setVisibility(View.GONE);
+        }else if(themeStr.equals("NightTheme")){
+            themaNightBtn.setVisibility(View.GONE);
+            themaDayBtn.setVisibility(View.VISIBLE);
+
+        }
+        themaNightBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                themaNightBtn.setVisibility(View.GONE);
+                themaDayBtn.setVisibility(View.VISIBLE);
+
+                NightThemeMode();
+
+            }
+        });
+        themaDayBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                themaNightBtn.setVisibility(View.VISIBLE);
+                themaDayBtn.setVisibility(View.GONE);
+                DayThemeMode();
+
+            }
+        });
+
 
         profileİmg.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -183,16 +231,55 @@ public class EditProfileFragment extends AppCompatActivity {
 
 
 
-
         mapView.getMapAsync(new OnMapReadyCallback() {
             @Override
             public void onMapReady(GoogleMap googleMap) {
                 myGoogleMap = googleMap;
                 myGoogleMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
 
+                myGoogleMap.setOnMyLocationButtonClickListener(new GoogleMap.OnMyLocationButtonClickListener() {
+                    @Override
+                    public boolean onMyLocationButtonClick() {
+                        if(locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)){
+                            Toast.makeText(getApplicationContext(),"KAYITLI KONUM GÜNCELLENİYOR!", Toast.LENGTH_LONG).show();
+                            myGoogleMap.addMarker(new MarkerOptions().position(user).title("Bulunduğunuz yer").snippet(""));
+                            return true;
+                        } else {
+                            Toast.makeText(getApplicationContext(),"Konumunuzu güncellemek için GPS açmalısınız.", Toast.LENGTH_LONG).show();
+                            startActivity(new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS));
+                            return  true;
+                        }
 
+                    }
+                });
             }
         });
+
+
+
+
+    }
+    public void DayThemeMode(){
+        SharedPreferences.Editor editor = sharedpreferences.edit();
+        editor.putString("theme", "DayTheme" );
+        editor.commit();
+        reloadApplication();
+    }
+
+    public void NightThemeMode(){
+        SharedPreferences.Editor editor = sharedpreferences.edit();
+        editor.putString("theme", "NightTheme" );
+        editor.commit();
+        reloadApplication();
+    }
+    private void reloadApplication() {
+        Intent mStartActivity = new Intent(EditProfileFragment.this, EditProfileFragment.class);            //For reload application
+        int mPendingIntentId = 123456;
+        PendingIntent mPendingIntent = PendingIntent.getActivity(EditProfileFragment.this, mPendingIntentId, mStartActivity,
+                PendingIntent.FLAG_CANCEL_CURRENT);
+        AlarmManager mgr = (AlarmManager) EditProfileFragment.this.getSystemService(Context.ALARM_SERVICE);
+        mgr.set(AlarmManager.RTC, System.currentTimeMillis() + 100, mPendingIntent);
+        System.exit(0);
     }
 
     public void setProfileİmg(){
@@ -363,9 +450,4 @@ public class EditProfileFragment extends AppCompatActivity {
     public void setArguments(){
 
     }
-
-
-
-
-
 }

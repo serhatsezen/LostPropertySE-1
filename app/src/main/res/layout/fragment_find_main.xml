@@ -2,6 +2,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:id="@+id/relativeLayFind_Main"
     tools:context="com.team3s.lostpropertyse.MainPage.FindMainFrag">
 
     <android.support.design.widget.AppBarLayout
@@ -25,11 +26,11 @@
         <android.support.v7.widget.RecyclerView
             android:id="@+id/find_main_list"
             android:layout_width="match_parent"
-            android:background="#142634"
             android:layout_height="match_parent"/>
     </FrameLayout>
-    <FrameLayout
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id="@+id/postdetr"/>
+        android:id="@+id/postdetr"
+        android:orientation="vertical" />
 </RelativeLayout>

@@ -3,12 +3,14 @@ package com.team3s.lostpropertyse.MainPage;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.AppBarLayout;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.ActionBarActivity;
@@ -27,6 +29,7 @@ import android.widget.ArrayAdapter;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.SpinnerAdapter;
@@ -59,7 +62,8 @@ import java.util.ArrayList;
 public class FindMainFrag extends Fragment {
 
     private ImageButton commentButton;
-    private RecyclerView find_main_list;
+    private static RecyclerView find_main_list;
+    private static RelativeLayout relativeLayFind_Main;
 
     private DatabaseReference database,mDatabaseUsers,mDatabaseUsersProfile,mDatabaseLikeCounter,mDatabaseUsersFilter;
     private DatabaseReference mDatabaseLike, mDatabaseDistance;
@@ -69,7 +73,8 @@ public class FindMainFrag extends Fragment {
     private boolean mProcessLike = false;
     private static String tokenUser = null;
     private static String questionName = null;
-    AppBarLayout appBarLayout;
+    static AppBarLayout appBarLayout;
+    private static TextView toolbarTextFind;
 
     private static String question = null;
     private static String username = null;
@@ -92,9 +97,11 @@ public class FindMainFrag extends Fragment {
     double lngUserL;
     double dist;
     String distStr;
+    public static String themeStr;
 
     private final static String TAG_FRAGMENT = "TAG_FRAGMENT";
     public static final String PREFS = "MyPrefs" ;
+    FragmentManager manager;
 
     SharedPreferences sharedpreferences;
     public FindMainFrag() {
@@ -107,6 +114,7 @@ public class FindMainFrag extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View v = inflater.inflate(R.layout.fragment_find_main, container, false);
+        manager = getFragmentManager();
 
         Toolbar toolbar = (Toolbar) v.findViewById(R.id.toolbar);
 
@@ -123,6 +131,9 @@ public class FindMainFrag extends Fragment {
         appBarLayout = (AppBarLayout) v.findViewById(R.id.findappBarLayout);
         mDatabaseUsersFilter = FirebaseDatabase.getInstance().getReference().child("Users").child(user.getUid());
         mDatabaseDistance = FirebaseDatabase.getInstance().getReference().child("Users").child(user.getUid()).child("latLng");
+        themeStr = sharedpreferences.getString("theme", "DayTheme");
+        relativeLayFind_Main = (RelativeLayout) v.findViewById(R.id.relativeLayFind_Main);
+        toolbarTextFind = (TextView) v.findViewById(R.id.toolbarTextFind);
 
 
         mDatabaseUsersFilter.addValueEventListener(new ValueEventListener() {
@@ -260,7 +271,7 @@ public class FindMainFrag extends Fragment {
                         fragmentD.setArguments(bundleComment);
                         getFragmentManager()
                                 .beginTransaction()
-                                .add(R.id.group, fragmentD,"addPostDetail")
+                                .add(R.id.postdetr, fragmentD,"addPostDetail")
                                 .addToBackStack(null)
                                 .commit();
 
@@ -278,7 +289,7 @@ public class FindMainFrag extends Fragment {
                         fragmentCom.setArguments(bundleComment);
                         getFragmentManager()
                                 .beginTransaction()
-                                .add(R.id.group, fragmentCom,"addPostComment")
+                                .add(R.id.postdetr, fragmentCom,"addPostComment")
                                 .addToBackStack(null)
                                 .commit();
                     }
@@ -302,7 +313,7 @@ public class FindMainFrag extends Fragment {
                                     UsersProfiFrag fragment2 = new UsersProfiFrag();
                                     getFragmentManager()
                                             .beginTransaction()
-                                            .add(R.id.group, fragment2,"addUserProfile")
+                                            .add(R.id.postdetr, fragment2,"addUserProfile")
                                             .addToBackStack(null)
                                             .commit();
 
@@ -318,7 +329,7 @@ public class FindMainFrag extends Fragment {
                                     fragment2.setArguments(bundleAnother);
                                     getFragmentManager()
                                             .beginTransaction()
-                                            .add(R.id.group, fragment2,"addAnotherProfile")
+                                            .add(R.id.postdetr, fragment2,"addAnotherProfile")
                                             .addToBackStack(null)
                                             .commit();
                                 }
@@ -402,6 +413,11 @@ public class FindMainFrag extends Fragment {
         TextView commentCount;
 
         TextView distanceUser;
+        TextView question_text;
+        TextView category;
+
+        LinearLayout linearLayout;
+        LinearLayout linearListLay2;
 
 
         public ShareViewHolder(View itemView) {
@@ -413,10 +429,40 @@ public class FindMainFrag extends Fragment {
 
             commentCount = (TextView) mView.findViewById(R.id.commentCount);
             distanceUser = (TextView) mView.findViewById(R.id.distanceTxt);
+            question_text = (TextView) mView.findViewById(R.id.question_text);
+            category = (TextView) mView.findViewById(R.id.category);
 
             profile = (ImageView) mView.findViewById(R.id.user_profile);
             postImg = (ImageView) mView.findViewById(R.id.share_img);
+            linearLayout = (LinearLayout) mView.findViewById(R.id.linearListLay);
+            linearListLay2 = (LinearLayout) mView.findViewById(R.id.linearListLay2);
+
             mAuth = FirebaseAuth.getInstance();
+
+            if(themeStr.equals("NightTheme")){
+                linearLayout.setBackgroundColor(Color.parseColor("#142634"));
+                linearListLay2.setBackgroundColor(Color.parseColor("#142634"));
+                find_main_list.setBackgroundColor(Color.parseColor("#1a2f40"));
+                relativeLayFind_Main.setBackgroundColor(Color.parseColor("#1a2f40"));
+                appBarLayout.setBackgroundColor(Color.parseColor("#142629"));
+                question_text.setTextColor(Color.parseColor("#BDC7C1"));
+                category.setTextColor(Color.parseColor("#7E8889"));
+                commentCount.setTextColor(Color.parseColor("#7E8889"));
+                toolbarTextFind.setTextColor(Color.parseColor("#BDC7C1"));
+
+
+            }else if(themeStr.equals("DayTheme")){
+                linearLayout.setBackgroundColor(Color.parseColor("#EEEEEE"));
+                linearListLay2.setBackgroundColor(Color.parseColor("#EEEEEE"));
+                find_main_list.setBackgroundColor(Color.parseColor("#9E9E9E"));
+                relativeLayFind_Main.setBackgroundColor(Color.parseColor("#9E9E9E"));
+                appBarLayout.setBackgroundColor(Color.parseColor("#EEEEEE"));
+                question_text.setTextColor(Color.parseColor("#000000"));
+                category.setTextColor(Color.parseColor("#000000"));
+                commentCount.setTextColor(Color.parseColor("#000000"));
+                toolbarTextFind.setTextColor(Color.parseColor("#000000"));
+
+            }
         }
 
 
@@ -470,5 +516,48 @@ public class FindMainFrag extends Fragment {
 
     }
 
+    @Override
+    public void onResume() {        // click back button
+
+        super.onResume();
+
+        getView().setFocusableInTouchMode(true);
+        getView().requestFocus();
+        getView().setOnKeyListener(new View.OnKeyListener() {
+            @Override
+            public boolean onKey(View v, int keyCode, KeyEvent event) {
+                if (event.getAction() == KeyEvent.ACTION_UP && keyCode == KeyEvent.KEYCODE_BACK){
+                    appBarLayout.setVisibility(View.VISIBLE);
+
+                    AnotherUsersProfiFrag fragmentAnother = (AnotherUsersProfiFrag) manager.findFragmentByTag("addAnotherProfile");
+                    FragmentTransaction transaction = manager.beginTransaction();
+                    if(fragmentAnother != null){
+                        transaction.remove(fragmentAnother);
+                        transaction.commit();
+                    }
+                    PostDetailFrag fragmentPostDetail = (PostDetailFrag) manager.findFragmentByTag("addPostDetail");
+                    FragmentTransaction transactionPostDet = manager.beginTransaction();
+                    if(fragmentPostDetail != null){
+                        transactionPostDet.remove(fragmentPostDetail);
+                        transactionPostDet.commit();
+                    }
+                    CommentFrag fragmentPostComment = (CommentFrag) manager.findFragmentByTag("addPostComment");
+                    FragmentTransaction transactionPostComment = manager.beginTransaction();
+                    if(fragmentPostComment != null){
+                        transactionPostComment.remove(fragmentPostComment);
+                        transactionPostComment.commit();
+                    }
+                    UsersProfiFrag fragmentUserProfile = (UsersProfiFrag) manager.findFragmentByTag("addUserProfile");
+                    FragmentTransaction transactionUserProfile = manager.beginTransaction();
+                    if(fragmentUserProfile != null){
+                        transactionUserProfile.remove(fragmentUserProfile);
+                        transactionUserProfile.commit();
+                    }
+
+                }
+                return false;
+            }
+        });
+    }
 
 }

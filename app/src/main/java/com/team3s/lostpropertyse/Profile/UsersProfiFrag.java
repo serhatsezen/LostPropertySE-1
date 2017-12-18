@@ -1,10 +1,13 @@
 package com.team3s.lostpropertyse.Profile;
 
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -23,6 +26,7 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -84,13 +88,18 @@ public class UsersProfiFrag extends Fragment {
     public Uri mProfImageUri = null;
     public Uri mBackImageUri = null;
 
-    public TabLayout tlUserProfileTabs;
+    public RelativeLayout tlUserProfileTabs;
     public boolean backgroundImage = false;
     public boolean profileImage = false;
     public Query mQueryUserId;
     public FirebaseUser user;
     public String currentUserId;
     public String LostCount;
+    FragmentManager manager;
+
+    private SharedPreferences sharedpreferences;
+    public static final String PREFS = "MyPrefs" ;
+    public String themeStr;
 
     public UsersProfiFrag() {
         // Required empty public constructor
@@ -103,7 +112,7 @@ public class UsersProfiFrag extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View v = inflater.inflate(R.layout.user_profil_frag, container, false);
-
+      manager = getFragmentManager();
         //get firebase auth instance
       auth = FirebaseAuth.getInstance();
       FirebaseStorage storage = FirebaseStorage.getInstance();
@@ -111,6 +120,11 @@ public class UsersProfiFrag extends Fragment {
       backgroundStorageReference = storageReference.child("background_images");
         //get current user
       user = FirebaseAuth.getInstance().getCurrentUser();
+
+      tlUserProfileTabs = (RelativeLayout) v.findViewById(R.id.tlUserProfileTabs);
+
+      sharedpreferences = getActivity().getSharedPreferences(PREFS, Context.MODE_PRIVATE);
+      themeStr = sharedpreferences.getString("theme", "DayTheme");          //eğer null ise DayTheme
 
       authListener = new FirebaseAuth.AuthStateListener() {
             @Override
@@ -243,6 +257,16 @@ public class UsersProfiFrag extends Fragment {
         });
 
 
+      if(themeStr.equals("NightTheme")){
+          tlUserProfileTabs.setBackgroundColor(Color.parseColor("#142634"));
+          viewPager.setBackgroundColor(Color.parseColor("#142634"));
+
+
+      }else if(themeStr.equals("DayTheme")){
+          tlUserProfileTabs.setBackgroundColor(Color.parseColor("#9E9E9E"));
+          viewPager.setBackgroundColor(Color.parseColor("#EEEEEE"));
+
+      }
 
         return v;
     }
@@ -410,5 +434,22 @@ public class UsersProfiFrag extends Fragment {
         auth.signOut();
         Intent intent = new Intent(getActivity(), TabsHeaderActivity.class);
         startActivity(intent);
+    }
+    @Override
+    public void onResume() {        // click back button
+
+        super.onResume();
+
+        getView().setFocusableInTouchMode(true);
+        getView().requestFocus();
+        getView().setOnKeyListener(new View.OnKeyListener() {
+            @Override
+            public boolean onKey(View v, int keyCode, KeyEvent event) {
+                if (event.getAction() == KeyEvent.ACTION_UP && keyCode == KeyEvent.KEYCODE_BACK){
+                    manager.popBackStack();
+                }
+                return false;
+            }
+        });
     }
 }

@@ -160,14 +160,7 @@ public class SignUp_Fragment extends Fragment implements AdapterView.OnItemSelec
         selectLoc = (TextView) view.findViewById(R.id.selectLoc);
         selectLocProgress = (ProgressBar) view.findViewById(R.id.selectLocProgress);
         // Setting text selector over textviews
-        XmlResourceParser xrp = getResources().getXml(R.drawable.text_selector);
-        try {
-            ColorStateList csl = ColorStateList.createFromXml(getResources(),
-                    xrp);
 
-            terms_conditions.setTextColor(csl);
-        } catch (Exception e) {
-        }
     }
 
     @Override

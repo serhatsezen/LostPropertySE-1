@@ -3,6 +3,7 @@ package com.team3s.lostpropertyse.Profile;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
@@ -12,6 +13,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
@@ -29,7 +31,7 @@ import com.team3s.lostpropertyse.R;
 
 public class FindProp_Fragment extends Fragment {
 
-    public RecyclerView findPropList;
+    public static RecyclerView findPropList;
     public Query mQueryUser;
     public DatabaseReference mDatabase;
     public FirebaseAuth.AuthStateListener authListener;
@@ -38,7 +40,10 @@ public class FindProp_Fragment extends Fragment {
     public DatabaseReference mDatabaseUsers;
     public String currentUserId;
     public String str;
+    private SharedPreferences sharedpreferences;
     public static final String PREFS = "MyPrefs" ;
+    public static String themeStr;
+    public static RelativeLayout relativeFound_prop;
 
 
     public FindProp_Fragment() {
@@ -54,7 +59,9 @@ public class FindProp_Fragment extends Fragment {
 
         auth = FirebaseAuth.getInstance();
         user = FirebaseAuth.getInstance().getCurrentUser();
-
+        sharedpreferences = getActivity().getSharedPreferences(PREFS,0);
+        themeStr = sharedpreferences.getString("theme", "DayTheme");          //eğer null ise DayTheme
+        relativeFound_prop = (RelativeLayout) v.findViewById(R.id.relativeFound_prop);
         authListener = new FirebaseAuth.AuthStateListener() {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
@@ -70,8 +77,7 @@ public class FindProp_Fragment extends Fragment {
         };
 
         try {
-            SharedPreferences mPrefs = getActivity().getSharedPreferences(PREFS,0);
-            str = mPrefs.getString("USERKEY_SHARED", "");
+            str = sharedpreferences.getString("USERKEY_SHARED", "");
         }catch (Exception e){
 
         }
@@ -154,34 +160,57 @@ public class FindProp_Fragment extends Fragment {
 
         DatabaseReference mDatabaseLike;
         FirebaseAuth mAuth;
+        RelativeLayout relativeLayFindProfile;
+        TextView questions_title;
+        TextView date;
+        TextView time;
 
         public ShareViewHolder(View itemView) {
             super(itemView);
             mView = itemView;
             mDatabaseLike = FirebaseDatabase.getInstance().getReference().child("Likes");
             mAuth = FirebaseAuth.getInstance();
+            relativeLayFindProfile = (RelativeLayout) mView.findViewById(R.id.relativeLayFindProfile);
+            questions_title = (TextView) mView.findViewById(R.id.titleProfileText);
+            date = (TextView) mView.findViewById(R.id.dateTxt);
+            time = (TextView) mView.findViewById(R.id.timeTxt);
+
+            if(themeStr.equals("NightTheme")){
+                relativeLayFindProfile.setBackgroundColor(Color.parseColor("#142634"));
+                findPropList.setBackgroundColor(Color.parseColor("#142634"));
+                relativeFound_prop.setBackgroundColor(Color.parseColor("#142634"));
+                questions_title.setTextColor(Color.parseColor("#FFFFFF"));
+                date.setTextColor(Color.parseColor("#FFFFFF"));
+                time.setTextColor(Color.parseColor("#FFFFFF"));
+
+
+            }else if(themeStr.equals("DayTheme")){
+                relativeLayFindProfile.setBackgroundColor(Color.parseColor("#EEEEEE"));
+                findPropList.setBackgroundColor(Color.parseColor("#EEEEEE"));
+                relativeFound_prop.setBackgroundColor(Color.parseColor("#EEEEEE"));
+                questions_title.setTextColor(Color.parseColor("#FFFFFF"));
+                date.setTextColor(Color.parseColor("#FFFFFF"));
+                time.setTextColor(Color.parseColor("#FFFFFF"));
+
+            }
+
+
         }
 
 
         public void setQuestions(String questions){
 
-            TextView questions_title = (TextView) mView.findViewById(R.id.titleProfileText);
             questions_title.setText(questions);
         }
         public void setPost_date(String post_date){
-
-            TextView date = (TextView) mView.findViewById(R.id.dateTxt);
             date.setText(post_date);
         }
         public void setPost_time(String post_time){
-
-            TextView time = (TextView) mView.findViewById(R.id.timeTxt);
             time.setText(post_time);
         }
 
         public void setPost_image(Context ctx, String post_image){
             ImageView post_img = (ImageView) mView.findViewById(R.id.post_img);
-            //Picasso.with(ctx).load(post_image).networkPolicy(NetworkPolicy.OFFLINE).fit().centerCrop().into(post_img);
             Glide.with(ctx)
                     .load(post_image)
                     .fitCenter()

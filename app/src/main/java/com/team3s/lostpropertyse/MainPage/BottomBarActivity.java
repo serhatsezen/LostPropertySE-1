@@ -2,10 +2,12 @@ package com.team3s.lostpropertyse.MainPage;
 
 import android.Manifest.permission;
 import android.app.AlertDialog;
+import android.app.FragmentManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.location.LocationManager;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -58,6 +60,7 @@ public class BottomBarActivity extends AppCompatActivity {
 
     public String usersdmlist;
     public String googlesign;
+    public String themeStr;
 
 
     @Override
@@ -113,6 +116,7 @@ public class BottomBarActivity extends AppCompatActivity {
         editor = preferences.edit();
 
         googlesign = preferences.getString("GoogleSign","");
+        themeStr = preferences.getString("theme", "DayTheme");          //eğer null ise DayTheme
 
         if(googlesign.equals("")){
             editor.putString("USERKEY_SHARED", currentUserId);
@@ -127,6 +131,14 @@ public class BottomBarActivity extends AppCompatActivity {
         // Set the 0th Fragment to be displayed by default.
         switchFragment(0, TAG_FRAGMENT_NEWS);
 
+        if(themeStr.equals("NightTheme")){
+            bottomNavigationView.setBackgroundColor(Color.parseColor("#142629"));
+
+
+
+        }else if(themeStr.equals("DayTheme")){
+            bottomNavigationView.setBackgroundColor(Color.parseColor("#9E9E9E"));
+        }
     }
 
     private void askLocation() {
@@ -224,12 +236,12 @@ public class BottomBarActivity extends AppCompatActivity {
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {     //backpress
         if (keyCode == KeyEvent.KEYCODE_BACK) {
-            if (getFragmentManager().getBackStackEntryCount() > 0) {
+            FragmentManager manager = getFragmentManager();
+            if (manager.getBackStackEntryCount() > 0) {
                 getFragmentManager().popBackStack();
                 super.onBackPressed();
             } else {
                 moveTaskToBack(false);
-
             }
             return true;
         }

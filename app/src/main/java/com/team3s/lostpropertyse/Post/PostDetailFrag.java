@@ -3,11 +3,14 @@ package com.team3s.lostpropertyse.Post;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AppCompatDelegate;
 import android.support.v7.widget.PopupMenu;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -20,12 +23,14 @@ import android.view.Window;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.github.andreilisun.swipedismissdialog.SwipeDismissDialog;
+import com.google.android.gms.maps.model.LatLng;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -50,6 +55,7 @@ public class PostDetailFrag extends Fragment{
     private String post_type = null;
     private String post_img;
     private String post_desc;
+    private String themeStr;
     private DatabaseReference mDatabase;
     private DatabaseReference mDatabaseUsers;
     private DatabaseReference mDatabaseLike;
@@ -59,12 +65,16 @@ public class PostDetailFrag extends Fragment{
     private TextView mPostCommentCounter;
     private ImageButton comments,popupMenuBTN;
     private Intent intent;
+    private RelativeLayout relativeLayout;
 
     private FirebaseAuth auth;
 
     private Button showMap;
 
     private final static String TAG_FRAGMENT = "TAG_FRAGMENT";
+
+    private SharedPreferences sharedpreferences;
+    public static final String PREFS = "MyPrefs" ;
 
     public PostDetailFrag() {
         // Required empty public constructor
@@ -85,6 +95,11 @@ public class PostDetailFrag extends Fragment{
         mDatabase = FirebaseDatabase.getInstance().getReference().child("Icerik").child(post_type);
         mDatabaseUsers = FirebaseDatabase.getInstance().getReference().child("Users");
         mDatabaseLike = FirebaseDatabase.getInstance().getReference().child("Likes");
+        relativeLayout = (RelativeLayout) v.findViewById(R.id.relativePostDet);
+
+
+        sharedpreferences = getActivity().getSharedPreferences(PREFS, Context.MODE_PRIVATE);
+        themeStr = sharedpreferences.getString("theme", "DayTheme");          //eğer null ise DayTheme
 
 
         mPostImage = (ImageView) v.findViewById(R.id.post_image_btn);
@@ -142,7 +157,7 @@ public class PostDetailFrag extends Fragment{
                 post_desc = (String) dataSnapshot.child("questions").getValue();
                 post_img = (String) dataSnapshot.child("post_image").getValue();
                 String post_id = (String) dataSnapshot.child("uid").getValue();
-                String post_city = (String) dataSnapshot.child("city").getValue();
+                String post_city = (String) dataSnapshot.child("addressname").getValue();
 
 
                 mPostDesc.setText(post_desc);
@@ -225,6 +240,18 @@ public class PostDetailFrag extends Fragment{
                         .into(image);
             }
         });
+
+        if(themeStr.equals("NightTheme")){
+            relativeLayout.setBackgroundColor(Color.parseColor("#142634"));
+            mPostDesc.setTextColor(Color.WHITE);
+            mPostCity.setTextColor(Color.WHITE);
+            mPostCommentCounter.setTextColor(Color.WHITE);
+        }else if(themeStr.equals("DayTheme")){
+            relativeLayout.setBackgroundColor(Color.parseColor("#FFFFFF"));
+            mPostDesc.setTextColor(Color.BLACK);
+            mPostCity.setTextColor(Color.BLACK);
+            mPostCommentCounter.setTextColor(Color.BLACK);
+        }
         return v;
     }
 }

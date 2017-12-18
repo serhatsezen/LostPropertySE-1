@@ -3,6 +3,7 @@ package com.team3s.lostpropertyse.MainPage;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -23,6 +24,7 @@ import android.widget.ArrayAdapter;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.SpinnerAdapter;
@@ -53,11 +55,13 @@ import com.team3s.lostpropertyse.Profile.AnotherUsersProfiFrag;
 import com.team3s.lostpropertyse.Profile.UsersProfiFrag;
 import com.team3s.lostpropertyse.R;
 
+import org.w3c.dom.Text;
+
 public class LostMainFrag extends Fragment {
 
     private ImageButton commentButton;
-    private RecyclerView lost_main_list;
-
+    private static RecyclerView lost_main_list;
+    private static RelativeLayout relativeLayLost_Main;
     private DatabaseReference database,mDatabaseUsers,mDatabaseUsersProfile,mDatabaseLikeCounter,mDatabaseUsersFilter;
     private DatabaseReference mDatabaseLike, mDatabaseDistance;
     private FirebaseAuth.AuthStateListener authListener;
@@ -66,8 +70,8 @@ public class LostMainFrag extends Fragment {
     private boolean mProcessLike = false;
     private static String tokenUser = null;
     private static String questionName = null;
-    private AppBarLayout appBarLayout;
-
+    private static AppBarLayout appBarLayout;
+    private static TextView toolbarText;
     private static String question = null;
     private static String username = null;
 
@@ -75,6 +79,7 @@ public class LostMainFrag extends Fragment {
     public String user_key = null;
     public String userNames;
     public String cityFilter = "Genel";
+    public static String themeStr;
 
     private String latUsers;
     private String lngUsers;
@@ -137,11 +142,12 @@ public class LostMainFrag extends Fragment {
         //get current user
         final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         appBarLayout = (AppBarLayout) v.findViewById(R.id.LostappBarLayout);
+        relativeLayLost_Main = (RelativeLayout) v.findViewById(R.id.relativeLayLost_Main);
 
         sharedpreferences = getActivity().getSharedPreferences(PREFS, Context.MODE_PRIVATE);
 
         appBarLayout.setVisibility(View.VISIBLE);
-
+        toolbarText = (TextView) v.findViewById(R.id.toolbarText);
         mDatabaseUsersFilter = FirebaseDatabase.getInstance().getReference().child("Users").child(user.getUid());
         mDatabaseDistance = FirebaseDatabase.getInstance().getReference().child("Users").child(user.getUid()).child("latLng");
 
@@ -205,6 +211,9 @@ public class LostMainFrag extends Fragment {
 
         lost_main_list.setHasFixedSize(true);
         lost_main_list.setLayoutManager(layoutManager);
+
+        themeStr = sharedpreferences.getString("theme", "DayTheme");
+
 
         return v;
     }
@@ -403,6 +412,11 @@ public class LostMainFrag extends Fragment {
 
         TextView commentCount;
         TextView distanceUser;
+        TextView question_text;
+        TextView category;
+
+        LinearLayout linearLayout;
+        LinearLayout linearListLay2;
 
         DatabaseReference mDatabaseLike;
         FirebaseAuth mAuth;
@@ -418,12 +432,42 @@ public class LostMainFrag extends Fragment {
 
             commentCount = (TextView) mView.findViewById(R.id.commentCount);
             distanceUser = (TextView) mView.findViewById(R.id.distanceTxt);
+            question_text = (TextView) mView.findViewById(R.id.question_text);
+            category = (TextView) mView.findViewById(R.id.category);
 
             profile = (ImageView) mView.findViewById(R.id.user_profile);
             postImg = (ImageView) mView.findViewById(R.id.share_img);
+            linearLayout = (LinearLayout) mView.findViewById(R.id.linearListLay);
+            linearListLay2 = (LinearLayout) mView.findViewById(R.id.linearListLay2);
 
             mDatabaseLike = FirebaseDatabase.getInstance().getReference().child("Likes");
             mAuth = FirebaseAuth.getInstance();
+
+            if(themeStr.equals("NightTheme")){
+                linearLayout.setBackgroundColor(Color.parseColor("#142634"));
+                linearListLay2.setBackgroundColor(Color.parseColor("#142634"));
+                lost_main_list.setBackgroundColor(Color.parseColor("#1a2f40"));
+                relativeLayLost_Main.setBackgroundColor(Color.parseColor("#1a2f40"));
+                appBarLayout.setBackgroundColor(Color.parseColor("#142629"));
+                question_text.setTextColor(Color.parseColor("#BDC7C1"));
+                category.setTextColor(Color.parseColor("#7E8889"));
+                commentCount.setTextColor(Color.parseColor("#7E8889"));
+                toolbarText.setTextColor(Color.parseColor("#BDC7C1"));
+
+
+            }else if(themeStr.equals("DayTheme")){
+                linearLayout.setBackgroundColor(Color.parseColor("#EEEEEE"));
+                linearListLay2.setBackgroundColor(Color.parseColor("#EEEEEE"));
+                lost_main_list.setBackgroundColor(Color.parseColor("#9E9E9E"));
+                relativeLayLost_Main.setBackgroundColor(Color.parseColor("#9E9E9E"));
+                appBarLayout.setBackgroundColor(Color.parseColor("#EEEEEE"));
+                question_text.setTextColor(Color.parseColor("#000000"));
+                category.setTextColor(Color.parseColor("#000000"));
+                commentCount.setTextColor(Color.parseColor("#000000"));
+                toolbarText.setTextColor(Color.parseColor("#000000"));
+
+            }
+
         }
 
         public void setQuestions(String questions){
@@ -489,7 +533,7 @@ public class LostMainFrag extends Fragment {
             @Override
             public boolean onKey(View v, int keyCode, KeyEvent event) {
                 if (event.getAction() == KeyEvent.ACTION_UP && keyCode == KeyEvent.KEYCODE_BACK){
-
+                    appBarLayout.setVisibility(View.VISIBLE);
 
                     AnotherUsersProfiFrag fragmentAnother = (AnotherUsersProfiFrag) manager.findFragmentByTag("addAnotherProfile");
                     FragmentTransaction transaction = manager.beginTransaction();

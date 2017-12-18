@@ -3,6 +3,7 @@ package com.team3s.lostpropertyse.Profile;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
@@ -15,6 +16,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
@@ -26,6 +28,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.team3s.lostpropertyse.AdapterClass;
+import com.team3s.lostpropertyse.Chat.CommentFrag;
 import com.team3s.lostpropertyse.LoginSign.TabsHeaderActivity;
 import com.team3s.lostpropertyse.Post.PostDetailFrag;
 import com.team3s.lostpropertyse.R;
@@ -33,7 +36,7 @@ import com.team3s.lostpropertyse.R;
 public class LostProp_Fragment extends Fragment {
 
 
-    private RecyclerView lostPropList;
+    private static RecyclerView lostPropList;
     private Query mQueryUser;
     private DatabaseReference mDatabase;
     private FirebaseAuth.AuthStateListener authListener;
@@ -42,9 +45,11 @@ public class LostProp_Fragment extends Fragment {
     private DatabaseReference mDatabaseUsers;
     private String currentUserId;
     private String str;
+    private SharedPreferences sharedpreferences;
     public static final String PREFS = "MyPrefs" ;
     FragmentManager manager;
-
+    public static String themeStr;
+    public static RelativeLayout relativeLayLosted_prop;
     public LostProp_Fragment() {
         // Required empty public constructor
     }
@@ -61,6 +66,9 @@ public class LostProp_Fragment extends Fragment {
 
         auth = FirebaseAuth.getInstance();
         user = FirebaseAuth.getInstance().getCurrentUser();
+        sharedpreferences = getActivity().getSharedPreferences(PREFS,0);
+        themeStr = sharedpreferences.getString("theme", "DayTheme");          //eğer null ise DayTheme
+        relativeLayLosted_prop = (RelativeLayout) v.findViewById(R.id.relativeLayLosted_prop);
 
         authListener = new FirebaseAuth.AuthStateListener() {
             @Override
@@ -77,8 +85,8 @@ public class LostProp_Fragment extends Fragment {
         };
 
         try {
-            SharedPreferences mPrefs = getActivity().getSharedPreferences(PREFS,0);
-            str = mPrefs.getString("USERKEY_SHARED", "");
+            str = sharedpreferences.getString("USERKEY_SHARED", "");
+
         }catch (Exception e){}
 
 
@@ -129,11 +137,10 @@ public class LostProp_Fragment extends Fragment {
 
                         PostDetailFrag fragmentDetail = new PostDetailFrag();
                         fragmentDetail.setArguments(bundlePostDetail);
-                        getFragmentManager()
-                                .beginTransaction()
-                                .add(R.id.another_user_frag, fragmentDetail,"PostDetail")
-                                .addToBackStack(null)
-                                .commit();
+                        FragmentTransaction transaction = manager.beginTransaction();
+                        transaction.add(R.id.another_user_frag, fragmentDetail,"detailpost");
+                        transaction.addToBackStack(null);
+                        transaction.commit();
 
                     }
                 });
@@ -149,30 +156,49 @@ public class LostProp_Fragment extends Fragment {
         View mView;
 
         FirebaseAuth mAuth;
-
+        RelativeLayout relativeLayFindProfile;
+        TextView questions_title;
+        TextView date;
+        TextView time;
         public ShareViewHolder(View itemView) {
             super(itemView);
             mView = itemView;
             mAuth = FirebaseAuth.getInstance();
+            relativeLayFindProfile = (RelativeLayout) mView.findViewById(R.id.relativeLayFindProfile);
+            questions_title = (TextView) mView.findViewById(R.id.titleProfileText);
+            date = (TextView) mView.findViewById(R.id.dateTxt);
+            time = (TextView) mView.findViewById(R.id.timeTxt);
+
+            if(themeStr.equals("NightTheme")){
+                relativeLayFindProfile.setBackgroundColor(Color.parseColor("#142634"));
+                lostPropList.setBackgroundColor(Color.parseColor("#142634"));
+                relativeLayLosted_prop.setBackgroundColor(Color.parseColor("#142634"));
+                questions_title.setTextColor(Color.parseColor("#FFFFFF"));
+                date.setTextColor(Color.parseColor("#FFFFFF"));
+                time.setTextColor(Color.parseColor("#FFFFFF"));
+
+
+            }else if(themeStr.equals("DayTheme")){
+                relativeLayFindProfile.setBackgroundColor(Color.parseColor("#EEEEEE"));
+                lostPropList.setBackgroundColor(Color.parseColor("#EEEEEE"));
+                relativeLayLosted_prop.setBackgroundColor(Color.parseColor("#EEEEEE"));
+                questions_title.setTextColor(Color.parseColor("#FFFFFF"));
+                date.setTextColor(Color.parseColor("#FFFFFF"));
+                time.setTextColor(Color.parseColor("#FFFFFF"));
+
+            }
         }
 
 
         public void setQuestions(String questions){
-
-            TextView questions_title = (TextView) mView.findViewById(R.id.titleProfileText);
             questions_title.setText(questions);
         }
         public void setPost_date(String post_date){
-
-            TextView date = (TextView) mView.findViewById(R.id.dateTxt);
             date.setText(post_date);
         }
         public void setPost_time(String post_time){
-
-            TextView time = (TextView) mView.findViewById(R.id.timeTxt);
             time.setText(post_time);
         }
-
         public void setPost_image(Context ctx, String post_image){
             ImageView post_img = (ImageView) mView.findViewById(R.id.post_img);
             Glide.with(ctx)
@@ -182,32 +208,5 @@ public class LostProp_Fragment extends Fragment {
                     .animate(R.anim.shake)
                     .into(post_img);
         }
-
-    }
-    @Override
-    public void onResume() {        // click back button
-
-        super.onResume();
-
-        getView().setFocusableInTouchMode(true);
-        getView().requestFocus();
-        getView().setOnKeyListener(new View.OnKeyListener() {
-            @Override
-            public boolean onKey(View v, int keyCode, KeyEvent event) {
-                if (event.getAction() == KeyEvent.ACTION_UP && keyCode == KeyEvent.KEYCODE_BACK){
-
-                    PostDetailFrag fragmentPostDetail = (PostDetailFrag) manager.findFragmentByTag("PostDetail");
-                    FragmentTransaction transactionPostDet = manager.beginTransaction();
-                    if(fragmentPostDetail != null){
-                        transactionPostDet.remove(fragmentPostDetail);
-                        transactionPostDet.commit();
-                    }
-
-
-
-                }
-                return false;
-            }
-        });
     }
 }

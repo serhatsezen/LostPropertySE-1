@@ -116,6 +116,30 @@
                 app:layout_constraintStart_toStartOf="@+id/kaydetButon"
                 app:layout_constraintTop_toBottomOf="@+id/kaydetButon" />
 
+            <Button
+                android:id="@+id/themeNightBtn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="16dp"
+                android:text="Gece Modu"
+                app:layout_constraintEnd_toEndOf="@+id/kaydetButon"
+                app:layout_constraintHorizontal_bias="1.0"
+                app:layout_constraintStart_toStartOf="@+id/kaydetButon"
+                app:layout_constraintTop_toBottomOf="@+id/iptalButon" />
+            <Button
+                android:id="@+id/themeDayBtn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="16dp"
+                android:text="Gündüz Modu"
+                android:visibility="gone"
+                app:layout_constraintEnd_toEndOf="@+id/kaydetButon"
+                app:layout_constraintHorizontal_bias="1.0"
+                app:layout_constraintStart_toStartOf="@+id/kaydetButon"
+                app:layout_constraintTop_toBottomOf="@+id/iptalButon" />
+
 
         </android.support.constraint.ConstraintLayout>
 

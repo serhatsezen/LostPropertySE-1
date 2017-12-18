@@ -2,16 +2,16 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
+    android:id="@+id/relativeLayFindProfile"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_gravity="">
+    >
 
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_marginLeft="40dp"
         android:layout_marginRight="15dp"
         android:id="@+id/background"
-        android:background="#808080"
         android:layout_height="135dp"
         android:layout_centerVertical="true"
         android:layout_marginTop="15dp"
@@ -29,7 +29,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignBottom="@+id/imageView3"
-            android:background="#80403a3a" />
+            android:background="#80181313" />
 
         <TextView
             android:id="@+id/titleProfileText"
@@ -41,8 +41,7 @@
             android:layout_marginStart="17dp"
             android:text=""
             android:maxLines="1"
-            android:layout_toLeftOf="@+id/dateTxt"
-            android:textColor="#fff" />
+            android:layout_toLeftOf="@+id/dateTxt"/>
 
         <TextView
             android:id="@+id/dateTxt"
@@ -51,8 +50,7 @@
             android:layout_marginEnd="17dp"
             android:layout_alignParentEnd="true"
             android:layout_below="@+id/timeTxt"
-            android:text=""
-            android:textColor="#fff" />
+            android:text="" />
 
         <TextView
             android:id="@+id/timeTxt"
@@ -60,8 +58,7 @@
             android:layout_height="wrap_content"
             android:layout_above="@+id/titleProfileText"
             android:layout_alignEnd="@+id/dateTxt"
-            android:text=""
-            android:textColor="#fff" />
+            android:text=""/>
 
     </RelativeLayout>
 

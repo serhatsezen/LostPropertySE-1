@@ -4,13 +4,12 @@
     android:id="@+id/toolbar"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="#142629"
     app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Bulunan Eşyalar"
-        android:textColor="#BDC7C1"
         android:textSize="25sp"
+        android:id="@+id/toolbarTextFind"
         android:gravity="center"/>
 </android.support.v7.widget.Toolbar>

@@ -1,72 +1,69 @@
 <?xml version="1.0" encoding="utf-8"?>
-    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     xmlns:app="http://schemas.android.com/res-auto"
     android:layout_width="match_parent"
+    android:id="@+id/linearListLay"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:background="#142634"
     android:layout_margin="5dp"
     tools:ignore="ResAuto">
-
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
+        android:id="@+id/linearListLay2"
         android:layout_margin="10dp"
-        android:background="#142634"
         >
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+            <com.github.siyamed.shapeimageview.CircularImageView
+                android:id="@+id/user_profile"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_marginLeft="8dp"
+                android:src="@drawable/default_avatar"
+                app:siBorderColor="@color/black"
+                app:siBorderWidth="8dp"
+                android:layout_centerVertical="true"
+                android:layout_alignParentEnd="true" />
 
-      <LinearLayout
+            <com.team3s.lostpropertyse.Utils.MyTextView
+                android:id="@+id/shaUsername"
+                android:layout_marginLeft="16dp"
+                android:layout_weight="1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Team3s"
+                android:maxLines="1"
+                android:textColor="#5A666B"
+                android:textSize="14dp"
+                android:layout_gravity="center"
+                />
 
-          android:layout_width="match_parent"
-          android:layout_height="wrap_content"
-          android:orientation="horizontal">
-          <com.github.siyamed.shapeimageview.CircularImageView
-              android:id="@+id/user_profile"
-              android:layout_width="40dp"
-              android:layout_height="40dp"
-              android:layout_marginLeft="8dp"
-              android:src="@drawable/default_avatar"
-              app:siBorderColor="@color/black"
-              app:siBorderWidth="8dp"
-              android:layout_centerVertical="true"
-              android:layout_alignParentEnd="true" />
+            <com.team3s.lostpropertyse.Utils.MyTextView
+                android:id="@+id/time"
+                android:layout_width="178dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_weight="0.6"
+                android:text="12/12/2017"
+                android:maxLines="1"
+                android:textColor="#5A666B"
+                android:textSize="14dp" />
 
-          <com.team3s.lostpropertyse.Utils.MyTextView
-              android:id="@+id/shaUsername"
-              android:layout_marginLeft="16dp"
-              android:layout_weight="1"
-              android:layout_width="match_parent"
-              android:layout_height="wrap_content"
-              android:text="Team3s"
-              android:maxLines="1"
-              android:textColor="#5A666B"
-              android:textSize="14dp"
-              android:layout_gravity="center"
-              />
-
-          <com.team3s.lostpropertyse.Utils.MyTextView
-              android:id="@+id/time"
-              android:layout_width="178dp"
-              android:layout_height="wrap_content"
-              android:layout_gravity="center"
-              android:layout_weight="0.6"
-              android:text="12/12/2017"
-              android:maxLines="1"
-              android:textColor="#5A666B"
-              android:textSize="14dp" />
-
-          <ImageView
-              android:id="@+id/more"
-              android:visibility="invisible"
-              android:layout_width="15dp"
-              android:layout_height="22dp"
-              android:src="@drawable/ic_add_a_photo_black_24dp"
-              android:layout_gravity="center"
-              />
-      </LinearLayout>
+            <ImageView
+                android:id="@+id/more"
+                android:visibility="invisible"
+                android:layout_width="15dp"
+                android:layout_height="22dp"
+                android:src="@drawable/ic_add_a_photo_black_24dp"
+                android:layout_gravity="center"
+                />
+        </LinearLayout>
 
         <LinearLayout
             android:layout_marginTop="12dp"
@@ -74,51 +71,50 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal">
 
-    <LinearLayout
-        android:layout_weight="1"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:layout_marginRight="5dp"
-        >
+            <LinearLayout
+                android:layout_weight="1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginRight="5dp"
+                >
 
-        <com.team3s.lostpropertyse.Utils.MyTextView
-            android:id="@+id/question_text"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Kayıp Eşya"
-            android:lines="3"
-            android:textSize="15dp"
-            android:textColor="#BDC7C1"
-            android:lineSpacingExtra="3dp"
-            android:maxLines="3"
-            />
+                <com.team3s.lostpropertyse.Utils.MyTextView
+                    android:id="@+id/question_text"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Kayıp Eşya"
+                    android:lines="3"
+                    android:textSize="15dp"
+                    android:lineSpacingExtra="3dp"
+                    android:maxLines="3"
+                    />
 
-        <com.team3s.lostpropertyse.Utils.MyTextView
-            android:id="@+id/category"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Espark Alışveriş Merkezi"
-            android:layout_marginTop="13dp"
-            android:textSize="13dp"
-            android:maxLines="2"
-            android:textColor="#7E8889"
-            android:lineSpacingExtra="3dp"
-            />
+                <com.team3s.lostpropertyse.Utils.MyTextView
+                    android:id="@+id/category"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Espark Alışveriş Merkezi"
+                    android:layout_marginTop="13dp"
+                    android:textSize="13dp"
+                    android:maxLines="2"
+                    android:textColor="#7E8889"
+                    android:lineSpacingExtra="3dp"
+                    />
 
 
-        <com.team3s.lostpropertyse.Utils.MyTextView
-            android:id="@+id/distanceTxt"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="1.3km"
-            android:textSize="12dp"
-            android:textColor="#D48872"
-            android:maxLines="1"
-            android:layout_marginTop="13dp"
-            />
+                <com.team3s.lostpropertyse.Utils.MyTextView
+                    android:id="@+id/distanceTxt"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="1.3km"
+                    android:textSize="12dp"
+                    android:textColor="#D48872"
+                    android:maxLines="1"
+                    android:layout_marginTop="13dp"
+                    />
 
-    </LinearLayout>
+            </LinearLayout>
 
             <LinearLayout
                 android:layout_weight="2.2"

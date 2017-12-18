@@ -1,5 +1,6 @@
 package com.team3s.lostpropertyse.Chat;
 
+import android.app.FragmentManager;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
@@ -85,7 +86,6 @@ public class Chat extends AppCompatActivity {
         senderName = uids.getStringExtra("sender_name");
         receiver_name = uids.getStringExtra("receiver_name");
 
-        Toast.makeText(Chat.this, senderName, Toast.LENGTH_LONG).show();
 
         if(receiverToken != null) {
             mDatabaseToken = FirebaseDatabase.getInstance().getReference().child("Users").child(receiver_uid);
@@ -235,18 +235,5 @@ public class Chat extends AppCompatActivity {
         }
     }
 
-    @Override
-    public boolean onKeyDown(int keyCode, KeyEvent event)  {
-        if (Integer.parseInt(android.os.Build.VERSION.SDK) > 5
-                && keyCode == KeyEvent.KEYCODE_BACK
-                && event.getRepeatCount() == 0) {
 
-            Intent intent = new Intent(Chat.this, BottomBarActivity.class);
-            intent.putExtra("usersDMlist","chatsc");
-            startActivity(intent);
-
-            return true;
-        }
-        return super.onKeyDown(keyCode, event);
-    }
 }
