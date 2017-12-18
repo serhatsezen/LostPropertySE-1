@@ -1,15 +1,15 @@
 <?php
 
 require "init.php";
-$Cevap = $_POST['cevap'];
+$Cevap = $_POST['comment'];
 $UserName = $_POST['userName'];
 $TokenDevice = $_POST['tokendevice'];
+$Post_type = $_POST['post_type'];
+$Post_key = $_POST['post_key'];
+
 $path_to_fcm = 'https://fcm.googleapis.com/fcm/send';
-$server_key = "AIzaSyDr6wjJL4c3VAHRM7g5eV8v68hfiUGkmik";
-$sql = "select fcm_token_haber from fcm_haberler";
-$result = mysqli_query($con,$sql);
-$row = mysqli_fetch_row($result);
-$key = $row[0];
+$server_key = "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX";
+
 $headers = array(
 			'Authorization:key ='.$server_key,
 			'Content-Type:application/json'
@@ -19,10 +19,14 @@ $fields = array(
         'registration_ids' =>  [$TokenDevice],
          'notification' => array('title' => $UserName." Cevap!", 
          'body' => $Cevap,
-         'subtitle'      => $Cevap,
          'smallIcon'	=> 'ic',
+         'click_action' => 'Comment',
          'sound' => "default"),
-         'data' => array('message' => $Cevap )
+         'data' => array('post_type' =>$Post_type,
+         'post_key'	=> $Post_key,
+         'msg' => $Cevap,
+         'title' => $UserName." Cevap!",
+         'click_action' =>'Comment' )
         );
         
 $payload = json_encode($fields);

@@ -1,14 +1,15 @@
 <?php
-
 require "init.php";
+
+$Cevap = $_POST['dm'];
 $UserName = $_POST['userName'];
-$TokenDevice = $_POST['tokendevice'];
-$bildirimpost = $_POST['bildirimPost'];
-$Post_type = $_POST['post_type'];
-$Post_key = $_POST['post_key'];
+$SenderName = $_POST['sender_name'];
+$TokenDevice = $_POST['tokeNDevice'];
+$ReceiverName = $_POST['receiver_name'];
 
 $path_to_fcm = 'https://fcm.googleapis.com/fcm/send';
 $server_key = "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX";
+
 
 $headers = array(
 			'Authorization:key ='.$server_key,
@@ -17,18 +18,17 @@ $headers = array(
 
 $fields = array(
         'registration_ids' =>  [$TokenDevice],
-         'notification' => array('title' => $UserName, 
-         'body' => $bildirimpost,
-         'subtitle'      => $bildirimpost,
+         'notification' => array('title' =>$UserName ." Mesaj Gönderdi!", 
+         'body' => $Cevap,
+         'subtitle'      => $Cevap,
          'smallIcon'	=> 'ic',
-         'click_action' => 'NewPost',
+         'click_action' =>'Chat',
          'sound' => "default"),
-         'data' => array('userName' =>$UserName,
-         'msg' => "Çevrenden yeni bir paylaşım var!",
-         'post_type' =>$Post_type,
-         'post_key'	=> $Post_key,
-         'title' => $bildirimpost,
-         'click_action' =>'NewPost')
+         'data' => array('sender_name' =>$SenderName,
+         'receiver_name'	=> $ReceiverName,
+         'msg' => $Cevap,
+         'title' => $UserName ." Mesaj Gönderdi!",
+         'click_action' =>'Chat')
         );
         
 $payload = json_encode($fields);
@@ -41,7 +41,7 @@ curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);  
 curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
 curl_setopt($ch, CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V4);
-curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($fields));	
+curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($fields));		
 
 $result = curl_exec($ch);   
 curl_close($ch);
