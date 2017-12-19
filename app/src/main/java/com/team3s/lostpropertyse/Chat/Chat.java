@@ -19,6 +19,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -52,7 +54,7 @@ public class Chat extends AppCompatActivity {
     private EditText messageArea;
     private ScrollView scrollView;
     private TextView dmUserNameTxt;
-    private DatabaseReference reference1,reference2,mDatabaseToken;
+    private DatabaseReference reference1,reference2,mDatabaseToken,mDatabaseUserName;
     private String receiver_name;
     private String senderName;
     private String receiver_uid;
@@ -62,6 +64,9 @@ public class Chat extends AppCompatActivity {
 
     private String userkeyfornotif;
     private String userschatnamekey;
+    public FirebaseUser user;
+    public String currentUserId;
+    public FirebaseAuth auth;
 
     private String PREFS = "MyPrefs" ;
     SharedPreferences mPrefs;
@@ -77,17 +82,21 @@ public class Chat extends AppCompatActivity {
         scrollView = (ScrollView)findViewById(R.id.scrollView);
         dmUserNameTxt = (TextView)findViewById(R.id.dmUserNameTxt);
 
-
+        //get firebase auth instance
+        auth = FirebaseAuth.getInstance();
+        currentUserId = auth.getCurrentUser().getUid();
+        mDatabaseUserName = FirebaseDatabase.getInstance().getReference().child("Users").child(currentUserId);
+        mPrefs = getSharedPreferences(PREFS, 0);
+        senderName = mPrefs.getString("username", "");
 
         Intent uids = getIntent();
         sender_uid = uids.getStringExtra("sender_uid");
         receiver_uid = uids.getStringExtra("receiver_uid");
         receiverToken = uids.getStringExtra("receiverToken");
-        senderName = uids.getStringExtra("sender_name");
-        receiver_name = uids.getStringExtra("receiver_name");
+        receiver_name= uids.getStringExtra("receiverr_name");
 
 
-        if(receiverToken != null) {
+        if(receiver_uid != null) {
             mDatabaseToken = FirebaseDatabase.getInstance().getReference().child("Users").child(receiver_uid);
             mDatabaseToken.child("token").addValueEventListener(new ValueEventListener() {
                 @Override
@@ -100,9 +109,8 @@ public class Chat extends AppCompatActivity {
             });
         }
 
-        if(senderName == null) {
-            mPrefs = getSharedPreferences(PREFS, 0);
-            senderName = mPrefs.getString("username", "");
+        if(receiver_name == null) {
+
             receiver_name = mPrefs.getString("receiver_name", "");
             receiver_name = receiver_name.replaceAll("\\s+", "");
             receiver_name.toLowerCase();
@@ -112,16 +120,14 @@ public class Chat extends AppCompatActivity {
 
             reference1 = FirebaseDatabase.getInstance().getReference().child("messages").child(senderName+"_"+receiver_name);
             reference2 = FirebaseDatabase.getInstance().getReference().child("messages").child(receiver_name+"_"+senderName);
+            reference1.child("readornot").setValue("Okundu");
         }else{
-            /*String splitted_names[] =userschatnamekey.split("_");
-            receiver_name = splitted_names[0];
-            senderName = splitted_names[1];*/
-
             reference1 = FirebaseDatabase.getInstance().getReference().child("messages").child(senderName+"_"+receiver_name);
             reference2 = FirebaseDatabase.getInstance().getReference().child("messages").child(receiver_name+"_"+senderName);
+            reference1.child("readornot").setValue("Okundu");
+
+            dmUserNameTxt.setText(receiver_name);
         }
-
-
 
 
         sendButton.setOnClickListener(new View.OnClickListener() {
@@ -135,17 +141,26 @@ public class Chat extends AppCompatActivity {
                     map.put("sender_uid", sender_uid);
                     map.put("receiver_uid", receiver_uid);
                     reference1.push().setValue(map);
-                    reference1.child("senderUid").setValue(sender_uid);
-                    reference1.child("receiver_uid").setValue(receiver_uid);
+                    reference1.child("readornot").setValue("Okunmadı");
+                    reference1.child("lastmsg").setValue(dmtxt);
 
+                    if(sender_uid!=null) {
+                        reference1.child("senderUid").setValue(sender_uid);
+                        reference1.child("receiver_uid").setValue(receiver_uid);
+                    }
                     Map<String, String> maprece = new HashMap<String, String>();
                     maprece.put("message", dmtxt);
                     maprece.put("user", senderName);
                     maprece.put("sender_uid", receiver_uid);
                     maprece.put("receiver_uid", sender_uid);
                     reference2.push().setValue(maprece);
-                    reference2.child("senderUid").setValue(receiver_uid);
-                    reference2.child("receiver_uid").setValue(sender_uid);
+                    reference2.child("readornot").setValue("Okunmadı");
+                    reference2.child("lastmsg").setValue(dmtxt);
+
+                    if(sender_uid!=null) {
+                        reference2.child("senderUid").setValue(sender_uid);
+                        reference2.child("receiver_uid").setValue(receiver_uid);
+                    }
 
                     new Send().execute();                           //başarılı ise notification gönderme
                 }
@@ -194,14 +209,14 @@ public class Chat extends AppCompatActivity {
             lp.setMargins(100, 0, 0, 10);
             lp.gravity = Gravity.RIGHT;
             textView.setLayoutParams(lp);
-            textView.setBackgroundResource(R.drawable.rounded_corner1);
+            textView.setBackgroundResource(R.drawable.chatgreen);
         }
         else{
             LinearLayout.LayoutParams lpp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
             lpp.setMargins(0, 0, 100, 10);
             lpp.gravity = Gravity.LEFT;
             textView.setLayoutParams(lpp);
-            textView.setBackgroundResource(R.drawable.rounded_corner2);
+            textView.setBackgroundResource(R.drawable.chatgray);
         }
         layout.addView(textView);
         scrollView.fullScroll(View.FOCUS_DOWN);

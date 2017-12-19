@@ -343,8 +343,13 @@ public class SignIn_Fragment extends Fragment implements OnClickListener,GoogleA
                 public void onDataChange(DataSnapshot dataSnapshot) {
                     if(dataSnapshot.hasChild(user_id)){         //kayıt varsa bottombaractivity e
                         addNewToken();
-                        Intent intent = new Intent(getActivity(), BottomBarActivity.class);
-                        startActivity(intent);
+                        try {
+                            Intent intent = new Intent(getActivity(), BottomBarActivity.class);
+                            startActivity(intent);
+                        }catch (Exception e){
+
+                        }
+
                     }
                     else{                       //kayıt yoksa
                         if(loginsign == true) { //google hesapla giriş için denediyse
@@ -368,12 +373,17 @@ public class SignIn_Fragment extends Fragment implements OnClickListener,GoogleA
         mDatabaseUsers.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                SharedPreferences sharedPreferences = getActivity().getApplicationContext().getSharedPreferences(getString(R.string.FCM_PREF), Context.MODE_PRIVATE);
-                token = sharedPreferences.getString(getString(R.string.FCM_TOKEN), "");
-                user_id = auth.getCurrentUser().getUid();
+                try{
+                    SharedPreferences sharedPreferences = getActivity().getApplicationContext().getSharedPreferences(getString(R.string.FCM_PREF), Context.MODE_PRIVATE);
+                    token = sharedPreferences.getString(getString(R.string.FCM_TOKEN), "");
+                    user_id = auth.getCurrentUser().getUid();
 
-                current_user_db = mDatabaseUsers.child(user_id);
-                current_user_db.child("token").setValue(token);
+                    current_user_db = mDatabaseUsers.child(user_id);
+                    current_user_db.child("token").setValue(token);
+                }catch (Exception e){
+
+                }
+
             }
             @Override
             public void onCancelled(DatabaseError databaseError) {

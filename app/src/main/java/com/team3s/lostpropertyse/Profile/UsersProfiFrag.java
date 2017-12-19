@@ -98,8 +98,10 @@ public class UsersProfiFrag extends Fragment {
     FragmentManager manager;
 
     private SharedPreferences sharedpreferences;
+    private SharedPreferences.Editor editor;
     public static final String PREFS = "MyPrefs" ;
     public String themeStr;
+    public String currentusername;
 
     public UsersProfiFrag() {
         // Required empty public constructor
@@ -184,6 +186,7 @@ public class UsersProfiFrag extends Fragment {
       dm_imgBtn.setOnClickListener(new OnClickListener() {
           @Override
           public void onClick(View view) {
+
               UsersDMList fragmentD = new UsersDMList();
               getFragmentManager()
                       .beginTransaction()
@@ -235,6 +238,8 @@ public class UsersProfiFrag extends Fragment {
             @Override
             public void onDataChange(DataSnapshot snapshot) {
                 u_username.setText("@"+String.valueOf(snapshot.getValue())+",");
+                currentusername = String.valueOf(snapshot.getValue());
+
             }
             @Override
             public void onCancelled(DatabaseError databaseError) {
@@ -346,58 +351,6 @@ public class UsersProfiFrag extends Fragment {
     public void onActivityResult(int reqCode, int resultCode, Intent data) {
         super.onActivityResult(reqCode, resultCode, data);
         if (resultCode == RESULT_OK) {
-
-            /*if(profileImage==true) {
-                try {
-                    mProfImageUri = data.getData();
-                    final InputStream imageStream = getActivity().getContentResolver().openInputStream(mProfImageUri);
-                    final Bitmap selectedImage = BitmapFactory.decodeStream(imageStream);
-                    profileImg.setImageBitmap(selectedImage);
-                    profileImage=false;
-                    StorageReference filepath = mStorageImage.child(mProfImageUri.getLastPathSegment());
-                    if (mProfImageUri != null) {
-                        filepath.putFile(mProfImageUri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                            @Override
-                            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                                final String downloadUri = taskSnapshot.getDownloadUrl().toString();
-                                mDatabaseUsers.child("profileImage").setValue(downloadUri);
-                                //-----------------------------------------------------------------------------postlardaki profil resmini güncellemek için
-                                mQueryUserLost.addListenerForSingleValueEvent(new ValueEventListener() {
-                                        @Override
-                                        public void onDataChange(DataSnapshot tasksSnapshot) {
-                                            for (DataSnapshot snapshot: tasksSnapshot.getChildren()) {
-                                                snapshot.getRef().child("image").setValue(downloadUri);
-                                            }
-                                        }
-                                        @Override
-                                        public void onCancelled(DatabaseError databaseError) {
-                                        }
-
-                                    });
-                                mQueryUserFind.addListenerForSingleValueEvent(new ValueEventListener() {
-                                    @Override
-                                    public void onDataChange(DataSnapshot tasksSnapshot) {
-                                        for (DataSnapshot snapshot: tasksSnapshot.getChildren()) {
-                                            snapshot.getRef().child("image").setValue(downloadUri);
-                                        }
-                                    }
-                                    @Override
-                                    public void onCancelled(DatabaseError databaseError) {
-                                    }
-
-                                });
-
-
-                            }
-                        });
-                    }
-
-
-                } catch (FileNotFoundException e) {
-                    e.printStackTrace();
-                    Toast.makeText(getActivity(), "Bir sorun oluştu", Toast.LENGTH_LONG).show();
-                }
-            }*/
             if(backgroundImage==true) {
                 try {
                     mBackImageUri = data.getData();

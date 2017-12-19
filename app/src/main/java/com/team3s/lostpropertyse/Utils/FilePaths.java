@@ -2,9 +2,6 @@ package com.team3s.lostpropertyse.Utils;
 
 import android.os.Environment;
 
-/**
- * Created by User on 7/24/2017.
- */
 
 public class FilePaths {
 

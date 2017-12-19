@@ -120,7 +120,7 @@ public class NextActivity extends AppCompatActivity {
     public String bildirimPost;
     public String kategori;
     public String bildirimBaslik;
-
+    public String post_key;
     public Uri imageUri = null;
 
     ArrayList<String> tokenList = new ArrayList<String>();
@@ -377,6 +377,7 @@ public class NextActivity extends AppCompatActivity {
                     final Uri downloadUrl = taskSnapshot.getDownloadUrl();
 
                     final DatabaseReference newPost2 = mDatabaseIcerik.child(kategori).push();
+                    post_key = newPost2.getKey();
 
                     final Time today = new Time(Time.getCurrentTimezone());
                     today.setToNow();
@@ -402,7 +403,6 @@ public class NextActivity extends AppCompatActivity {
                                     if (task.isSuccessful()) {
                                         notificationFilter();
                                         Toast.makeText(NextActivity.this, "Tamamlandı!", Toast.LENGTH_LONG).show();
-
                                     }
                                 }
                             });
@@ -496,6 +496,9 @@ public class NextActivity extends AppCompatActivity {
                     nameValuePairs.add(new BasicNameValuePair("tokendevice", myToken));
                     nameValuePairs.add(new BasicNameValuePair("bildirimPost", bildirimPost));
                     nameValuePairs.add(new BasicNameValuePair("userName", userNameU));
+                    nameValuePairs.add(new BasicNameValuePair("post_key", post_key));
+                    nameValuePairs.add(new BasicNameValuePair("post_type", kategori));
+
                     httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs, HTTP.UTF_8));
                     HttpResponse response = httpclient.execute(httppost);
                 }

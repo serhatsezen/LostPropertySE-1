@@ -17,9 +17,6 @@ import com.team3s.lostpropertyse.R;
 
 import java.util.ArrayList;
 
-/**
- * Created by User on 6/4/2017.
- */
 
 public class GridImageAdapter extends ArrayAdapter<String>{
 
@@ -100,22 +97,3 @@ public class GridImageAdapter extends ArrayAdapter<String>{
         return convertView;
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

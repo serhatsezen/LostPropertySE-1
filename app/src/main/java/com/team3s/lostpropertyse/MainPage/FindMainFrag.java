@@ -118,7 +118,7 @@ public class FindMainFrag extends Fragment {
 
         Toolbar toolbar = (Toolbar) v.findViewById(R.id.toolbar);
 
-        AppCompatActivity activity = (AppCompatActivity) getActivity();    //-------------------------------------------actionbar spinner eklemek için
+        AppCompatActivity activity = (AppCompatActivity) getActivity();    //-------------------------------------------actionbar
         activity.setSupportActionBar(toolbar);
 
 

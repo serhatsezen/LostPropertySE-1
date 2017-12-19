@@ -12,11 +12,6 @@ import com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx;
 import com.team3s.lostpropertyse.R;
 import com.team3s.lostpropertyse.ShareSc.ShareActivity;
 
-
-/**
- * Created by User on 5/28/2017.
- */
-
 public class BottomNavigationViewHelper {
 
     private static final String TAG = "BottomNavigationViewHel";

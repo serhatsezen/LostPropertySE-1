@@ -97,6 +97,7 @@ public class LostMainFrag extends Fragment {
 
     String distStr;
     SharedPreferences sharedpreferences;
+    private SharedPreferences.Editor editor;
 
     private final static String TAG_FRAGMENT = "TAG_FRAGMENT";
     public static final String PREFS = "MyPrefs" ;
@@ -121,22 +122,7 @@ public class LostMainFrag extends Fragment {
         //for crate home button
         AppCompatActivity activity = (AppCompatActivity) getActivity();
         activity.setSupportActionBar(toolbar);
-        /*SpinnerAdapter spinnerAdapter = ArrayAdapter.createFromResource(getActivity().getApplicationContext(), R.array.kms, R.layout.spinner_dropdown_item);        //km degerlerini string.xml içindeki kms arrayinden çekiyor
-        Spinner navigationSpinner = new Spinner(activity.getSupportActionBar().getThemedContext());
-        navigationSpinner.setAdapter(spinnerAdapter);
-        toolbar.addView(navigationSpinner, 0);
 
-        navigationSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                distance = kms[position];
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-
-            }
-        });*/
         //get firebase auth instance
         auth = FirebaseAuth.getInstance();
         //get current user
@@ -145,6 +131,7 @@ public class LostMainFrag extends Fragment {
         relativeLayLost_Main = (RelativeLayout) v.findViewById(R.id.relativeLayLost_Main);
 
         sharedpreferences = getActivity().getSharedPreferences(PREFS, Context.MODE_PRIVATE);
+        editor = sharedpreferences.edit();
 
         appBarLayout.setVisibility(View.VISIBLE);
         toolbarText = (TextView) v.findViewById(R.id.toolbarText);
@@ -156,6 +143,8 @@ public class LostMainFrag extends Fragment {
             public void onDataChange(DataSnapshot dataSnapshot) {
                 userNames = (String) dataSnapshot.child("username").getValue();
                 userNames = userNames.toLowerCase();
+                editor.putString("username", userNames);
+
 
             }
 

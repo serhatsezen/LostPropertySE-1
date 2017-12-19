@@ -21,7 +21,8 @@
         android:largeHeap="true"
         android:supportsRtl="true"
         android:theme="@style/AppTheme.NoActionBar"
-        android:launchMode="singleTop">
+        android:launchMode="singleTop"
+        android:screenOrientation="portrait">
         <meta-data
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
@@ -37,7 +38,8 @@
         </activity>
         <activity
             android:name=".MainPage.BottomBarActivity"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:theme="@style/AppTheme.NoActionBar"
+            android:screenOrientation="portrait"/>
         <!--
              The API key for Google Maps-based APIs is defined as a string resource.
              (See the file "res/values/google_maps_api.xml").
@@ -52,7 +54,8 @@
 
         <activity
             android:name=".Maps.PropMaps"
-            android:label="@string/title_activity_prop_maps" />
+            android:label="@string/title_activity_prop_maps"
+            android:screenOrientation="portrait"/>
 
         <service android:name=".services.FCMessagingService">
             <intent-filter>
@@ -77,23 +80,34 @@
                 <action android:name="com.team3s.lostpropertyse.LONGRUNSERVICE" />
             </intent-filter>
         </service>
-        <activity android:name=".ShareSc.ShareActivity"/>
-        <activity android:name=".ShareSc.NextActivity"/>
-        <activity android:name=".Profile.EditProfileFragment"/>
+        <activity android:name=".ShareSc.ShareActivity"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".ShareSc.NextActivity"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".Profile.EditProfileFragment"
+            android:screenOrientation="portrait"/>
 
-        <activity android:name=".Chat.Chat">
+        <activity android:name=".Chat.Chat"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="Chat"></action>
                 <category android:name="android.intent.category.DEFAULT"></category>
             </intent-filter>
         </activity>
-        <activity android:name=".Chat.CommentAct">
+        <activity android:name=".Chat.CommentAct"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="Comment"></action>
                 <category android:name="android.intent.category.DEFAULT"></category>
             </intent-filter>
         </activity>
-
+        <activity android:name=".Post.PostDetailAct"
+            android:screenOrientation="portrait">
+            <intent-filter>
+                <action android:name="NewPost"></action>
+                <category android:name="android.intent.category.DEFAULT"></category>
+            </intent-filter>
+        </activity>
 
     </application>
 

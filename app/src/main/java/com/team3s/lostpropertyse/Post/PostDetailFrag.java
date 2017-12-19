@@ -39,6 +39,8 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.team3s.lostpropertyse.Chat.CommentFrag;
 import com.team3s.lostpropertyse.MainPage.BottomBarActivity;
+import com.team3s.lostpropertyse.MainPage.FindMainFrag;
+import com.team3s.lostpropertyse.MainPage.LostMainFrag;
 import com.team3s.lostpropertyse.MainPage.MainPage;
 import com.team3s.lostpropertyse.Maps.PropMaps;
 import com.team3s.lostpropertyse.Profile.UsersProfiFrag;
@@ -196,23 +198,21 @@ public class PostDetailFrag extends Fragment{
                         switch (item.getItemId()) {
                             case R.id.deleteBtn:
                                 if(post_type == "Kayiplar") {
-                                    mDatabase.child(post_key).removeValue();
-                                    mDatabaseLike.child(post_key).child(auth.getCurrentUser().getUid()).removeValue();
                                     MainPage fragmentMain = new MainPage();
                                     getFragmentManager()
                                             .beginTransaction()
-                                            .add(R.id.postdetpfr, fragmentMain, TAG_FRAGMENT)
-                                            .addToBackStack(null)
+                                            .replace(R.id.mainfragsc, fragmentMain, TAG_FRAGMENT)
                                             .commit();
+                                    mDatabase.child(post_key).removeValue();
+
                                 }else if(post_type == "Bulunanlar"){
-                                    mDatabase.child(post_key).removeValue();
-                                    mDatabaseLike.child(post_key).child(auth.getCurrentUser().getUid()).removeValue();
                                     MainPage fragmentMain = new MainPage();
                                     getFragmentManager()
                                             .beginTransaction()
-                                            .add(R.id.postdetr, fragmentMain, TAG_FRAGMENT)
-                                            .addToBackStack(null)
+                                            .replace(R.id.mainfragsc, fragmentMain, TAG_FRAGMENT)
                                             .commit();
+                                    mDatabase.child(post_key).removeValue();
+
                                 }
                                 return true;
 

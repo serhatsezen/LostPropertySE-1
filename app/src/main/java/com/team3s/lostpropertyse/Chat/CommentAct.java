@@ -87,7 +87,7 @@ public class CommentAct extends AppCompatActivity {
         currentUser = auth.getCurrentUser();
 
         Intent bundlecom = getIntent();                          //mainFragment ten post un keyini çekiyoruz.
-        post_key = bundlecom.getStringExtra("post_id_key");
+        post_key = bundlecom.getStringExtra("post_key");
         post_type = bundlecom.getStringExtra("post_type");
 
         authListener = new FirebaseAuth.AuthStateListener() {

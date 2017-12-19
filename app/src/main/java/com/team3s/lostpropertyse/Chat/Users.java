@@ -10,6 +10,7 @@ public class Users {
         this.isim = isim;
         this.sure = sure;
         this.resimId = resimId;
+
     }
 
     public String getIsim() {
@@ -35,4 +36,5 @@ public class Users {
     public void setResimId(String resimId) {
         this.resimId = resimId;
     }
+
 }

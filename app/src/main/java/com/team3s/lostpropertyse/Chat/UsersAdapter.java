@@ -16,9 +16,6 @@ import com.team3s.lostpropertyse.Utils.CircleTransform;
 
 import java.util.ArrayList;
 
-/**
- * Created by serhat on 07/12/2017.
- */
 
 public class UsersAdapter extends BaseAdapter {
     private LayoutInflater mInflater;
@@ -52,7 +49,7 @@ public class UsersAdapter extends BaseAdapter {
         convertView = mInflater.inflate(R.layout.dmlist_row, null);
         TextView usernameTxt = (TextView) convertView.findViewById(R.id.list_row_textview_isim);
         TextView userUidTxt = (TextView) convertView.findViewById(R.id.list_row_textview_sure);
-        ImageView userProfileImage = (ImageView) convertView.findViewById(R.id.list_row_imageview_padisah);
+        ImageView userProfileImage = (ImageView) convertView.findViewById(R.id.list_row_imageview_profimg);
         Users users = usersArrayList.get(position);
         usernameTxt.setText(users.getIsim());
         userUidTxt.setText(users.getSure());

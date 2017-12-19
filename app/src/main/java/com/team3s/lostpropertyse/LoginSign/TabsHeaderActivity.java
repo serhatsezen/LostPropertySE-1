@@ -18,9 +18,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class TabsHeaderActivity extends AppCompatActivity {
-    /*public static final String PREF_USER_FIRST_TIME = "user_first_time";
-      boolean isUserFirstTime;
-    */
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,14 +27,7 @@ public class TabsHeaderActivity extends AppCompatActivity {
         final ViewPager viewPager = (ViewPager) findViewById(R.id.htab_viewpager);
         setupViewPager(viewPager);
         checkPermissions();
-        /*isUserFirstTime = Boolean.valueOf(Utils.readSharedSetting(TabsHeaderActivity.this, PREF_USER_FIRST_TIME, "true"));
 
-        Intent introIntent = new Intent(TabsHeaderActivity.this, PagerActivity.class);
-        introIntent.putExtra(PREF_USER_FIRST_TIME, isUserFirstTime);
-
-        if (isUserFirstTime) {
-            startActivity(introIntent);
-        }*/
 
         TabLayout tabLayout = (TabLayout) findViewById(R.id.htab_tabs);
         tabLayout.setupWithViewPager(viewPager);

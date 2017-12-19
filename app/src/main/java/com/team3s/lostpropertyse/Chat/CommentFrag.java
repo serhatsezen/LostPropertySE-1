@@ -232,7 +232,8 @@ public class CommentFrag extends Fragment {
                 nameValuePairs.add(new BasicNameValuePair("tokendevice", tokenUser));
                 nameValuePairs.add(new BasicNameValuePair("comment", cevap_val));
                 nameValuePairs.add(new BasicNameValuePair("userName", nameFuser));
-
+                nameValuePairs.add(new BasicNameValuePair("post_key", post_key));
+                nameValuePairs.add(new BasicNameValuePair("post_type", post_type));
 
                 httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs, HTTP.UTF_8));
                 // Execute HTTP Post Request
