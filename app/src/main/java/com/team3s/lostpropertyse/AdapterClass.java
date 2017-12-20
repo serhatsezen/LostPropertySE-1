@@ -14,6 +14,7 @@ public class AdapterClass {
     public String commentText;
     public String commentUsername;
     public String dmtxt;
+    public String category;
 
 
     public double latMap;
@@ -22,7 +23,7 @@ public class AdapterClass {
     public AdapterClass(){
     }
 
-    public AdapterClass(String questions, String desc, String post_image, String name, String image, String addressname, String post_time, String post_date, String token, String commentText, String commentUsername,String dmtxt, double latMap, double longMap){
+    public AdapterClass(String questions, String desc, String post_image, String name, String image, String addressname, String post_time, String post_date, String token, String commentText, String commentUsername,String dmtxt, String category, double latMap, double longMap){
         this.questions = questions;
         this.desc = desc;
         this.post_image = post_image;
@@ -35,6 +36,7 @@ public class AdapterClass {
         this.commentText = commentText;
         this.commentUsername = commentUsername;
         this.dmtxt = dmtxt;
+        this.category = category;
         this.latMap = latMap;
         this.longMap = longMap;
     }
@@ -131,6 +133,14 @@ public class AdapterClass {
 
     public void setDmtxt(String dmtxt) {
         this.dmtxt = dmtxt;
+    }
+
+    public String getCategory() {
+        return category;
+    }
+
+    public void setCategory(String category) {
+        this.category = category;
     }
 
     public Double getLatMap() {

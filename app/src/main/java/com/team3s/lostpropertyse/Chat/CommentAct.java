@@ -35,6 +35,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.team3s.lostpropertyse.AdapterClass;
 import com.team3s.lostpropertyse.LoginSign.TabsHeaderActivity;
+import com.team3s.lostpropertyse.MainPage.BottomBarActivity;
 import com.team3s.lostpropertyse.R;
 import com.team3s.lostpropertyse.Utils.CircleTransform;
 
@@ -213,7 +214,6 @@ public class CommentAct extends AppCompatActivity {
         public ShareViewHolder(View itemView) {
             super(itemView);
             mViewRoad = itemView;
-            counterComment = (TextView) mViewRoad.findViewById(R.id.counterLike);
             mAuth = FirebaseAuth.getInstance();
         }
         public void setcommentText(String commentText) {            //burada bulunan commentText ile firebasedeki child ın altındaki node aynı olmak zorunda ayrıca bunları AdapterClass.java classında tanımlıyoruz. get fonksiyonları share classdan çekiyoruz.
@@ -264,5 +264,10 @@ public class CommentAct extends AppCompatActivity {
         }
         protected void onPostExecute(Long result) {
         }
+    }
+    @Override
+    public void onBackPressed() {
+        Intent intent = new Intent(CommentAct.this, BottomBarActivity.class);
+        startActivity(intent);
     }
 }

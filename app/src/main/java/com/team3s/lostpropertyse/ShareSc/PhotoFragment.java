@@ -78,19 +78,29 @@ public class PhotoFragment extends Fragment {
         if(requestCode == CAMERA_REQUEST_CODE){
             Log.d(TAG, "onActivityResult: done taking a photo.");
             Log.d(TAG, "onActivityResult: attempting to navigate to final share screen.");
-
             Bitmap bitmap;
-            bitmap = (Bitmap) data.getExtras().get("data");
+            Uri uri = null;
 
-            Uri uri = getImageUri(getActivity().getApplicationContext(), bitmap);
+            try {
+                bitmap = (Bitmap) data.getExtras().get("data");
+                uri = getImageUri(getActivity().getApplicationContext(), bitmap);
+
+            }catch (Exception e){
+
+            }
 
             if(isRootTask()){
-                try{
-                    Intent intent = new Intent(getActivity(), NextActivity.class);
-                    intent.putExtra(getString(R.string.selected_bitmap), uri);
+                if(uri != null) {
+                    try {
+                        Intent intent = new Intent(getActivity(), NextActivity.class);
+                        intent.putExtra(getString(R.string.selected_bitmap), uri);
+                        startActivity(intent);
+                    } catch (NullPointerException e) {
+                        Log.d(TAG, "onActivityResult: NullPointerException: " + e.getMessage());
+                    }
+                }else{
+                    Intent intent = new Intent(getActivity(), ShareActivity.class);
                     startActivity(intent);
-                }catch (NullPointerException e){
-                    Log.d(TAG, "onActivityResult: NullPointerException: " + e.getMessage());
                 }
             }else{
                 try{

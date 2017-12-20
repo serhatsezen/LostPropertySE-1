@@ -51,12 +51,12 @@
     <string name="selected_bitmap">selected_bitmap</string>
     <string name="selected_bituri">selected_bitmap</string>
 
-    <string-array name= "kms">
-    <item>1 km</item>
-    <item>5 km</item>
-    <item>10 km</item>
-    <item>15 km</item>
-    <item>20 km</item>
+    <string-array name="kms">
+        <item>1 km</item>
+        <item>5 km</item>
+        <item>10 km</item>
+        <item>15 km</item>
+        <item>20 km</item>
     </string-array>
 
 </resources>

@@ -15,20 +15,23 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.provider.MediaStore;
-import android.provider.Settings;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.app.AppCompatDelegate;
 import android.util.Log;
 import android.view.View;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
+import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
+import com.google.android.gms.common.GooglePlayServicesRepairableException;
+import com.google.android.gms.location.places.Place;
+import com.google.android.gms.location.places.ui.PlacePicker;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
@@ -40,6 +43,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -53,18 +57,20 @@ import com.google.firebase.storage.UploadTask;
 import com.team3s.lostpropertyse.R;
 import com.team3s.lostpropertyse.Utils.CircleTransform;
 
+import org.w3c.dom.Text;
+
 import java.io.IOException;
 
 public class EditProfileFragment extends AppCompatActivity {
 
-    private EditText AdSoyad;
-    private EditText Sehir;
+    private EditText adSoyad;
+    private TextView sehir;
     private String Uid,themeStr;
     private ImageView profileİmg;
     private MapView mapView;
     private GoogleMap myGoogleMap;
-    Button kaydetButton,themaNightBtn,themaDayBtn;
-    Uri newImageUri;
+    public ImageButton kaydetButton,themaNightBtn,themaDayBtn;
+    public Uri newImageUri;
     private boolean mLocationPermissionGranted;
     private StorageReference imgStorageRef;
     private FirebaseUser currentUser;
@@ -73,20 +79,25 @@ public class EditProfileFragment extends AppCompatActivity {
     private Query mQueryUserFind;
     double latMarkers;
     double lngMarkers;
-    String imgUrl;
+    public String imgUrl;
     public LatLng user;
     private static final int IMAGE_PICK_REQUEST = 888;
     private static final int PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 999;
     private SharedPreferences sharedpreferences;
     public static final String PREFS = "MyPrefs" ;
-    SharedPreferences.Editor editor;
+    public SharedPreferences.Editor editor;
     double latMarkerss;
     double lngMarkerss;
-    LocationManager locationManager;
-    LocationListener locationListener;
-    Handler handler;
-    Runnable runnable;
-    FrameLayout frameLayout ;
+    public LocationManager locationManager;
+    public LocationListener locationListener;
+    public Handler handler;
+    public Runnable runnable;
+    public FrameLayout frameLayout;
+    int PLACE_PICKER_REQUEST = 3;
+    private String fullAddress;
+    private String addressName;
+    private LatLng addressLatLng;
+    private boolean write = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -101,11 +112,11 @@ public class EditProfileFragment extends AppCompatActivity {
         imgStorageRef = FirebaseStorage.getInstance().getReference("Profile_images");
         mQueryUserLost = FirebaseDatabase.getInstance().getReference("Icerik").child("Kayiplar").orderByChild("uid").equalTo(Uid);
         mQueryUserFind = FirebaseDatabase.getInstance().getReference("Icerik").child("Bulunanlar").orderByChild("uid").equalTo(Uid);
-        AdSoyad = (EditText) findViewById(R.id.editTextAdSoyad);
-        Sehir = (EditText) findViewById(R.id.editTextSehir);
-        kaydetButton = (Button) findViewById(R.id.kaydetButon);
-        themaNightBtn = (Button) findViewById(R.id.themeNightBtn);
-        themaDayBtn = (Button) findViewById(R.id.themeDayBtn);
+        adSoyad = (EditText) findViewById(R.id.editTextAdSoyad);
+        sehir = (TextView) findViewById(R.id.textSehir);
+        kaydetButton = (ImageButton) findViewById(R.id.kaydetButon);
+        themaNightBtn = (ImageButton) findViewById(R.id.themeNightBtn);
+        themaDayBtn = (ImageButton) findViewById(R.id.themeDayBtn);
         mapView = (MapView) findViewById(R.id.mapView);
         kaydetButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -163,7 +174,7 @@ public class EditProfileFragment extends AppCompatActivity {
         curentUserRef.child("namesurname").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                AdSoyad.setHint(String.valueOf(dataSnapshot.getValue()));
+                adSoyad.setHint(String.valueOf(dataSnapshot.getValue()));
             }
 
             @Override
@@ -175,7 +186,7 @@ public class EditProfileFragment extends AppCompatActivity {
         curentUserRef.child("cityName").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                Sehir.setHint(String.valueOf(dataSnapshot.getValue()));
+                sehir.setText(String.valueOf(dataSnapshot.getValue()));
             }
 
             @Override
@@ -240,13 +251,12 @@ public class EditProfileFragment extends AppCompatActivity {
                 myGoogleMap.setOnMyLocationButtonClickListener(new GoogleMap.OnMyLocationButtonClickListener() {
                     @Override
                     public boolean onMyLocationButtonClick() {
+
                         if(locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)){
-                            Toast.makeText(getApplicationContext(),"KAYITLI KONUM GÜNCELLENİYOR!", Toast.LENGTH_LONG).show();
-                            myGoogleMap.addMarker(new MarkerOptions().position(user).title("Bulunduğunuz yer").snippet(""));
+                            methodGetLocation();
                             return true;
                         } else {
-                            Toast.makeText(getApplicationContext(),"Konumunuzu güncellemek için GPS açmalısınız.", Toast.LENGTH_LONG).show();
-                            startActivity(new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS));
+                            methodGetLocation();
                             return  true;
                         }
 
@@ -259,6 +269,23 @@ public class EditProfileFragment extends AppCompatActivity {
 
 
     }
+
+    private void methodGetLocation(){
+        PlacePicker.IntentBuilder builder = new PlacePicker.IntentBuilder();
+        Intent intentroadpic;
+
+        try {
+            intentroadpic = builder.build(EditProfileFragment.this);
+            startActivityForResult(intentroadpic,PLACE_PICKER_REQUEST );
+        } catch (GooglePlayServicesRepairableException e) {
+            e.printStackTrace();
+        } catch (GooglePlayServicesNotAvailableException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+
     public void DayThemeMode(){
         SharedPreferences.Editor editor = sharedpreferences.edit();
         editor.putString("theme", "DayTheme" );
@@ -303,15 +330,21 @@ public class EditProfileFragment extends AppCompatActivity {
         });
 
     }
+    private class UpdateDB extends AsyncTask<String, String, String> {      // update işlemini asynctask ile gerçekleştiriyoruz.
+
+        @Override
+        protected String doInBackground(String... params) {
+            writeNewDatasToDB();
+            return null;
+
+        }
+    }
 
     public void writeNewDatasToDB(){
-        final String newName = AdSoyad.getText().toString();
-        String newCity = Sehir.getText().toString();
-
+        final String newName = adSoyad.getText().toString();
 
         //gözlemlemek için yazdım
         Log.i("newDatas", "writeNewDatasToDB: " + newName +" - " + newName.isEmpty());
-        Log.i("newDatas", "writeNewDatasToDB: " + newCity +" - " + newCity.isEmpty());
 
         if(!newName.isEmpty()){
             curentUserRef.child("namesurname").setValue(newName);
@@ -320,6 +353,7 @@ public class EditProfileFragment extends AppCompatActivity {
                 public void onDataChange(DataSnapshot tasksSnapshot) {
                     for (DataSnapshot snapshot: tasksSnapshot.getChildren()) {
                         snapshot.getRef().child("name").setValue(newName);
+                        Toast.makeText(EditProfileFragment.this, "Bilgileriniz Güncellendi!", Toast.LENGTH_LONG).show();
                     }
                 }
                 @Override
@@ -332,6 +366,7 @@ public class EditProfileFragment extends AppCompatActivity {
                 public void onDataChange(DataSnapshot tasksSnapshot) {
                     for (DataSnapshot snapshot: tasksSnapshot.getChildren()) {
                         snapshot.getRef().child("name").setValue(newName);
+
                     }
                 }
                 @Override
@@ -339,9 +374,7 @@ public class EditProfileFragment extends AppCompatActivity {
                 }
 
             });
-        }
-        if(!newCity.isEmpty()){
-            curentUserRef.child("cityName").setValue(newCity);
+
         }
         if(newImageUri != null){
             StorageReference filePath = imgStorageRef.child(newImageUri.getLastPathSegment());
@@ -356,6 +389,7 @@ public class EditProfileFragment extends AppCompatActivity {
                         public void onDataChange(DataSnapshot tasksSnapshot) {
                             for (DataSnapshot snapshot: tasksSnapshot.getChildren()) {
                                 snapshot.getRef().child("image").setValue(downloadUri);
+                                Toast.makeText(EditProfileFragment.this, "Bilgileriniz Güncellendi!", Toast.LENGTH_LONG).show();
                             }
                         }
                         @Override
@@ -379,17 +413,45 @@ public class EditProfileFragment extends AppCompatActivity {
             });
 
         }
-    }
+        if(!fullAddress.equals(null)) {
+            curentUserRef.addChildEventListener(new ChildEventListener() {
+                @Override
+                public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                    if(write == false) {
+                        curentUserRef.child("fullAddress").setValue(fullAddress);
+                        curentUserRef.child("cityName").setValue(addressName);
+                        curentUserRef.child("latLng").setValue(addressLatLng);
+                        Toast.makeText(EditProfileFragment.this, "Bilgileriniz Güncellendi!", Toast.LENGTH_LONG).show();
+                        write = true;
+                    }
 
-    private class UpdateDB extends AsyncTask<String, String, String> {      // update işlemini asynctask ile gerçekleştiriyoruz.
+                }
 
-        @Override
-        protected String doInBackground(String... params) {
-            writeNewDatasToDB();
-            return null;
+                @Override
+                public void onChildChanged(DataSnapshot dataSnapshot, String s) {}
+
+                @Override
+                public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+                }
+
+                @Override
+                public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+
+                }
+
+            });
+
+        }else{
 
         }
     }
+
 
     public void getLocation(){
         curentUserRef.child("latLng").addValueEventListener(new ValueEventListener() {
@@ -431,7 +493,6 @@ public class EditProfileFragment extends AppCompatActivity {
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if(data == null ){
-            Toast.makeText(this,"Resim Seçmediniz",Toast.LENGTH_LONG).show();
             Log.i("TESTGALLERY", "NULL ABİSİ"); /* ****** */
         }
         if(requestCode == IMAGE_PICK_REQUEST && resultCode == RESULT_OK && data != null){
@@ -443,6 +504,29 @@ public class EditProfileFragment extends AppCompatActivity {
                 profileİmg.setImageBitmap(bitmap);
             } catch (IOException e) {
                 e.printStackTrace();
+            }
+        }
+        if(requestCode==PLACE_PICKER_REQUEST){
+            if(resultCode == RESULT_OK){
+                Place place = PlacePicker.getPlace(data,EditProfileFragment.this);
+                fullAddress = (String) place.getAddress();
+                addressLatLng = (LatLng) place.getLatLng();
+
+                if(fullAddress.contains("/")) {
+                    String[] city = fullAddress.split("/");
+
+                    String part1 = city[0];
+                    String part2 = city[1];
+                    String[] cityname = part2.split(",");
+                    addressName = cityname[0];
+
+                }else{
+                    String[] cityname = fullAddress.split(",");
+                    addressName = cityname[0];
+                }
+
+                write = false;
+
             }
         }
     }

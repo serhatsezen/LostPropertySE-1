@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
+import android.graphics.Typeface;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -11,10 +12,12 @@ import android.support.design.widget.AppBarLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -55,7 +58,10 @@ import com.team3s.lostpropertyse.Profile.AnotherUsersProfiFrag;
 import com.team3s.lostpropertyse.Profile.UsersProfiFrag;
 import com.team3s.lostpropertyse.R;
 
+import org.json.JSONArray;
 import org.w3c.dom.Text;
+
+import java.util.ArrayList;
 
 public class LostMainFrag extends Fragment {
 
@@ -64,6 +70,8 @@ public class LostMainFrag extends Fragment {
     private static RelativeLayout relativeLayLost_Main;
     private DatabaseReference database,mDatabaseUsers,mDatabaseUsersProfile,mDatabaseLikeCounter,mDatabaseUsersFilter;
     private DatabaseReference mDatabaseLike, mDatabaseDistance;
+    public Query mQueryUserFindCat,mQueryUserLostCat;
+    public DatabaseReference mDatabaseFindCat,mDatabaseLostCat;
     private FirebaseAuth.AuthStateListener authListener;
     private FirebaseAuth auth;
     private Query mQueryIcerik;
@@ -104,6 +112,13 @@ public class LostMainFrag extends Fragment {
     private boolean showPost;
     FragmentManager manager;
 
+    final ArrayList<String> categorynames = new ArrayList<String>();
+    final ArrayList<Category> categoriesInformation = new ArrayList<Category>();
+
+    public String category;
+
+
+
     public LostMainFrag() {
         // Required empty public constructor
     }
@@ -133,10 +148,16 @@ public class LostMainFrag extends Fragment {
         sharedpreferences = getActivity().getSharedPreferences(PREFS, Context.MODE_PRIVATE);
         editor = sharedpreferences.edit();
 
+        category = sharedpreferences.getString("categoryShared", "Hepsi");
+
         appBarLayout.setVisibility(View.VISIBLE);
         toolbarText = (TextView) v.findViewById(R.id.toolbarText);
         mDatabaseUsersFilter = FirebaseDatabase.getInstance().getReference().child("Users").child(user.getUid());
         mDatabaseDistance = FirebaseDatabase.getInstance().getReference().child("Users").child(user.getUid()).child("latLng");
+
+        Typeface type = Typeface.createFromAsset(getActivity().getAssets(),
+                "fonts/Ubuntu-B.ttf");
+        toolbarText.setTypeface(type);
 
         mDatabaseUsersFilter.addValueEventListener(new ValueEventListener() {
             @Override
@@ -203,192 +224,386 @@ public class LostMainFrag extends Fragment {
 
         themeStr = sharedpreferences.getString("theme", "DayTheme");
 
+        if(themeStr.equals("NightTheme")){
+            lost_main_list.setBackgroundColor(Color.parseColor("#1a2f40"));
+            relativeLayLost_Main.setBackgroundColor(Color.parseColor("#1a2f40"));
+            appBarLayout.setBackgroundColor(Color.parseColor("#142629"));
+            toolbarText.setTextColor(Color.parseColor("#BDC7C1"));
+
+
+        }else if(themeStr.equals("DayTheme")){
+            lost_main_list.setBackgroundColor(Color.parseColor("#9E9E9E"));
+            relativeLayLost_Main.setBackgroundColor(Color.parseColor("#9E9E9E"));
+            appBarLayout.setBackgroundColor(Color.parseColor("#EEEEEE"));
+            toolbarText.setTextColor(Color.parseColor("#000000"));
+
+        }
+
 
         return v;
     }
 
 
-    public void onStart(){
+    public void onStart() {
         super.onStart();
         final String currentUserId = auth.getCurrentUser().getUid();
         database = FirebaseDatabase.getInstance().getReference().child("Icerik").child("Kayiplar");
-        mQueryIcerik = database.orderByChild("city").equalTo(cityFilter);
+        mQueryIcerik = database.orderByChild("category").equalTo(category);
+
+        if (category.equals("Hepsi")) {
+            FirebaseRecyclerAdapter<AdapterClass, ShareViewHolder> firebaseRecyclerAdapter = new FirebaseRecyclerAdapter<AdapterClass, ShareViewHolder>(
+                    AdapterClass.class,
+                    R.layout.list,
+                    ShareViewHolder.class,
+                    database
+            ) {
+                @Override
+                protected void populateViewHolder(final ShareViewHolder viewHolder, final AdapterClass model, final int position) {
+
+                    final String post_key = getRef(position).getKey();
+                    viewHolder.setQuestions(model.getQuestions());
+                    viewHolder.setCity(model.getaddressname());
+                    viewHolder.setPost_image(getActivity().getApplicationContext(), model.getPost_image());
+                    viewHolder.setName(model.getName());
+                    viewHolder.setImage(getActivity().getApplicationContext(), model.getImage());
+                    viewHolder.setDate(model.getPost_date());
 
 
-        FirebaseRecyclerAdapter<AdapterClass, ShareViewHolder> firebaseRecyclerAdapter = new FirebaseRecyclerAdapter<AdapterClass, ShareViewHolder>(
-                AdapterClass.class,
-                R.layout.list,
-                ShareViewHolder.class,
-                database
-        ) {
-            @Override
-            protected void populateViewHolder(final ShareViewHolder viewHolder, final AdapterClass model, final int position) {
+                    database.child(post_key).child("latlng").addValueEventListener(new ValueEventListener() {       // her postun lat lng değerleri
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
 
-                final String post_key = getRef(position).getKey();
-                 viewHolder.setQuestions(model.getQuestions());
-                 viewHolder.setCity(model.getaddressname());
-                 viewHolder.setPost_image(getActivity().getApplicationContext(), model.getPost_image());
-                 viewHolder.setName(model.getName());
-                 viewHolder.setImage(getActivity().getApplicationContext(), model.getImage());
-                viewHolder.setDate(model.getPost_date());
+                            for (DataSnapshot childDataSnapshot : dataSnapshot.getChildren()) {
 
 
-                database.child(post_key).child("latlng").addValueEventListener(new ValueEventListener() {       // her postun lat lng değerleri
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-
-                        for (DataSnapshot childDataSnapshot : dataSnapshot.getChildren()) {
+                                Location destination = new Location("destination");
+                                destination.setLatitude(latUserL);
+                                destination.setLongitude(lngUserL);
 
 
-                            Location destination = new Location("destination");
-                            destination.setLatitude(latUserL);
-                            destination.setLongitude(lngUserL);
+                                latPost = dataSnapshot.child("latitude").getValue().toString();
+                                lngPost = dataSnapshot.child("longitude").getValue().toString();
 
 
-                            latPost = dataSnapshot.child("latitude").getValue().toString();
-                            lngPost = dataSnapshot.child("longitude").getValue().toString();
+                                latPostL = Double.parseDouble(String.valueOf(latPost));
+                                lngPostL = Double.parseDouble(String.valueOf(lngPost));
 
 
-                            latPostL = Double.parseDouble(String.valueOf(latPost));
-                            lngPostL = Double.parseDouble(String.valueOf(lngPost));
+                                Location current = new Location("destination");
+                                current.setLatitude(latPostL);
+                                current.setLongitude(lngPostL);
+
+                                dist = current.distanceTo(destination) / 1000;                      //kullanıcının lat lng değerleri ile posttaki lat lng değerlerinin karşılarştırılması ve km olarak hesaplanması
+                                distStr = String.format("%.2f", dist);
+
+                                viewHolder.distanceUser.setText(distStr + " km");
 
 
-                            Location current = new Location("destination");
-                            current.setLatitude(latPostL);
-                            current.setLongitude(lngPostL);
+                            }
+                        }
 
-                            dist = current.distanceTo(destination) / 1000;                      //kullanıcının lat lng değerleri ile posttaki lat lng değerlerinin karşılarştırılması ve km olarak hesaplanması
-                            distStr = String.format("%.2f", dist );
-
-                            viewHolder.distanceUser.setText(distStr+" km");
-
-
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
 
                         }
-                    }
+                    });
+                    viewHolder.postImg.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            View dialog = LayoutInflater.from(getActivity()).inflate(R.layout.custom_image_dialog, null);
+                            final SwipeDismissDialog swipeDismissDialog = new SwipeDismissDialog.Builder(getActivity())
+                                    .setView(dialog)
+                                    .build()
+                                    .show();
+                            ImageView image = (ImageView) dialog.findViewById(R.id.image);
+                            Glide.with(getActivity().getApplicationContext())
+                                    .load(model.getPost_image())
+                                    .diskCacheStrategy(DiskCacheStrategy.ALL)
+                                    .into(image);
+
+                        }
+                    });
+
+                    viewHolder.mView.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            Bundle bundleComment = new Bundle();
+                            bundleComment.putString("post_id", post_key);
+                            bundleComment.putString("post_type", "Kayiplar");
+                            appBarLayout.setVisibility(View.GONE);
+
+                            PostDetailFrag fragmentDet = new PostDetailFrag();
+                            fragmentDet.setArguments(bundleComment);
+                            getFragmentManager()
+                                    .beginTransaction()
+                                    .add(R.id.postdetpfr, fragmentDet, "addPostDetail")
+                                    .addToBackStack(null)
+                                    .commit();
+
+                        }
+                    });
+                    viewHolder.commentBtn.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            Bundle bundleComment = new Bundle();
+                            bundleComment.putString("post_id_key", post_key);
+                            bundleComment.putString("post_type", "Kayiplar");
+                            appBarLayout.setVisibility(View.GONE);
+
+                            CommentFrag fragmentCom = new CommentFrag();
+                            fragmentCom.setArguments(bundleComment);
+                            getFragmentManager()
+                                    .beginTransaction()
+                                    .add(R.id.postdetpfr, fragmentCom, "addPostComment")
+                                    .addToBackStack(null)
+                                    .commit();
+
+                        }
+                    });
+                    viewHolder.profile.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+
+                            database.child(post_key).addValueEventListener(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(DataSnapshot dataSnapshot) {
+                                    user_key = (String) dataSnapshot.child("uid").getValue();
+                                    SharedPreferences.Editor editor = sharedpreferences.edit();
+                                    editor.putString("USERKEY_SHARED", user_key);
+                                    editor.putString("username", userNames);
+                                    editor.commit();
+
+                                    Bundle bundle = new Bundle();
+                                    bundle.putString("key", user_key); // User ID çekip anotherUserProfile ekranını açmak için
+                                    appBarLayout.setVisibility(View.GONE);
+                                    if (currentUserId.equals(user_key)) {     //User ID ve CurrentUserID aynı ise kendi profil sayfasına gitmek için
+                                        UsersProfiFrag fragment2 = new UsersProfiFrag();
+                                        getFragmentManager()
+                                                .beginTransaction()
+                                                .add(R.id.postdetpfr, fragment2, "addUserProfile")
+                                                .addToBackStack(null)
+                                                .commit();
+                                    } else {
+                                        appBarLayout.setVisibility(View.GONE);
+                                        AnotherUsersProfiFrag fragment3 = new AnotherUsersProfiFrag();
+                                        fragment3.setArguments(bundle);
+                                        getFragmentManager()
+                                                .beginTransaction()
+                                                .add(R.id.postdetpfr, fragment3, "addAnotherProfile")
+                                                .addToBackStack(null)
+                                                .commit();
+                                    }
+                                }
+
+                                @Override
+                                public void onCancelled(DatabaseError error) {
+                                    // Failed to read value
+                                }
+                            });
+
+                        }
+                    });
+                    database.child(post_key).child("Comments").addValueEventListener(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+
+                            for (DataSnapshot childDataSnapshot : dataSnapshot.getChildren()) {
+                                viewHolder.commentCount.setText(String.valueOf(dataSnapshot.getChildrenCount()));  //displays the key for the node
+
+                            }
+                        }
+
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+
+                        }
+                    });
+
+
+                }
+            };
+            lost_main_list.setAdapter(firebaseRecyclerAdapter);
+            firebaseRecyclerAdapter.notifyDataSetChanged();
+
+
+        }else{
+            {
+                FirebaseRecyclerAdapter<AdapterClass, ShareViewHolder> firebaseRecyclerAdapter = new FirebaseRecyclerAdapter<AdapterClass, ShareViewHolder>(
+                        AdapterClass.class,
+                        R.layout.list,
+                        ShareViewHolder.class,
+                        mQueryIcerik
+                ) {
                     @Override
-                    public void onCancelled(DatabaseError databaseError) {
+                    protected void populateViewHolder(final ShareViewHolder viewHolder, final AdapterClass model, final int position) {
 
-                    }
-                });
-                viewHolder.postImg.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        View dialog = LayoutInflater.from(getActivity()).inflate(R.layout.custom_image_dialog, null);
-                        final SwipeDismissDialog swipeDismissDialog = new SwipeDismissDialog.Builder(getActivity())
-                                .setView(dialog)
-                                .build()
-                                .show();
-                        ImageView image = (ImageView) dialog.findViewById(R.id.image);
-                        Glide.with(getActivity().getApplicationContext())
-                                .load(model.getPost_image())
-                                .diskCacheStrategy(DiskCacheStrategy.ALL)
-                                .into(image);
+                        final String post_key = getRef(position).getKey();
+                        viewHolder.setQuestions(model.getQuestions());
+                        viewHolder.setCity(model.getaddressname());
+                        viewHolder.setPost_image(getActivity().getApplicationContext(), model.getPost_image());
+                        viewHolder.setName(model.getName());
+                        viewHolder.setImage(getActivity().getApplicationContext(), model.getImage());
+                        viewHolder.setDate(model.getPost_date());
 
-                    }
-                });
 
-                viewHolder.mView.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        Bundle bundleComment = new Bundle();
-                        bundleComment.putString("post_id",post_key);
-                        bundleComment.putString("post_type","Kayiplar");
-                        appBarLayout.setVisibility(View.GONE);
-
-                        PostDetailFrag fragmentDet = new PostDetailFrag();
-                        fragmentDet.setArguments(bundleComment);
-                        getFragmentManager()
-                                .beginTransaction()
-                                .add(R.id.postdetpfr, fragmentDet,"addPostDetail")
-                                .addToBackStack(null)
-                                .commit();
-
-                    }
-                });
-                viewHolder.commentBtn.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        Bundle bundleComment = new Bundle();
-                        bundleComment.putString("post_id_key",post_key);
-                        bundleComment.putString("post_type","Kayiplar");
-                        appBarLayout.setVisibility(View.GONE);
-
-                        CommentFrag fragmentCom = new CommentFrag();
-                        fragmentCom.setArguments(bundleComment);
-                        getFragmentManager()
-                                .beginTransaction()
-                                .add(R.id.postdetpfr, fragmentCom,"addPostComment")
-                                .addToBackStack(null)
-                                .commit();
-
-                    }
-                });
-                viewHolder.profile.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-
-                        database.child(post_key).addValueEventListener(new ValueEventListener() {
+                        database.child(post_key).child("latlng").addValueEventListener(new ValueEventListener() {       // her postun lat lng değerleri
                             @Override
                             public void onDataChange(DataSnapshot dataSnapshot) {
-                                user_key = (String) dataSnapshot.child("uid").getValue();
-                                SharedPreferences.Editor editor = sharedpreferences.edit();
-                                editor.putString("USERKEY_SHARED", user_key);
-                                editor.putString("username", userNames);
-                                editor.commit();
 
-                                Bundle bundle = new Bundle();
-                                bundle.putString("key",user_key); // User ID çekip anotherUserProfile ekranını açmak için
-                                appBarLayout.setVisibility(View.GONE);
-                                if(currentUserId.equals(user_key)){     //User ID ve CurrentUserID aynı ise kendi profil sayfasına gitmek için
-                                    UsersProfiFrag fragment2 = new UsersProfiFrag();
-                                    getFragmentManager()
-                                            .beginTransaction()
-                                            .add(R.id.postdetpfr, fragment2,"addUserProfile")
-                                            .addToBackStack(null)
-                                            .commit();
-                                }else {
-                                    appBarLayout.setVisibility(View.GONE);
-                                    AnotherUsersProfiFrag fragment3 = new AnotherUsersProfiFrag();
-                                    fragment3.setArguments(bundle);
-                                    getFragmentManager()
-                                            .beginTransaction()
-                                            .add(R.id.postdetpfr, fragment3,"addAnotherProfile")
-                                            .addToBackStack(null)
-                                            .commit();
+                                for (DataSnapshot childDataSnapshot : dataSnapshot.getChildren()) {
+
+
+                                    Location destination = new Location("destination");
+                                    destination.setLatitude(latUserL);
+                                    destination.setLongitude(lngUserL);
+
+
+                                    latPost = dataSnapshot.child("latitude").getValue().toString();
+                                    lngPost = dataSnapshot.child("longitude").getValue().toString();
+
+
+                                    latPostL = Double.parseDouble(String.valueOf(latPost));
+                                    lngPostL = Double.parseDouble(String.valueOf(lngPost));
+
+
+                                    Location current = new Location("destination");
+                                    current.setLatitude(latPostL);
+                                    current.setLongitude(lngPostL);
+
+                                    dist = current.distanceTo(destination) / 1000;                      //kullanıcının lat lng değerleri ile posttaki lat lng değerlerinin karşılarştırılması ve km olarak hesaplanması
+                                    distStr = String.format("%.2f", dist);
+
+                                    viewHolder.distanceUser.setText(distStr + " km");
+
+
                                 }
                             }
 
                             @Override
-                            public void onCancelled(DatabaseError error) {
-                                // Failed to read value
+                            public void onCancelled(DatabaseError databaseError) {
+
+                            }
+                        });
+                        viewHolder.postImg.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                View dialog = LayoutInflater.from(getActivity()).inflate(R.layout.custom_image_dialog, null);
+                                final SwipeDismissDialog swipeDismissDialog = new SwipeDismissDialog.Builder(getActivity())
+                                        .setView(dialog)
+                                        .build()
+                                        .show();
+                                ImageView image = (ImageView) dialog.findViewById(R.id.image);
+                                Glide.with(getActivity().getApplicationContext())
+                                        .load(model.getPost_image())
+                                        .diskCacheStrategy(DiskCacheStrategy.ALL)
+                                        .into(image);
+
                             }
                         });
 
+                        viewHolder.mView.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                Bundle bundleComment = new Bundle();
+                                bundleComment.putString("post_id", post_key);
+                                bundleComment.putString("post_type", "Kayiplar");
+                                appBarLayout.setVisibility(View.GONE);
+
+                                PostDetailFrag fragmentDet = new PostDetailFrag();
+                                fragmentDet.setArguments(bundleComment);
+                                getFragmentManager()
+                                        .beginTransaction()
+                                        .add(R.id.postdetpfr, fragmentDet, "addPostDetail")
+                                        .addToBackStack(null)
+                                        .commit();
+
+                            }
+                        });
+                        viewHolder.commentBtn.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                Bundle bundleComment = new Bundle();
+                                bundleComment.putString("post_id_key", post_key);
+                                bundleComment.putString("post_type", "Kayiplar");
+                                appBarLayout.setVisibility(View.GONE);
+
+                                CommentFrag fragmentCom = new CommentFrag();
+                                fragmentCom.setArguments(bundleComment);
+                                getFragmentManager()
+                                        .beginTransaction()
+                                        .add(R.id.postdetpfr, fragmentCom, "addPostComment")
+                                        .addToBackStack(null)
+                                        .commit();
+
+                            }
+                        });
+                        viewHolder.profile.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+
+                                database.child(post_key).addValueEventListener(new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(DataSnapshot dataSnapshot) {
+                                        user_key = (String) dataSnapshot.child("uid").getValue();
+                                        SharedPreferences.Editor editor = sharedpreferences.edit();
+                                        editor.putString("USERKEY_SHARED", user_key);
+                                        editor.putString("username", userNames);
+                                        editor.commit();
+
+                                        Bundle bundle = new Bundle();
+                                        bundle.putString("key", user_key); // User ID çekip anotherUserProfile ekranını açmak için
+                                        appBarLayout.setVisibility(View.GONE);
+                                        if (currentUserId.equals(user_key)) {     //User ID ve CurrentUserID aynı ise kendi profil sayfasına gitmek için
+                                            UsersProfiFrag fragment2 = new UsersProfiFrag();
+                                            getFragmentManager()
+                                                    .beginTransaction()
+                                                    .add(R.id.postdetpfr, fragment2, "addUserProfile")
+                                                    .addToBackStack(null)
+                                                    .commit();
+                                        } else {
+                                            appBarLayout.setVisibility(View.GONE);
+                                            AnotherUsersProfiFrag fragment3 = new AnotherUsersProfiFrag();
+                                            fragment3.setArguments(bundle);
+                                            getFragmentManager()
+                                                    .beginTransaction()
+                                                    .add(R.id.postdetpfr, fragment3, "addAnotherProfile")
+                                                    .addToBackStack(null)
+                                                    .commit();
+                                        }
+                                    }
+
+                                    @Override
+                                    public void onCancelled(DatabaseError error) {
+                                        // Failed to read value
+                                    }
+                                });
+
+                            }
+                        });
+                        database.child(post_key).child("Comments").addValueEventListener(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(DataSnapshot dataSnapshot) {
+
+                                for (DataSnapshot childDataSnapshot : dataSnapshot.getChildren()) {
+                                    viewHolder.commentCount.setText(String.valueOf(dataSnapshot.getChildrenCount()));  //displays the key for the node
+
+                                }
+                            }
+
+                            @Override
+                            public void onCancelled(DatabaseError databaseError) {
+
+                            }
+                        });
+
+
                     }
-                });
-                database.child(post_key).child("Comments").addValueEventListener(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-
-                        for (DataSnapshot childDataSnapshot : dataSnapshot.getChildren()) {
-                            viewHolder.commentCount.setText(String.valueOf(dataSnapshot.getChildrenCount()));  //displays the key for the node
-
-                        }
-                    }
-
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
-
-                    }
-                });
-
-
+                };
+                lost_main_list.setAdapter(firebaseRecyclerAdapter);
+                lost_main_list.invalidate();
             }
-        };
-        lost_main_list.setAdapter(firebaseRecyclerAdapter);
+        }
     }
-
 
     public static class ShareViewHolder extends RecyclerView.ViewHolder {
 
@@ -464,12 +679,7 @@ public class LostMainFrag extends Fragment {
             questions_title.setText(questions);
         }
 
-        public void setDesc(String desc){
 
-            TextView share_desc = (TextView) mView.findViewById(R.id.desc_text);
-            share_desc.setText(desc);
-
-        }
 
         public void setCity(String city){
 

@@ -224,9 +224,14 @@ public class SignIn_Fragment extends Fragment implements OnClickListener,GoogleA
         mDatabaseUsers.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                SharedPreferences sharedPreferences = getActivity().getApplicationContext().getSharedPreferences(getString(R.string.FCM_PREF), Context.MODE_PRIVATE);
-                final String token = sharedPreferences.getString(getString(R.string.FCM_TOKEN), "");
-                user_id = auth.getCurrentUser().getUid();
+                try {
+                    SharedPreferences sharedPreferences = getActivity().getApplicationContext().getSharedPreferences(getString(R.string.FCM_PREF), Context.MODE_PRIVATE);
+                    final String token = sharedPreferences.getString(getString(R.string.FCM_TOKEN), "");
+
+                }catch (Exception e){
+
+                }
+                 user_id = auth.getCurrentUser().getUid();
 
                 double lat = 39.500;
                 double lng = 30.500;

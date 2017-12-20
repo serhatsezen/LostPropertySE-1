@@ -82,21 +82,50 @@
                     android:textSize="20sp" />
 
                 <TextView
+                    android:id="@+id/kmcinsinden"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Bildirim göndermek itediğiniz çapın büyüklüğü(km)"
+                    android:layout_below="@+id/lostOrfind"
+                    android:layout_toEndOf="@+id/kmdegeri"
+                    android:padding="5dp"
+                    android:text=" km çevrenize bildirim gönderilecek!"
+                    android:textColor="@color/commentBackGround"
+                    android:textSize="15sp" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text=" x"
                     android:layout_below="@+id/lostOrfind"
                     android:padding="5dp"
+                    android:layout_marginLeft="3dp"
                     android:textSize="15sp"
-                    android:id="@+id/kmcinsinden"
-                    android:textColor="@color/commentBackGround"/>
+                    android:id="@+id/kmdegeri"
+                    android:textColor="@color/colorAccent"/>
+
                 <android.support.v7.widget.RecyclerView
                     android:id="@+id/horizontal_recycler_view"
-                    android:layout_width="40dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="70dp"
                     android:layout_below="@+id/kmcinsinden"
                     android:layout_centerHorizontal="true"
                     android:background="#fff" />
+
+                <EditText
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/horizontal_recycler_view"
+                    android:id="@+id/edtxCategory"
+                    android:hint="Kategori yazabilir ya da alttan seçebilirsiniz."/>
+
+                <android.support.v7.widget.RecyclerView
+                    android:id="@+id/horizontal_recycler_view_kategoriler"
+                    android:layout_width="wrap_content"
+                    android:layout_height="70dp"
+                    android:layout_marginLeft="5dp"
+                    android:layout_marginRight="5dp"
+                    android:layout_below="@+id/edtxCategory"
+                    android:layout_centerHorizontal="true"
+                    />
 
             </RelativeLayout>
 

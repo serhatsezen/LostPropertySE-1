@@ -129,9 +129,11 @@ public class MainPage extends Fragment {
     private void setupViewPager(ViewPager viewPager) {
 
         Adapter adapter = new Adapter(getChildFragmentManager());
+        adapter.addFragment(new CategorySelect(), "Kategoriler");
         adapter.addFragment(new LostMainFrag(), "Kayıp Eşyalar");
         adapter.addFragment(new FindMainFrag(), "Bulunanlar");
         viewPager.setAdapter(adapter);
+        viewPager.setCurrentItem(1);
     }
     static class Adapter extends FragmentPagerAdapter {
         private final List<Fragment> mFragmentList = new ArrayList<>();

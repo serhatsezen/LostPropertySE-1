@@ -224,4 +224,9 @@ public class PostDetailAct extends AppCompatActivity {
             mPostCommentCounter.setTextColor(Color.BLACK);
         }
     }
+     @Override
+    public void onBackPressed() {
+        Intent intent = new Intent(PostDetailAct.this, BottomBarActivity.class);
+        startActivity(intent);
+    }
 }

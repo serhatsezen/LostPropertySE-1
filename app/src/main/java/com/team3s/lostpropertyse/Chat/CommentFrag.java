@@ -194,7 +194,6 @@ public class CommentFrag extends Fragment {
         public ShareViewHolder(View itemView) {
             super(itemView);
             mViewRoad = itemView;
-            counterComment = (TextView) mViewRoad.findViewById(R.id.counterLike);
             mAuth = FirebaseAuth.getInstance();
         }
         public void setcommentText(String commentText) {            //burada bulunan commentText ile firebasedeki child ın altındaki node aynı olmak zorunda ayrıca bunları AdapterClass.java classında tanımlıyoruz. get fonksiyonları share classdan çekiyoruz.

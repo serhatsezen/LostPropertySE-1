@@ -15,13 +15,14 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.text.format.Time;
-import android.util.Base64;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -45,7 +46,6 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
-import com.team3s.lostpropertyse.LoginSign.CustomToast;
 import com.team3s.lostpropertyse.MainPage.BottomBarActivity;
 import com.team3s.lostpropertyse.R;
 import com.team3s.lostpropertyse.Utils.UniversalImageLoader;
@@ -58,8 +58,8 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.protocol.HTTP;
+import org.w3c.dom.Text;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -123,14 +123,21 @@ public class NextActivity extends AppCompatActivity {
     public String post_key;
     public Uri imageUri = null;
 
+    public EditText edtxCategory;
+    public TextView kmdegeri;
+
     ArrayList<String> tokenList = new ArrayList<String>();
     ArrayList<String> kmList = new ArrayList<String>();
 
     private RecyclerView horizontal_recycler_view;
-    private ArrayList<String> horizontalList;
-    private HorizontalAdapter horizontalAdapter;
+    private ArrayList<String> horizontalListkm;
+    private HorizontalAdapterKm horizontalAdapterkmKm;
 
-
+    private RecyclerView horizontal_recycler_view_kategoriler;
+    private ArrayList<String> horizontalListkategori;
+    private HorizontalAdapterr horizontalAdapterkategori;
+    private String category;
+    private boolean mValid = true;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -166,20 +173,47 @@ public class NextActivity extends AppCompatActivity {
 
         horizontal_recycler_view= (RecyclerView) findViewById(R.id.horizontal_recycler_view);
 
-        horizontalList=new ArrayList<>();
-        horizontalList.add("1");
-        horizontalList.add("5");
-        horizontalList.add("10");
-        horizontalList.add("15");
-        horizontalList.add("20");
+        horizontalListkm =new ArrayList<>();
+        horizontalListkm.add("1");
+        horizontalListkm.add("5");
+        horizontalListkm.add("10");
+        horizontalListkm.add("15");
+        horizontalListkm.add("20");
 
-        horizontalAdapter=new HorizontalAdapter(horizontalList);
+        horizontalAdapterkmKm =new HorizontalAdapterKm(horizontalListkm);
 
-        LinearLayoutManager horizontalLayoutManagaer
-                = new LinearLayoutManager(NextActivity.this, LinearLayoutManager.HORIZONTAL, false);
+        LinearLayoutManager horizontalLayoutManagaer = new LinearLayoutManager(NextActivity.this, LinearLayoutManager.HORIZONTAL, false);
         horizontal_recycler_view.setLayoutManager(horizontalLayoutManagaer);
 
-        horizontal_recycler_view.setAdapter(horizontalAdapter);
+        horizontal_recycler_view.setAdapter(horizontalAdapterkmKm);
+
+        //-------------------------------------for select km
+
+        horizontal_recycler_view_kategoriler= (RecyclerView) findViewById(R.id.horizontal_recycler_view_kategoriler);
+
+        horizontalListkategori =new ArrayList<>();
+        horizontalListkategori.add("Kart");
+        horizontalListkategori.add("Bisiklet");
+        horizontalListkategori.add("Elektronik");
+        horizontalListkategori.add("Cüzdan");
+        horizontalListkategori.add("Kırtasiye");
+        horizontalListkategori.add("Çanta");
+        horizontalListkategori.add("Anahtar");
+
+
+        horizontalAdapterkategori =new HorizontalAdapterr(horizontalListkategori);
+
+        LinearLayoutManager horizontalLayoutManagaerKategori = new LinearLayoutManager(NextActivity.this, LinearLayoutManager.HORIZONTAL, false);
+
+        horizontal_recycler_view_kategoriler.setLayoutManager(horizontalLayoutManagaerKategori);
+
+        horizontal_recycler_view_kategoriler.setAdapter(horizontalAdapterkategori);
+
+        //------------------------------------ for select category
+
+
+        edtxCategory = (EditText) findViewById(R.id.edtxCategory);
+        kmdegeri = (TextView) findViewById(R.id.kmdegeri);
 
         mCaption = (EditText) findViewById(R.id.caption) ;
         ImageView backArrow = (ImageView) findViewById(R.id.ivBackArrow);
@@ -245,12 +279,12 @@ public class NextActivity extends AppCompatActivity {
 
 
     }
-    public class HorizontalAdapter extends RecyclerView.Adapter<HorizontalAdapter.MyViewHolder> {
+    public class HorizontalAdapterKm extends RecyclerView.Adapter<HorizontalAdapterKm.MyViewHolder> {
 
-        private List<String> horizontalList;
-
+        private List<String> horizontalListKm;
         public class MyViewHolder extends RecyclerView.ViewHolder {
             public TextView txtView;
+            private boolean mValid = true;
 
             public MyViewHolder(View view) {
                 super(view);
@@ -260,8 +294,8 @@ public class NextActivity extends AppCompatActivity {
         }
 
 
-        public HorizontalAdapter(List<String> horizontalList) {
-            this.horizontalList = horizontalList;
+        public HorizontalAdapterKm(List<String> horizontalList) {
+            this.horizontalListKm = horizontalList;
         }
 
         @Override
@@ -274,13 +308,75 @@ public class NextActivity extends AppCompatActivity {
 
         @Override
         public void onBindViewHolder(final MyViewHolder holder, final int position) {
-            holder.txtView.setText(horizontalList.get(position));
+            holder.txtView.setText(horizontalListKm.get(position));
+
+            LinearLayout.LayoutParams lpp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+            lpp.setMargins(10, 0, 10, 0);
+            lpp.gravity = Gravity.LEFT;
+            holder.txtView.setLayoutParams(lpp);
+            holder.txtView.setBackgroundResource(R.drawable.chatgreen);
+            holder.txtView.setTextColor(getResources().getColor(R.color.white));
+
 
             holder.txtView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Toast.makeText(NextActivity.this,holder.txtView.getText().toString(),Toast.LENGTH_SHORT).show();
+                    holder.txtView.setTextSize(19);
                     rangeDestStr = holder.txtView.getText().toString();
+                    kmdegeri.setText(rangeDestStr);
+                }
+            });
+        }
+
+        @Override
+        public int getItemCount() {
+            return horizontalListKm.size();
+        }
+    }
+
+    public class HorizontalAdapterr extends RecyclerView.Adapter<HorizontalAdapterr.MyViewHolder> {
+
+        private List<String> horizontalListKategori;
+
+        public class MyViewHolder extends RecyclerView.ViewHolder {
+            public TextView txtView;
+
+            public MyViewHolder(View view) {
+                super(view);
+                txtView = (TextView) view.findViewById(R.id.txtView);
+
+            }
+        }
+
+
+        public HorizontalAdapterr(List<String> horizontalList) {
+            this.horizontalListKategori = horizontalList;
+        }
+
+        @Override
+        public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+            View itemView = LayoutInflater.from(parent.getContext())
+                    .inflate(R.layout.horizontal_item_view, parent, false);
+
+            return new MyViewHolder(itemView);
+        }
+
+        @Override
+        public void onBindViewHolder(final MyViewHolder holder, final int position) {
+            holder.txtView.setText(horizontalListKategori.get(position));
+
+            LinearLayout.LayoutParams lpp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+            lpp.setMargins(10, 0, 10, 0);
+            lpp.gravity = Gravity.LEFT;
+            holder.txtView.setLayoutParams(lpp);
+            holder.txtView.setBackgroundResource(R.drawable.categorycolor);
+            holder.txtView.setTextColor(getResources().getColor(R.color.white));
+
+            holder.txtView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    edtxCategory.setText(holder.txtView.getText().toString());
+                    category = holder.txtView.getText().toString();
 
                 }
             });
@@ -288,7 +384,7 @@ public class NextActivity extends AppCompatActivity {
 
         @Override
         public int getItemCount() {
-            return horizontalList.size();
+            return horizontalListKategori.size();
         }
     }
     public void lostOrFindMethod() {
@@ -362,58 +458,63 @@ public class NextActivity extends AppCompatActivity {
                     .diskCacheStrategy(DiskCacheStrategy.ALL)
                     .into(image);
         }
+        image.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent shareact = new Intent(NextActivity.this,ShareActivity.class);
+                startActivity(shareact);
+            }
+        });
     }
 
 
     private void startPosting() {
         description = mCaption.getText().toString().trim();
 
-            StorageReference filepath = storage.child("Shares_Image").child(imageUri.getLastPathSegment());
+        StorageReference filepath = storage.child("Shares_Image").child(imageUri.getLastPathSegment());
 
-            filepath.putFile(imageUri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                @Override
-                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+        filepath.putFile(imageUri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+            @Override
+            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                final Uri downloadUrl = taskSnapshot.getDownloadUrl();
+                final DatabaseReference newPost2 = mDatabaseIcerik.child(kategori).push();
+                post_key = newPost2.getKey();
+                final Time today = new Time(Time.getCurrentTimezone());
+                today.setToNow();
 
-                    final Uri downloadUrl = taskSnapshot.getDownloadUrl();
-
-                    final DatabaseReference newPost2 = mDatabaseIcerik.child(kategori).push();
-                    post_key = newPost2.getKey();
-
-                    final Time today = new Time(Time.getCurrentTimezone());
-                    today.setToNow();
-
-                    mDatabase.addValueEventListener(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(DataSnapshot dataSnapshot) {
-                            userNameU = (String) dataSnapshot.child("username").getValue();
-
-                            newPost2.child("questions").setValue(description);
-                            newPost2.child("fulladdress").setValue(fullAddress);
-                            newPost2.child("addressname").setValue(addressName);
-                            newPost2.child("latlng").setValue(addressLatLng);
-                            newPost2.child("token").setValue(dataSnapshot.child("token").getValue());
-                            newPost2.child("post_image").setValue(downloadUrl.toString());
-                            newPost2.child("post_time").setValue(today.format("%k:%M"));
-                            newPost2.child("post_date").setValue(today.format("%d/%m/%Y"));
-                            newPost2.child("uid").setValue(currentUser.getUid());
-                            newPost2.child("image").setValue(dataSnapshot.child("profileImage").getValue());
-                            newPost2.child("name").setValue(userNameU).addOnCompleteListener(new OnCompleteListener<Void>() {
-                                @Override
-                                public void onComplete(@NonNull Task<Void> task) {
-                                    if (task.isSuccessful()) {
-                                        notificationFilter();
-                                        Toast.makeText(NextActivity.this, "Tamamlandı!", Toast.LENGTH_LONG).show();
-                                    }
+                mDatabase.addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        userNameU = (String) dataSnapshot.child("username").getValue();
+                        newPost2.child("questions").setValue(description);
+                        newPost2.child("fulladdress").setValue(fullAddress);
+                        newPost2.child("addressname").setValue(addressName);
+                        newPost2.child("category").setValue(category);
+                        newPost2.child("latlng").setValue(addressLatLng);
+                        newPost2.child("token").setValue(dataSnapshot.child("token").getValue());
+                        newPost2.child("post_image").setValue(downloadUrl.toString());
+                        newPost2.child("post_time").setValue(today.format("%k:%M"));
+                        newPost2.child("post_date").setValue(today.format("%d/%m/%Y"));
+                        newPost2.child("uid").setValue(currentUser.getUid());
+                        newPost2.child("image").setValue(dataSnapshot.child("profileImage").getValue());
+                        newPost2.child("name").setValue(userNameU).addOnCompleteListener(new OnCompleteListener<Void>() {
+                            @Override
+                            public void onComplete(@NonNull Task<Void> task) {
+                                if (task.isSuccessful()) {
+                                    notificationFilter();
+                                    Toast.makeText(NextActivity.this, "Paylaşıldı!", Toast.LENGTH_LONG).show();
+                                }else{
+                                    Toast.makeText(NextActivity.this, "Hata Oluştu!", Toast.LENGTH_LONG).show();
                                 }
-                            });
-                        }
-
-                        @Override
-                        public void onCancelled(DatabaseError databaseError) {
-                        }
-                    });
-                }
-            });
+                            }
+                        });
+                    }
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+                    }
+                });
+            }
+        });
 
     }
 
