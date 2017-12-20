@@ -492,7 +492,7 @@ public class NextActivity extends AppCompatActivity {
 
     private void startPosting() {
         description = mCaption.getText().toString().trim();
-
+        category = edtxCategory.getText().toString().trim();
         StorageReference filepath = storage.child("Shares_Image").child(imageUri.getLastPathSegment());
 
         filepath.putFile(imageUri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {

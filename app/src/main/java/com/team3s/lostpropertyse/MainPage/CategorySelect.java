@@ -193,10 +193,14 @@ public class CategorySelect extends Fragment {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
                     for (DataSnapshot data : dataSnapshot.getChildren()) {
-                        String names = data.child("category").getValue().toString();
-                        if(!categorynames.contains(names)){
-                            categoriesInformation.add(new Category(names));     //custom listview e bu bilgileri koyuyoruz,
-                            categorynames.add(names);
+                        try {
+                            String names = data.child("category").getValue().toString();
+                            if(!categorynames.contains(names)){
+                                categoriesInformation.add(new Category(names));     //custom listview e bu bilgileri koyuyoruz,
+                                categorynames.add(names);
+                            }
+                        }catch (Exception e){
+
                         }
                     }
                 }
