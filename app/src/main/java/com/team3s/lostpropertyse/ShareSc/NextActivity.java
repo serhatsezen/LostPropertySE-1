@@ -430,10 +430,32 @@ public class NextActivity extends AppCompatActivity {
             if(resultCode == RESULT_OK){
                 Place place = PlacePicker.getPlace(data,NextActivity.this);
                 fullAddress = (String) place.getAddress();
-                addressName = (String) place.getName();
                 addressLatLng = (LatLng) place.getLatLng();
                 location.setVisibility(View.VISIBLE);
-                location.setText(addressName);
+
+                if(fullAddress.contains("/")) {
+                    String[] city = fullAddress.split("/");
+
+                    String part1 = city[0];
+                    String part2 = city[1];
+                    String[] cityname = part2.split(",");
+                    String addresscity = cityname[0];
+
+                    String[] addressplit = fullAddress.split(",");
+                    String address = addressplit[0];
+
+                    addressName = address + "," + addresscity;
+
+                    location.setText(addressName);
+
+
+                }else{
+                    String[] cityname = fullAddress.split(",");
+                    addressName = cityname[0];
+
+                    location.setText(addressName);
+
+                }
 
             }else {
                 location.setVisibility(View.VISIBLE);
