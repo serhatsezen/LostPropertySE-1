@@ -185,6 +185,10 @@ public class SignIn_Fragment extends Fragment implements OnClickListener,GoogleA
                 username = usernamee.replaceAll(" ","").toLowerCase();
                 addressName = "Türkiye";
 
+                Random rand = new Random();
+                int value = rand.nextInt(50000);
+                username = username + value;
+
 
                 AuthCredential credential = GoogleAuthProvider.getCredential(idToken, null);
                 firebaseAuthWithGoogle(credential);
@@ -224,29 +228,6 @@ public class SignIn_Fragment extends Fragment implements OnClickListener,GoogleA
     //firebase database e kullanıcı bilgilerini kayıt ediyoruz.
     private void createUserInFirebaseHelper(){
 
-        mQueryUsername = mDatabaseUsers.orderByChild("username");
-
-        mQueryUsername.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                for (DataSnapshot data : dataSnapshot.getChildren()) {
-                    sameusername = data.child("username").getValue().toString();
-                    if(sameusername.equals(username)){
-                        Random rand = new Random();
-                        int value = rand.nextInt(50000);
-                        username = username + value;
-                    }
-                }
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
-
-
-
         //Add a Listerner to that above location
         mDatabaseUsers.addValueEventListener(new ValueEventListener() {
             @Override
@@ -254,7 +235,6 @@ public class SignIn_Fragment extends Fragment implements OnClickListener,GoogleA
                 try {
                     SharedPreferences sharedPreferences = getActivity().getApplicationContext().getSharedPreferences(getString(R.string.FCM_PREF), Context.MODE_PRIVATE);
                     final String token = sharedPreferences.getString(getString(R.string.FCM_TOKEN), "");
-
                 }catch (Exception e){
 
                 }

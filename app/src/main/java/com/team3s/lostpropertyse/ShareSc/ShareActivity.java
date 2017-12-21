@@ -17,7 +17,6 @@ import android.view.MenuItem;
 import com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx;
 import com.team3s.lostpropertyse.MainPage.BottomBarActivity;
 import com.team3s.lostpropertyse.Utils.BottomNavigationViewHelper;
-import com.team3s.lostpropertyse.Utils.Permissions;
 import com.team3s.lostpropertyse.R;
 import com.team3s.lostpropertyse.Utils.SectionsPagerAdapter;
 
@@ -40,11 +39,8 @@ public class ShareActivity extends AppCompatActivity {
         setContentView(R.layout.activity_share);
         Log.d(TAG, "onCreate: started.");
 
-        if(checkPermissionsArray(Permissions.PERMISSIONS)){
-            setupViewPager();
-        }else{
-            verifyPermissions(Permissions.PERMISSIONS);
-        }
+        setupViewPager();
+
 
     }
 
@@ -97,42 +93,6 @@ public class ShareActivity extends AppCompatActivity {
         );
     }
 
-    /**
-     * Check an array of permissions
-     * @param permissions
-     * @return
-     */
-    public boolean checkPermissionsArray(String[] permissions){
-        Log.d(TAG, "checkPermissionsArray: checking permissions array.");
-
-        for(int i = 0; i< permissions.length; i++){
-            String check = permissions[i];
-            if(!checkPermissions(check)){
-                return false;
-            }
-        }
-        return true;
-    }
-
-    /**
-     * Check a single permission is it has been verified
-     * @param permission
-     * @return
-     */
-    public boolean checkPermissions(String permission){
-        Log.d(TAG, "checkPermissions: checking permission: " + permission);
-
-        int permissionRequest = ActivityCompat.checkSelfPermission(ShareActivity.this, permission);
-
-        if(permissionRequest != PackageManager.PERMISSION_GRANTED){
-            Log.d(TAG, "checkPermissions: \n Permission was not granted for: " + permission);
-            return false;
-        }
-        else{
-            Log.d(TAG, "checkPermissions: \n Permission was granted for: " + permission);
-            return true;
-        }
-    }
 
     /**
      * BottomNavigationView setup
