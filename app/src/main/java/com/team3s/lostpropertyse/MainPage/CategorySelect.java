@@ -138,6 +138,7 @@ public class CategorySelect extends Fragment {
         currentUserId = auth.getCurrentUser().getUid();
         mQueryUserFindCat = mDatabaseFindCat.orderByChild("category");
         mQueryUserLostCat = mDatabaseLostCat.orderByChild("category");
+
         new CategoryGet().execute();
 
         if(themeStr.equals("NightTheme")){

@@ -111,6 +111,7 @@ public class LostMainFrag extends Fragment {
     public static final String PREFS = "MyPrefs" ;
     private boolean showPost;
     FragmentManager manager;
+    public String currentuid;
 
     final ArrayList<String> categorynames = new ArrayList<String>();
     final ArrayList<Category> categoriesInformation = new ArrayList<Category>();
@@ -150,6 +151,7 @@ public class LostMainFrag extends Fragment {
 
         category = sharedpreferences.getString("categoryShared", "Hepsi");
 
+        currentuid = user.getUid();
         appBarLayout.setVisibility(View.VISIBLE);
         toolbarText = (TextView) v.findViewById(R.id.toolbarText);
         mDatabaseUsersFilter = FirebaseDatabase.getInstance().getReference().child("Users").child(user.getUid());
@@ -163,8 +165,8 @@ public class LostMainFrag extends Fragment {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 userNames = (String) dataSnapshot.child("username").getValue();
-                userNames = userNames.toLowerCase();
                 editor.putString("username", userNames);
+                editor.putString("sender_uid", currentuid);
 
 
             }

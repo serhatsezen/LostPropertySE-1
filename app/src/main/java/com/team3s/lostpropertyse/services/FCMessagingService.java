@@ -4,30 +4,19 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.RingtoneManager;
 import android.net.Uri;
-import android.provider.Settings;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
-import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
-import com.team3s.lostpropertyse.Chat.Chat;
+import com.team3s.lostpropertyse.Chat.DmMessage;
 import com.team3s.lostpropertyse.Chat.CommentAct;
-import com.team3s.lostpropertyse.MainPage.BottomBarActivity;
 import com.team3s.lostpropertyse.Post.PostDetailAct;
 import com.team3s.lostpropertyse.R;
-
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
-import java.util.Map;
-
-import static android.content.ContentValues.TAG;
 
 public class FCMessagingService extends com.google.firebase.messaging.FirebaseMessagingService {
     private static final String TAG = "FirebaseMessagingServic";
@@ -38,6 +27,10 @@ public class FCMessagingService extends com.google.firebase.messaging.FirebaseMe
     String click_action;
     String postKey;
     String postType;
+
+
+    private String PREFS = "MyPrefs" ;
+    SharedPreferences mPrefs;
 
 
     public FCMessagingService() {
@@ -52,10 +45,11 @@ public class FCMessagingService extends com.google.firebase.messaging.FirebaseMe
 
             if (click_action.equals("Chat")) {                          //-------------------------------------------------------------------Get information for DM from php
                 sender_name = remoteMessage.getData().get("sender_name");
+                receiver_name = remoteMessage.getData().get("receiver_name"); //get message
                 message = remoteMessage.getData().get("msg"); //get message
                 title = remoteMessage.getData().get("title"); //get title
+                System.out.print("-**********************-////////////////*****************/*/*/*/*///////////-------------"+sender_name);
                 sendNotification(title, message, sender_name,receiver_name,click_action);
-
             }else if (click_action.equals("Comment")) {                 //-------------------------------------------------------------------Get information for Comment from php
 
                 message = remoteMessage.getData().get("msg"); //get message
@@ -80,24 +74,25 @@ public class FCMessagingService extends com.google.firebase.messaging.FirebaseMe
     }
 
     private void sendNotification(String title,String message, String sender_name, String receiver_name, String click_action) {
-        Intent intent;
+        Intent intent = null;
         PendingIntent pendingIntent = null;
         if (click_action.equals("Chat")) {
-            intent = new Intent(this, Chat.class);
-            intent.putExtra("receiverr_name",sender_name);
-            pendingIntent = PendingIntent.getActivity(this, 0 /* Request code */, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-        } else if (click_action.equals("Comment")) {
+            intent = new Intent(this, DmMessage.class);
+            intent.putExtra("receiver_name",sender_name);
+            intent.putExtra("title",title);
+
+        }
+        if (click_action.equals("Comment")) {
             intent = new Intent(this, CommentAct.class);
             intent.putExtra("post_key",sender_name);
             intent.putExtra("post_type",receiver_name);
-            pendingIntent = PendingIntent.getActivity(this, 0 /* Request code */, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-        } else if(click_action.equals("NewPost")) {
+        }
+        if(click_action.equals("NewPost")) {
             intent = new Intent(this, PostDetailAct.class);
             intent.putExtra("post_key",sender_name);
             intent.putExtra("post_type",receiver_name);
-            pendingIntent = PendingIntent.getActivity(this, 0 /* Request code */, intent, PendingIntent.FLAG_UPDATE_CURRENT);
         }
-
+        pendingIntent = PendingIntent.getActivity(this, 0 /* Request code */, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
 
         Bitmap bitmap = BitmapFactory.decodeResource(this.getResources(),

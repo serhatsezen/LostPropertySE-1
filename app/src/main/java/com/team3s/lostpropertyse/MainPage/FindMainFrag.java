@@ -106,6 +106,7 @@ public class FindMainFrag extends Fragment {
 
     SharedPreferences sharedpreferences;
     public String category;
+    public String currentuid;
 
 
     public FindMainFrag() {
@@ -132,6 +133,7 @@ public class FindMainFrag extends Fragment {
         final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         sharedpreferences = getActivity().getSharedPreferences(PREFS, Context.MODE_PRIVATE);
         category = sharedpreferences.getString("categoryShared", "Hepsi");
+        currentuid = user.getUid();
 
         appBarLayout = (AppBarLayout) v.findViewById(R.id.findappBarLayout);
         mDatabaseUsersFilter = FirebaseDatabase.getInstance().getReference().child("Users").child(user.getUid());
@@ -147,9 +149,9 @@ public class FindMainFrag extends Fragment {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 userNames = (String) dataSnapshot.child("username").getValue();
-                userNames = userNames.toLowerCase();
                 SharedPreferences.Editor editor = sharedpreferences.edit();
                 editor.putString("username", userNames);
+                editor.putString("sender_uid", currentuid);
                 editor.commit();
             }
 

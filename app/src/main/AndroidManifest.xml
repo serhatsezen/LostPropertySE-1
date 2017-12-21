@@ -80,6 +80,8 @@
                 <action android:name="com.team3s.lostpropertyse.LONGRUNSERVICE" />
             </intent-filter>
         </service>
+        <activity android:name=".LoginSign.ForgetPassword"
+            android:screenOrientation="portrait"/>
         <activity android:name=".ShareSc.ShareActivity"
             android:screenOrientation="portrait"/>
         <activity android:name=".ShareSc.NextActivity"
@@ -87,7 +89,7 @@
         <activity android:name=".Profile.EditProfileFragment"
             android:screenOrientation="portrait"/>
 
-        <activity android:name=".Chat.Chat"
+        <activity android:name=".Chat.DmMessage"
             android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="Chat"></action>

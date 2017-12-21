@@ -8,7 +8,6 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
-import android.location.LocationListener;
 import android.os.Build;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
@@ -16,8 +15,12 @@ import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationRequest;
@@ -39,6 +42,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.team3s.lostpropertyse.Post.PostDetailAct;
 import com.team3s.lostpropertyse.R;
 
 public class PropMaps extends FragmentActivity implements OnMapReadyCallback, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, com.google.android.gms.location.LocationListener {
@@ -68,7 +72,8 @@ public class PropMaps extends FragmentActivity implements OnMapReadyCallback, Go
     double lngMarkers;
     private String post_key;
     private String post_type;
-
+    private String post_title;
+    private String post_image;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -150,12 +155,8 @@ public class PropMaps extends FragmentActivity implements OnMapReadyCallback, Go
                 }
             });
         }
-
-
         markers();
-
     }
-
     public void markers() {
         mDatabaseLostMap.orderByChild("latlng").addValueEventListener(new ValueEventListener() {
             @Override
@@ -168,7 +169,7 @@ public class PropMaps extends FragmentActivity implements OnMapReadyCallback, Go
                             .position(new LatLng(latUserL, lngUserL))
                             .title((String) data.child("questions").getValue())
                             .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE))
-                            .snippet((String) data.child("desc").getValue()));
+                            .snippet("Kayiplar/"+data.getKey()));
                 }
             }
 
@@ -179,7 +180,7 @@ public class PropMaps extends FragmentActivity implements OnMapReadyCallback, Go
         mDatabaseFindMap.orderByChild("latlng").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot snapshot) {
-                for (DataSnapshot data : snapshot.getChildren()) {
+                for (final DataSnapshot data : snapshot.getChildren()) {
                     double latUserL = (double) data.child("latlng").child("latitude").getValue();
                     double lngUserL = (double) data.child("latlng").child("longitude").getValue();
 
@@ -187,7 +188,8 @@ public class PropMaps extends FragmentActivity implements OnMapReadyCallback, Go
                             .position(new LatLng(latUserL, lngUserL))
                             .title((String) data.child("questions").getValue())
                             .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED))
-                            .snippet((String) data.child("desc").getValue()));
+                            .snippet("Bulunanlar/"+data.getKey()));
+
                 }
             }
 
@@ -195,16 +197,65 @@ public class PropMaps extends FragmentActivity implements OnMapReadyCallback, Go
             public void onCancelled(DatabaseError error) {
 
             }});
+        mMap.setInfoWindowAdapter(new GoogleMap.InfoWindowAdapter() {
+
+            // Use default InfoWindow frame
+            @Override
+            public View getInfoWindow(Marker arg0) {
+                return null;
+            }
+
+            // Defines the contents of the InfoWindow
+            @Override
+            public View getInfoContents(Marker arg0) {
+                View v = null;
+                try {
+                    // Getting view from the layout file info_window_layout
+                    v = getLayoutInflater().inflate(R.layout.map_custom_infowindow, null);
+
+                    post_title=arg0.getTitle();
+
+                    // Getting reference to the TextView to set latitude
+                    TextView addressTxt = (TextView) v.findViewById(R.id.addressTxt);
+                    addressTxt.setText(post_title);
+
+                    TextView postkey = (TextView) v.findViewById(R.id.postkey);
+                    postkey.setText(arg0.getSnippet());
+
+
+                } catch (Exception ev) {
+                    System.out.print(ev.getMessage());
+                }
+
+                return v;
+            }
+        });
         mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
             @Override
             public boolean onMarkerClick(Marker arg0) {
-                if (arg0 != null && arg0.getTitle().equals(marker.getTitle().toString()))
-                    ; // if marker  source is clicked
-                arg0.showInfoWindow();
+                if (arg0 != null && arg0.getTitle().equals(marker.getTitle().toString()));
+                    arg0.showInfoWindow();
+
                 return true;
             }
 
         });
+
+        mMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
+            @Override
+            public void onInfoWindowClick(Marker marker) {
+                String psttype = marker.getSnippet();
+                String[] output = psttype.split("/");
+                post_type=output[0];
+                post_key =output[1];
+                Intent postdetail = new Intent(PropMaps.this,PostDetailAct.class);
+                postdetail.putExtra("post_key",post_key);
+                postdetail.putExtra("post_type",post_type);
+                startActivity(postdetail);
+
+            }
+        });
+
 
     }
 

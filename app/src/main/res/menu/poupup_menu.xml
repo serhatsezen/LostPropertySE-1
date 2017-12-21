@@ -5,7 +5,4 @@
         android:id="@+id/deleteBtn"
         android:title="Sil"/>
 
-    <item
-        android:id="@+id/editBtnPopUp"
-        android:title="Düzenle"/>
 </menu>

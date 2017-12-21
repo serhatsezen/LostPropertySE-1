@@ -190,7 +190,7 @@ public class UsersProfiFrag extends Fragment {
               UsersDMList fragmentD = new UsersDMList();
               getFragmentManager()
                       .beginTransaction()
-                      .add(R.id.another_user_frag, fragmentD)
+                      .add(R.id.another_user_frag, fragmentD,"DMFrag")
                       .addToBackStack(null)
                       .commit();
           }
@@ -239,6 +239,7 @@ public class UsersProfiFrag extends Fragment {
             public void onDataChange(DataSnapshot snapshot) {
                 u_username.setText("@"+String.valueOf(snapshot.getValue())+",");
                 currentusername = String.valueOf(snapshot.getValue());
+
 
             }
             @Override

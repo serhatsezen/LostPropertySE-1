@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.net.Uri;
@@ -15,6 +16,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.provider.MediaStore;
+import android.support.constraint.ConstraintLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -69,7 +71,7 @@ public class EditProfileFragment extends AppCompatActivity {
     private ImageView profileİmg;
     private MapView mapView;
     private GoogleMap myGoogleMap;
-    public ImageButton kaydetButton,themaNightBtn,themaDayBtn;
+    public ImageButton kaydetButton,iptalButon,themaNightBtn,themaDayBtn;
     public Uri newImageUri;
     private boolean mLocationPermissionGranted;
     private StorageReference imgStorageRef;
@@ -98,6 +100,8 @@ public class EditProfileFragment extends AppCompatActivity {
     private String addressName;
     private LatLng addressLatLng;
     private boolean write = false;
+    public FrameLayout backgroundedtprof;
+    public TextView editAdSoyad;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -115,6 +119,7 @@ public class EditProfileFragment extends AppCompatActivity {
         adSoyad = (EditText) findViewById(R.id.editTextAdSoyad);
         sehir = (TextView) findViewById(R.id.textSehir);
         kaydetButton = (ImageButton) findViewById(R.id.kaydetButon);
+        iptalButon = (ImageButton) findViewById(R.id.iptalButon);
         themaNightBtn = (ImageButton) findViewById(R.id.themeNightBtn);
         themaDayBtn = (ImageButton) findViewById(R.id.themeDayBtn);
         mapView = (MapView) findViewById(R.id.mapView);
@@ -125,7 +130,18 @@ public class EditProfileFragment extends AppCompatActivity {
 
             }
         });
+        iptalButon.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                finish();
+
+            }
+        });
+
         mapView.onCreate(savedInstanceState);
+
+        backgroundedtprof = (FrameLayout) findViewById(R.id.backgroundedtprof);
+        editAdSoyad = (TextView) findViewById(R.id.editAdSoyad);
 
         mapView.onResume(); // needed to get the map to display immediately
         sharedpreferences = getSharedPreferences(PREFS, Context.MODE_PRIVATE);
@@ -139,10 +155,17 @@ public class EditProfileFragment extends AppCompatActivity {
         if(themeStr.equals("DayTheme")){
             themaNightBtn.setVisibility(View.VISIBLE);
             themaDayBtn.setVisibility(View.GONE);
+            backgroundedtprof.setBackgroundColor(Color.parseColor("#FFFFFF"));
+            editAdSoyad.setTextColor(Color.BLACK);
+            adSoyad.setHintTextColor(Color.BLACK);
+            sehir.setTextColor(Color.BLACK);
         }else if(themeStr.equals("NightTheme")){
             themaNightBtn.setVisibility(View.GONE);
             themaDayBtn.setVisibility(View.VISIBLE);
-
+            backgroundedtprof.setBackgroundColor(Color.parseColor("#142634"));
+            editAdSoyad.setTextColor(Color.WHITE);
+            adSoyad.setHintTextColor(Color.WHITE);
+            sehir.setTextColor(Color.WHITE);
         }
         themaNightBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -413,41 +436,46 @@ public class EditProfileFragment extends AppCompatActivity {
             });
 
         }
-        if(!fullAddress.equals(null)) {
-            curentUserRef.addChildEventListener(new ChildEventListener() {
-                @Override
-                public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                    if(write == false) {
-                        curentUserRef.child("fullAddress").setValue(fullAddress);
-                        curentUserRef.child("cityName").setValue(addressName);
-                        curentUserRef.child("latLng").setValue(addressLatLng);
-                        Toast.makeText(EditProfileFragment.this, "Bilgileriniz Güncellendi!", Toast.LENGTH_LONG).show();
-                        write = true;
+        try {
+            if (!fullAddress.equals(null)) {
+                curentUserRef.addChildEventListener(new ChildEventListener() {
+                    @Override
+                    public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                        if (write == false) {
+                            curentUserRef.child("fullAddress").setValue(fullAddress);
+                            curentUserRef.child("cityName").setValue(addressName);
+                            curentUserRef.child("latLng").setValue(addressLatLng);
+                            Toast.makeText(EditProfileFragment.this, "Bilgileriniz Güncellendi!", Toast.LENGTH_LONG).show();
+                            write = true;
+                        }
+
                     }
 
-                }
+                    @Override
+                    public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+                    }
 
-                @Override
-                public void onChildChanged(DataSnapshot dataSnapshot, String s) {}
+                    @Override
+                    public void onChildRemoved(DataSnapshot dataSnapshot) {
 
-                @Override
-                public void onChildRemoved(DataSnapshot dataSnapshot) {
+                    }
 
-                }
+                    @Override
+                    public void onChildMoved(DataSnapshot dataSnapshot, String s) {
 
-                @Override
-                public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+                    }
 
-                }
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
 
-                @Override
-                public void onCancelled(DatabaseError databaseError) {
+                    }
 
-                }
+                });
 
-            });
+            } else {
 
-        }else{
+            }
+        }catch (Exception e){
 
         }
     }

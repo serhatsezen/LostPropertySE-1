@@ -2,6 +2,9 @@ package com.team3s.lostpropertyse.Chat;
 
 
 import android.content.Context;
+import android.content.SharedPreferences;
+import android.graphics.Color;
+import android.graphics.Typeface;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -17,6 +20,7 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
@@ -32,6 +36,8 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.team3s.lostpropertyse.AdapterClass;
+import com.team3s.lostpropertyse.Profile.AnotherUsersProfiFrag;
+import com.team3s.lostpropertyse.Profile.UsersProfiFrag;
 import com.team3s.lostpropertyse.Utils.CircleTransform;
 import com.team3s.lostpropertyse.R;
 
@@ -72,6 +78,15 @@ public class CommentFrag extends Fragment {
 
     public String user_key = null;
     public String cevap_val;
+    public String currentUid;
+
+    public static Typeface type;
+
+    private SharedPreferences sharedpreferences;
+    public static final String PREFS = "MyPrefs" ;
+    private static String themeStr;
+
+    public RelativeLayout commentrelative;
 
     public CommentFrag() {
         // Required empty public constructor
@@ -84,11 +99,34 @@ public class CommentFrag extends Fragment {
         View v =  inflater.inflate(R.layout.fragment_comment, container, false);
         auth = FirebaseAuth.getInstance();
         currentUser = auth.getCurrentUser();
+        currentUid = currentUser.getUid();
+        cevapList = (RecyclerView) v.findViewById(R.id.comment_list);
+        cevap = (EditText) v.findViewById(R.id.edtx_comment);
+        cevaponay = (ImageButton) v.findViewById(R.id.comment_submit);
+        progressBar = (ProgressBar) v.findViewById(R.id.news_cevap_progressBar);
+        commentrelative = (RelativeLayout) v.findViewById(R.id.commentrelative);
+
+
+        sharedpreferences = getActivity().getSharedPreferences(PREFS, Context.MODE_PRIVATE);
+        themeStr = sharedpreferences.getString("theme", "DayTheme");          //eğer null ise DayTheme
+        if(themeStr.equals("NightTheme")){
+            commentrelative.setBackgroundColor(Color.parseColor("#142634"));
+            cevap.setHintTextColor(Color.WHITE);
+            cevap.setTextColor(Color.WHITE);
+
+        }else if(themeStr.equals("DayTheme")){
+            commentrelative.setBackgroundColor(Color.parseColor("#FFFFFF"));
+            cevap.setHintTextColor(Color.BLACK);
+            cevap.setTextColor(Color.BLACK);
+
+        }
 
         Bundle bundlecom = getArguments();                          //mainFragment ten post un keyini çekiyoruz.
         post_key = bundlecom.getString("post_id_key");
         post_type = bundlecom.getString("post_type");
 
+        type = Typeface.createFromAsset(getActivity().getAssets(),
+                "fonts/Ubuntu-B.ttf");
         mDatabase = FirebaseDatabase.getInstance().getReference().child("Users").child(currentUser.getUid());
         mDatabaseAnswer = FirebaseDatabase.getInstance().getReference().child("Icerik").child(post_type).child(post_key).child("Comments");
         database = FirebaseDatabase.getInstance().getReference().child("Icerik");
@@ -103,10 +141,7 @@ public class CommentFrag extends Fragment {
             public void onCancelled(DatabaseError databaseError) {
             }
         });
-        cevapList = (RecyclerView) v.findViewById(R.id.comment_list);
-        cevap = (EditText) v.findViewById(R.id.edtx_comment);
-        cevaponay = (ImageButton) v.findViewById(R.id.comment_submit);
-        progressBar = (ProgressBar) v.findViewById(R.id.news_cevap_progressBar);
+
         LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
         cevapList.setLayoutManager(layoutManager);
         cevaponay.setOnClickListener(new View.OnClickListener() {
@@ -170,18 +205,49 @@ public class CommentFrag extends Fragment {
             @Override
             protected void populateViewHolder(final ShareViewHolder viewHolder, AdapterClass model, final int position) {
                 final String post_key = getRef(position).getKey();
-                database.child(post_key).addValueEventListener(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-                        user_key = (String) dataSnapshot.child("uid").getValue();
-                    }
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
-                    }
-                });
+
                 viewHolder.setcommentText(model.getcommentText());          //comment text
                 viewHolder.setcommentUsername(model.getcommentUsername());  //comment user name
                 viewHolder.setImage(getActivity().getApplicationContext(), model.getImage());   //comment user image
+                viewHolder.profileclick.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        mDatabaseAnswer.child(post_key).addValueEventListener(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(DataSnapshot dataSnapshot) {
+                                user_key = (String) dataSnapshot.child("uid").getValue();
+                                SharedPreferences.Editor editor = sharedpreferences.edit();
+                                editor.putString("USERKEY_SHARED", user_key);
+                                editor.commit();
+
+                                Bundle bundle = new Bundle();
+                                bundle.putString("key", user_key); // User ID çekip anotherUserProfile ekranını açmak için
+                                if (currentUid.equals(user_key)) {     //User ID ve CurrentUserID aynı ise kendi profil sayfasına gitmek için
+                                    UsersProfiFrag fragment2 = new UsersProfiFrag();
+                                    getFragmentManager()
+                                            .beginTransaction()
+                                            .add(R.id.commentlinear, fragment2, "addUserProfile")
+                                            .addToBackStack(null)
+                                            .commit();
+                                } else {
+                                    AnotherUsersProfiFrag fragment3 = new AnotherUsersProfiFrag();
+                                    fragment3.setArguments(bundle);
+                                    getFragmentManager()
+                                            .beginTransaction()
+                                            .add(R.id.commentlinear, fragment3, "addAnotherProfile")
+                                            .addToBackStack(null)
+                                            .commit();
+                                }
+                            }
+
+                            @Override
+                            public void onCancelled(DatabaseError error) {
+                                // Failed to read value
+                            }
+                        });
+
+                    }
+                });
             }
         };
         cevapList.setAdapter(firebaseRecyclerAdapter);
@@ -190,19 +256,35 @@ public class CommentFrag extends Fragment {
     public static class ShareViewHolder extends RecyclerView.ViewHolder {       // burada bizim oluşturmuş olduğumuz comment_row layoutundaki bileşenleri kullandığımız yer
         View mViewRoad;
         FirebaseAuth mAuth;
-        TextView counterComment;
+        TextView mAnswer;
+        TextView shaUsername;
+        RelativeLayout profileclick;
         public ShareViewHolder(View itemView) {
             super(itemView);
             mViewRoad = itemView;
             mAuth = FirebaseAuth.getInstance();
+            mAnswer = (TextView) mViewRoad.findViewById(R.id.commentTxt);
+            shaUsername = (TextView) mViewRoad.findViewById(R.id.shaUsernameCom);
+            profileclick = (RelativeLayout) mViewRoad.findViewById(R.id.profileclick);
+
+            if(themeStr.equals("NightTheme")){
+                mAnswer.setTextColor(Color.WHITE);
+                shaUsername.setTextColor(Color.WHITE);
+            }else if(themeStr.equals("DayTheme")){
+                mAnswer.setTextColor(Color.BLACK);
+                shaUsername.setTextColor(Color.BLACK);
+            }
+
+
         }
         public void setcommentText(String commentText) {            //burada bulunan commentText ile firebasedeki child ın altındaki node aynı olmak zorunda ayrıca bunları AdapterClass.java classında tanımlıyoruz. get fonksiyonları share classdan çekiyoruz.
-            TextView mAnswer = (TextView) mViewRoad.findViewById(R.id.commentTxt);
             mAnswer.setText(commentText);
         }
         public void setcommentUsername(String commentUsername) {
-            TextView shaUsername = (TextView) mViewRoad.findViewById(R.id.shaUsernameCom);
+
             shaUsername.setText(commentUsername);
+            shaUsername.setTypeface(type);
+
         }
         public void setImage(Context ctx, String image) {
             ImageView user_Pic = (ImageView) mViewRoad.findViewById(R.id.user_profile_com);
@@ -213,12 +295,6 @@ public class CommentFrag extends Fragment {
                     .transform(new CircleTransform(ctx))
                     .into(user_Pic);
         }
-    }
-
-    @Override
-    public void onResume()
-    {  // After a pause OR at startup
-        super.onResume();
     }
 
     class Send extends AsyncTask<String, Void,Long > {          //burası notification kısmı.

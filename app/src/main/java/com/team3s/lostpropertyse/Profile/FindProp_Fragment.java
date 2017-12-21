@@ -215,7 +215,6 @@ public class FindProp_Fragment extends Fragment {
                     .load(post_image)
                     .fitCenter()
                     .diskCacheStrategy(DiskCacheStrategy.ALL)
-                    .animate(R.anim.shake)
                     .into(post_img);
         }
 

@@ -146,7 +146,6 @@ public class PostDetailAct extends AppCompatActivity {
                         .load(post_img)
                         .centerCrop()
                         .diskCacheStrategy(DiskCacheStrategy.ALL)
-                        .animate(R.anim.shake)
                         .into(mPostImage);
 
 

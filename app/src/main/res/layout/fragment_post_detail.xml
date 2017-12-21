@@ -7,10 +7,7 @@
     android:layout_gravity="center"
     android:fitsSystemWindows="true"
     >
-    <FrameLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:id="@+id/detailfrag"/>
+
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -20,7 +17,6 @@
             android:layout_height="match_parent"
             android:orientation="vertical"
         >
-
             <ImageView
             android:layout_width="match_parent"
             android:layout_height="250dp"
@@ -36,35 +32,35 @@
             android:layout_toEndOf="@+id/progressBar" />
 
 
-        <RelativeLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true"
-            android:layout_alignParentTop="true"
-            android:layout_marginLeft="17dp"
-            android:layout_marginStart="17dp"
-            android:layout_marginTop="15dp"
-            android:id="@+id/comments">
-
-            <TextView
-                android:id="@+id/commentArticleCounter"
+            <RelativeLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="0"
-                android:layout_centerVertical="true"
-                android:layout_marginLeft="16dp"
-                android:layout_marginStart="16dp" />
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
+                android:layout_alignParentTop="true"
+                android:layout_marginLeft="17dp"
+                android:layout_marginStart="17dp"
+                android:layout_marginTop="15dp"
+                android:id="@+id/comments">
 
-            <ImageButton
-                android:id="@+id/btnArticleComments"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:background="@drawable/btn_feed_action"
-                android:scaleType="centerCrop"
-                android:src="@drawable/ic_comment_outline_grey" />
+                <TextView
+                    android:id="@+id/commentArticleCounter"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="0"
+                    android:layout_centerVertical="true"
+                    android:layout_marginLeft="16dp"
+                    android:layout_marginStart="16dp" />
 
-        </RelativeLayout>
+                <ImageButton
+                    android:id="@+id/btnArticleComments"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:background="@drawable/btn_feed_action"
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/ic_comment_outline_grey" />
+
+            </RelativeLayout>
 
             <RelativeLayout
                 android:id="@+id/popupMenu"
@@ -86,56 +82,58 @@
                     android:src="@drawable/ic_drawer" />
 
             </RelativeLayout>
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/post_image_btn">
-            <TextView
-                android:text="TextView"
+            <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:id="@+id/post_descET"
-                android:padding="10dp"
-                android:textStyle="bold"
-                android:layout_below="@+id/post_cityName"
-                android:layout_alignParentLeft="true"
-                android:layout_alignParentStart="true" />
-            <TextView
-                android:text="City"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/post_cityName"
-                android:layout_gravity="right"
-                android:padding="10dp"
-                android:layout_marginRight="28dp"
-                android:layout_marginEnd="28dp"
-                android:layout_alignParentTop="true"
-                android:layout_alignParentRight="true"
-                android:layout_alignParentEnd="true" />
+                android:layout_below="@+id/post_image_btn">
+                <TextView
+                    android:text="TextView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/post_descET"
+                    android:padding="10dp"
+                    android:textStyle="bold"
+                    android:layout_below="@+id/post_cityName"
+                    android:layout_alignParentLeft="true"
+                    android:layout_alignParentStart="true" />
+                <TextView
+                    android:text="City"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/post_cityName"
+                    android:layout_gravity="right"
+                    android:padding="10dp"
+                    android:layout_marginRight="28dp"
+                    android:layout_marginEnd="28dp"
+                    android:layout_alignParentTop="true"
+                    android:layout_alignParentRight="true"
+                    android:layout_alignParentEnd="true" />
 
-            <Button
-                android:id="@+id/showMap"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                <Button
+                    android:id="@+id/showMap"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentBottom="true"
+                    android:layout_centerHorizontal="true"
+                    android:layout_marginTop="10dp"
+                    android:layout_below="@+id/post_descET"
+                    android:text="Haritada Göster" />
+
+
+            </RelativeLayout>
+
+            <ProgressBar
+                android:id="@+id/progressBar"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:visibility="gone"
                 android:layout_alignParentBottom="true"
-                android:layout_centerHorizontal="true"
-                android:layout_marginTop="10dp"
-                android:layout_below="@+id/post_descET"
-                android:text="Haritada Göster" />
-
-
+                />
         </RelativeLayout>
-
-        <ProgressBar
-            android:id="@+id/progressBar"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
-            android:visibility="gone"
-            android:layout_alignParentBottom="true"
-            />
-
-
-
-    </RelativeLayout>
     </ScrollView>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/detailfrag"
+        android:orientation="vertical" />
 </RelativeLayout>

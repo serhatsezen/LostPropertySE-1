@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:id="@+id/commentrelative"
     tools:context="com.team3s.lostpropertyse.Chat.CommentFrag"
     >
 
@@ -11,7 +12,6 @@
         android:layout_height="wrap_content"
         android:id="@+id/layedt"
         android:layout_alignParentEnd="true"
-        android:background="#ffffff"
         >
 
         <android.support.v7.widget.RecyclerView
@@ -20,7 +20,7 @@
             android:layout_height="match_parent"
             android:layout_above="@+id/edtx_comment"
             android:layout_alignParentStart="true"
-            android:background="#ffffff">
+            >
 
         </android.support.v7.widget.RecyclerView>
         <ProgressBar
@@ -55,6 +55,12 @@
             android:scaleType="centerCrop"
             android:src="@drawable/ic_done_black_36dp" />
     </RelativeLayout>
-
+    <LinearLayout
+        android:id="@+id/commentlinear"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/LostappBarLayout"
+        android:orientation="vertical" />
 
 </RelativeLayout>

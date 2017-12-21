@@ -3,10 +3,14 @@ package com.team3s.lostpropertyse.Chat;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.graphics.Color;
+import android.graphics.Typeface;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -19,6 +23,7 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
@@ -36,6 +41,8 @@ import com.google.firebase.database.ValueEventListener;
 import com.team3s.lostpropertyse.AdapterClass;
 import com.team3s.lostpropertyse.LoginSign.TabsHeaderActivity;
 import com.team3s.lostpropertyse.MainPage.BottomBarActivity;
+import com.team3s.lostpropertyse.Profile.AnotherUsersProfiFrag;
+import com.team3s.lostpropertyse.Profile.UsersProfiFrag;
 import com.team3s.lostpropertyse.R;
 import com.team3s.lostpropertyse.Utils.CircleTransform;
 
@@ -74,11 +81,17 @@ public class CommentAct extends AppCompatActivity {
     private String nameFuser = null;
     private String mUID = null;
     private String currentUID = null;
+    public String currentUid;
 
     public String user_key = null;
     public String cevap_val;
 
+    public static Typeface type;
+    private SharedPreferences sharedpreferences;
+    public static final String PREFS = "MyPrefs" ;
+    private static String themeStr;
 
+    public RelativeLayout commentrelative;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -86,10 +99,35 @@ public class CommentAct extends AppCompatActivity {
         setContentView(R.layout.fragment_comment);
         auth = FirebaseAuth.getInstance();
         currentUser = auth.getCurrentUser();
+        currentUid = currentUser.getUid();
+        cevapList = (RecyclerView) findViewById(R.id.comment_list);
+        cevap = (EditText) findViewById(R.id.edtx_comment);
+        cevaponay = (ImageButton) findViewById(R.id.comment_submit);
+        progressBar = (ProgressBar) findViewById(R.id.news_cevap_progressBar);
+        commentrelative = (RelativeLayout) findViewById(R.id.commentrelative);
+
+        sharedpreferences = getSharedPreferences(PREFS, Context.MODE_PRIVATE);
+        themeStr = sharedpreferences.getString("theme", "DayTheme");          //eğer null ise DayTheme
+        if(themeStr.equals("NightTheme")){
+            commentrelative.setBackgroundColor(Color.parseColor("#142634"));
+            cevap.setHintTextColor(Color.WHITE);
+            cevap.setTextColor(Color.WHITE);
+
+        }else if(themeStr.equals("DayTheme")){
+            commentrelative.setBackgroundColor(Color.parseColor("#FFFFFF"));
+            cevap.setHintTextColor(Color.BLACK);
+            cevap.setTextColor(Color.BLACK);
+
+
+        }
+
 
         Intent bundlecom = getIntent();                          //mainFragment ten post un keyini çekiyoruz.
         post_key = bundlecom.getStringExtra("post_key");
         post_type = bundlecom.getStringExtra("post_type");
+
+        type = Typeface.createFromAsset(getAssets(),
+                "fonts/Ubuntu-B.ttf");
 
         authListener = new FirebaseAuth.AuthStateListener() {
             @Override
@@ -122,10 +160,7 @@ public class CommentAct extends AppCompatActivity {
             public void onCancelled(DatabaseError databaseError) {
             }
         });
-        cevapList = (RecyclerView) findViewById(R.id.comment_list);
-        cevap = (EditText) findViewById(R.id.edtx_comment);
-        cevaponay = (ImageButton) findViewById(R.id.comment_submit);
-        progressBar = (ProgressBar) findViewById(R.id.news_cevap_progressBar);
+
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         cevapList.setLayoutManager(layoutManager);
         cevaponay.setOnClickListener(new View.OnClickListener() {
@@ -190,18 +225,45 @@ public class CommentAct extends AppCompatActivity {
             @Override
             protected void populateViewHolder(final ShareViewHolder viewHolder, AdapterClass model, final int position) {
                 final String post_key = getRef(position).getKey();
-                database.child(post_key).addValueEventListener(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-                        user_key = (String) dataSnapshot.child("uid").getValue();
-                    }
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
-                    }
-                });
                 viewHolder.setcommentText(model.getcommentText());          //comment text
                 viewHolder.setcommentUsername(model.getcommentUsername());  //comment user name
                 viewHolder.setImage(getApplicationContext(), model.getImage());   //comment user image
+                viewHolder.profileclick.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        mDatabaseAnswer.child(post_key).addValueEventListener(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(DataSnapshot dataSnapshot) {
+                                user_key = (String) dataSnapshot.child("uid").getValue();
+                                SharedPreferences.Editor editor = sharedpreferences.edit();
+                                editor.putString("USERKEY_SHARED", user_key);
+                                editor.commit();
+
+                                Bundle bundle = new Bundle();
+                                bundle.putString("key", user_key); // User ID çekip anotherUserProfile ekranını açmak için
+                                if (currentUid.equals(user_key)) {     //User ID ve CurrentUserID aynı ise kendi profil sayfasına gitmek için
+                                    UsersProfiFrag fragment = new UsersProfiFrag();
+                                    fragment.setArguments(bundle);
+                                    FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+                                    transaction.replace(R.id.commentlinear, fragment);
+                                    transaction.commit();
+                                } else {
+                                    AnotherUsersProfiFrag fragment = new AnotherUsersProfiFrag();
+                                    fragment.setArguments(bundle);
+                                    FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+                                    transaction.replace(R.id.commentlinear, fragment);
+                                    transaction.commit();
+                                }
+                            }
+
+                            @Override
+                            public void onCancelled(DatabaseError error) {
+                                // Failed to read value
+                            }
+                        });
+
+                    }
+                });
             }
         };
         cevapList.setAdapter(firebaseRecyclerAdapter);
@@ -210,19 +272,34 @@ public class CommentAct extends AppCompatActivity {
     public static class ShareViewHolder extends RecyclerView.ViewHolder {       // burada bizim oluşturmuş olduğumuz comment_row layoutundaki bileşenleri kullandığımız yer
         View mViewRoad;
         FirebaseAuth mAuth;
-        TextView counterComment;
+        TextView mAnswer;
+        TextView shaUsername;
+        RelativeLayout profileclick;
         public ShareViewHolder(View itemView) {
             super(itemView);
             mViewRoad = itemView;
             mAuth = FirebaseAuth.getInstance();
+            mAnswer = (TextView) mViewRoad.findViewById(R.id.commentTxt);
+            shaUsername = (TextView) mViewRoad.findViewById(R.id.shaUsernameCom);
+            profileclick = (RelativeLayout) mViewRoad.findViewById(R.id.profileclick);
+
+            if(themeStr.equals("NightTheme")){
+                mAnswer.setTextColor(Color.WHITE);
+                shaUsername.setTextColor(Color.WHITE);
+            }else if(themeStr.equals("DayTheme")){
+                mAnswer.setTextColor(Color.BLACK);
+                shaUsername.setTextColor(Color.BLACK);
+            }
+
+
         }
         public void setcommentText(String commentText) {            //burada bulunan commentText ile firebasedeki child ın altındaki node aynı olmak zorunda ayrıca bunları AdapterClass.java classında tanımlıyoruz. get fonksiyonları share classdan çekiyoruz.
-            TextView mAnswer = (TextView) mViewRoad.findViewById(R.id.commentTxt);
             mAnswer.setText(commentText);
         }
         public void setcommentUsername(String commentUsername) {
-            TextView shaUsername = (TextView) mViewRoad.findViewById(R.id.shaUsernameCom);
             shaUsername.setText(commentUsername);
+            shaUsername.setTypeface(type);
+
         }
         public void setImage(Context ctx, String image) {
             ImageView user_Pic = (ImageView) mViewRoad.findViewById(R.id.user_profile_com);

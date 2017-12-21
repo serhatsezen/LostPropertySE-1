@@ -62,7 +62,9 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.team3s.lostpropertyse.MainPage.BottomBarActivity;
 import com.team3s.lostpropertyse.R;
 
+import java.security.SecureRandom;
 import java.util.HashMap;
+import java.util.Random;
 
 import static android.content.ContentValues.TAG;
 
@@ -82,6 +84,7 @@ public class SignIn_Fragment extends Fragment implements OnClickListener,GoogleA
     private DatabaseReference mDatabaseUsers,mDatabaseFindUsers,mDatabaseLostUsers;
     private DatabaseReference current_user_db;
     private Query mQueryUserTokenFind,mQueryUserTokenLost;
+    private Query mQueryUsername;
 
     public String user_id;
     public String token;
@@ -98,6 +101,7 @@ public class SignIn_Fragment extends Fragment implements OnClickListener,GoogleA
     private String photo;
     private Uri photoUri;
     private boolean loginsign = false;
+    public String sameusername;
 
     private SharedPreferences sharedpreferences;
     private static final String PREFS = "MyPrefs";
@@ -220,6 +224,29 @@ public class SignIn_Fragment extends Fragment implements OnClickListener,GoogleA
     //firebase database e kullanıcı bilgilerini kayıt ediyoruz.
     private void createUserInFirebaseHelper(){
 
+        mQueryUsername = mDatabaseUsers.orderByChild("username");
+
+        mQueryUsername.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                for (DataSnapshot data : dataSnapshot.getChildren()) {
+                    sameusername = data.child("username").getValue().toString();
+                    if(sameusername.equals(username)){
+                        Random rand = new Random();
+                        int value = rand.nextInt(50000);
+                        username = username + value;
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
+
+
         //Add a Listerner to that above location
         mDatabaseUsers.addValueEventListener(new ValueEventListener() {
             @Override
@@ -329,7 +356,8 @@ public class SignIn_Fragment extends Fragment implements OnClickListener,GoogleA
                 signIn();
                 break;
             case R.id.forgot_password:
-
+                Intent forgotpass = new Intent(getActivity(),ForgetPassword.class);
+                startActivity(forgotpass);
                 break;
         }
 

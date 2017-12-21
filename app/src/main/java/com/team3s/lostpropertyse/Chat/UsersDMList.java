@@ -1,45 +1,25 @@
 package com.team3s.lostpropertyse.Chat;
 
 
-import android.app.AlertDialog;
 import android.app.ProgressDialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentPagerAdapter;
-import android.support.v4.app.FragmentTransaction;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.text.TextUtils;
-import android.text.format.Time;
-import android.util.Log;
+import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.AdapterView.OnItemClickListener;
-import android.widget.Toast;
 
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.engine.DiskCacheStrategy;
-import com.firebase.ui.database.FirebaseRecyclerAdapter;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -48,23 +28,9 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
-import com.team3s.lostpropertyse.AdapterClass;
 import com.team3s.lostpropertyse.R;
-import com.team3s.lostpropertyse.Utils.CircleTransform;
-
-import org.apache.http.HttpResponse;
-import org.apache.http.NameValuePair;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.message.BasicNameValuePair;
 
 import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.ExecutionException;
-
-import static com.google.android.gms.internal.zzagr.runOnUiThread;
 
 public class UsersDMList extends Fragment {
     private EditText cevap;
@@ -111,6 +77,7 @@ public class UsersDMList extends Fragment {
     private String useruidkey;
     private String currentUserId;
     private String profileImage;
+    private String textuidname;
 
     UsersAdapter usersAdapter;
     final ArrayList<Users> usersInformation = new ArrayList<Users>();
@@ -139,6 +106,8 @@ public class UsersDMList extends Fragment {
         currentUid = mPrefs.getString("USERKEY_SHARED","");
         userDB = FirebaseDatabase.getInstance().getReference().child("Users");
 
+        new makeList().execute();
+
         return v;
 
     }
@@ -147,9 +116,18 @@ public class UsersDMList extends Fragment {
     public void onResume() {
         super.onResume();
 
-        listUsers();
 
     }
+    private class makeList extends AsyncTask<String, String, String> {
+
+        @Override
+        protected String doInBackground(String... params) {
+            listUsers();
+            return null;
+
+        }
+    }
+
 
     public void listUsers() {                                                       //ListView e kullanıcının mesajlaştığı kişileri ekliyoruz
         DatabaseReference mDatabaseReference = FirebaseDatabase.getInstance()
@@ -174,10 +152,15 @@ public class UsersDMList extends Fragment {
 
                                     if (usersnames.contains(usernameReceiver)) {
                                     } else {
-                                        usersInformation.add(new Users(usernameReceiver, useruidkey, profileImage));     //custom listview e bu bilgileri koyuyoruz,
-                                        usersnames.add(usernameReceiver);
-                                        usersAdapter = new UsersAdapter(getActivity(), usersInformation);
-                                        cevapList.setAdapter(usersAdapter);
+                                        try {
+                                            usersInformation.add(new Users(usernameReceiver, useruidkey, profileImage));     //custom listview e bu bilgileri koyuyoruz,
+                                            usersnames.add(usernameReceiver);
+
+                                            usersAdapter = new UsersAdapter(getActivity(), usersInformation);
+                                            cevapList.setAdapter(usersAdapter);
+                                        }catch (Exception e){
+
+                                        }
                                     }
 
                                     cevapList.setOnItemClickListener(new OnItemClickListener() {
@@ -192,10 +175,51 @@ public class UsersDMList extends Fragment {
                                             SharedPreferences.Editor editor = mPrefs.edit();
                                             editor.putString("receiver_name", textuidname);
                                             editor.commit();
-                                            Intent senddmUser = new Intent(getActivity(), Chat.class);
+                                            Intent senddmUser = new Intent(getActivity(), DmMessage.class);
                                             senddmUser.putExtra("sender_uid",currentUserId);
                                             senddmUser.putExtra("receiver_uid",textuid);
                                             startActivity(senddmUser);
+                                        }
+                                    });
+                                    cevapList.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+                                        @Override
+                                        public boolean onItemLongClick(AdapterView<?> parent, final View view, int position, long id) {
+                                            TextView textViewUid = (TextView) view.findViewById(R.id.list_row_textview_sure);
+                                            textuidname = textViewUid.getText().toString();
+                                            TextView textViewName = (TextView) view.findViewById(R.id.list_row_textview_isim);
+                                            receiver_name  = textViewName.getText().toString();
+
+
+                                            AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getActivity());
+                                            alertDialogBuilder.setMessage("Konuşma silinsin mi?");
+                                            alertDialogBuilder.setPositiveButton("Evet",
+                                                    new DialogInterface.OnClickListener() {
+                                                        @Override
+                                                        public void onClick(DialogInterface arg0, int arg1) {
+                                                            reference1 = FirebaseDatabase.getInstance().getReference().child("messages").child(senderName+"_"+receiver_name);
+                                                            reference1.removeValue();
+                                                            usersnames.remove(receiver_name);
+
+                                                            UsersDMList fragmentD = new UsersDMList();
+                                                            getFragmentManager()
+                                                                    .beginTransaction()
+                                                                    .replace(R.id.another_user_frag, fragmentD,"DMFrag")
+                                                                    .addToBackStack(null)
+                                                                    .commit();
+
+                                                        }
+                                                    });
+                                            alertDialogBuilder.setNegativeButton("Hayır",
+                                                    new DialogInterface.OnClickListener() {
+                                                        @Override
+                                                        public void onClick(DialogInterface dialog, int which) {
+                                                            getActivity().finish();
+                                                        }
+                                                    });
+
+                                            AlertDialog alertDialog = alertDialogBuilder.create();
+                                            alertDialog.show();
+                                            return false;
                                         }
                                     });
                                 }
@@ -219,5 +243,4 @@ public class UsersDMList extends Fragment {
         });
 
     }
-
 }
