@@ -1,8 +1,3 @@
-
-
-[Google Play Store Link](https://play.google.com/store/apps/details?id=com.team3s.lostpropertyse)
-
-
 Anahtarınızı mı kaybettiniz? Eskartınız ya da kimliğinizi kaybettiniz ve yenisini çıkartmak çok mu uğraştırıcı gözüküyor? The Lost/Found Property size yardım edecektir!Kayıp eşyanızı paylaşın ve topluluk kısa zamanda bulmanıza yardım edecektir.
 Basit ve Hızlı: Kayıp eşyanızı sadece birkaç tıklama ile paylaşabilirsiniz. Tweet atmak kadar kolay!
 Zamandan ve Paradan Tasarruf edin: Yeni bir tane için ödeme yapmak yerine kayıp eşyanızı bulun.Harita üzerinden takip edebileceğiniz, konum ayarlarında 5 km, 10 km, 15 km veya 20 km seçeneklerine tıklayarak konumunuza yakın olan kayıp eşyalar hakkında bildirim alın ve kayıp eşyanızı kolayca bulun.Ayrıca uygulamamız tamamen ücretsizdir. Sadece uygulamayı telefonuzu kurun ve sürekli telefonunuzda saklayın. Ne zaman bir şey kaybedeceğiniz ya da bir şey bulacağınız belli olmaz.
