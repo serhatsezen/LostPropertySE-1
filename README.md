@@ -6,5 +6,5 @@
 ​![21hz5m](https://user-images.githubusercontent.com/20739328/34308138-d550738e-e75c-11e7-9d6f-e4e434573c55.gif)
 
 Written by:
--@serhatsezn
--@MericBERBER
+*@serhatsezn
+*@MericBERBER
