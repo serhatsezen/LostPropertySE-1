@@ -8,6 +8,8 @@ Contributers:
 * [Aydın Serhat SEZEN](https://github.com/serhatsezn)
 * [Meriç BERBER](https://github.com/MericBERBER)
 * [Tuba VARSAK](https://github.com/varsaktuba)
+* [Tuna BOLAT](https://github.com/team3sse)
+* [Metin Yücel](https://github.com/tean3sse)
 
 ​![21hz5m](https://user-images.githubusercontent.com/20739328/34308138-d550738e-e75c-11e7-9d6f-e4e434573c55.gif)
 
