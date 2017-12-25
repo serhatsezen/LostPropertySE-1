@@ -22,6 +22,7 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
@@ -34,6 +35,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.team3s.lostpropertyse.Chat.DmMessage;
+import com.team3s.lostpropertyse.LoginSign.CustomToast;
 import com.team3s.lostpropertyse.Utils.CircleTransform;
 import com.team3s.lostpropertyse.LoginSign.TabsHeaderActivity;
 import com.team3s.lostpropertyse.R;
@@ -147,6 +149,7 @@ public class AnotherUsersProfiFrag extends Fragment {
             showDialog();
           }
         });
+
 
 
       dm_imgBtn_another.setOnClickListener(new OnClickListener() {
@@ -292,9 +295,9 @@ public class AnotherUsersProfiFrag extends Fragment {
                     public void onClick(DialogInterface dialog, int which) {
                         // The 'which' argument contains the index position
                         // of the selected item
-                        System.out.println("*************"+which);
                         switch (which){
                             case 0:// şikayet et butonu
+                                Toast.makeText(getActivity(), "Şikayetiniz Alındı!", Toast.LENGTH_LONG).show();
 
                                 break;
 

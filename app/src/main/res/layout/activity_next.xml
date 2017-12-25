@@ -76,7 +76,7 @@
                     android:layout_alignParentStart="true"
                     android:layout_below="@+id/location"
                     android:background="@null"
-                    android:hint="Kategori Seç."
+                    android:hint="Kayıp/Bulunan"
                     android:padding="10dp"
                     android:textColor="@color/commentBackGround"
                     android:textSize="20sp" />

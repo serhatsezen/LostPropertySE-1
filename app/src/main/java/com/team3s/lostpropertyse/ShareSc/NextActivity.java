@@ -46,6 +46,7 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
+import com.team3s.lostpropertyse.LoginSign.CustomToast;
 import com.team3s.lostpropertyse.MainPage.BottomBarActivity;
 import com.team3s.lostpropertyse.R;
 import com.team3s.lostpropertyse.Utils.UniversalImageLoader;
@@ -86,7 +87,7 @@ public class NextActivity extends AppCompatActivity {
     private Intent intent;
     private TextView location,lostOrFind,share;
     int PLACE_PICKER_REQUEST = 3;
-    private String fullAddress;
+    private String fullAddress = "";
     private String addressName;
     private LatLng addressLatLng;
     private static View view;
@@ -107,7 +108,7 @@ public class NextActivity extends AppCompatActivity {
     public int rangeDest;
     public double dist;
     public String distStr;
-    public String rangeDestStr;
+    public String rangeDestStr = "";
 
     public int z = 0;
     public int m = 0;
@@ -118,7 +119,7 @@ public class NextActivity extends AppCompatActivity {
     public String lngUsers;
     public String tokenUsers;
     public String bildirimPost;
-    public String kategori;
+    public String kategori ="";
     public String bildirimBaslik;
     public String post_key;
     public Uri imageUri = null;
@@ -136,7 +137,7 @@ public class NextActivity extends AppCompatActivity {
     private RecyclerView horizontal_recycler_view_kategoriler;
     private ArrayList<String> horizontalListkategori;
     private HorizontalAdapterr horizontalAdapterkategori;
-    private String category;
+    private String category ="";
     private boolean mValid = true;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -199,6 +200,7 @@ public class NextActivity extends AppCompatActivity {
         horizontalListkategori.add("Kırtasiye");
         horizontalListkategori.add("Çanta");
         horizontalListkategori.add("Anahtar");
+        horizontalListkategori.add("Aksesuar");
 
 
         horizontalAdapterkategori =new HorizontalAdapterr(horizontalListkategori);
@@ -265,13 +267,26 @@ public class NextActivity extends AppCompatActivity {
                 else if(intent.hasExtra(getString(R.string.selected_bitmap))){
                     imageUri = intent.getParcelableExtra(getString(R.string.selected_bitmap));
                 }
-                if(!TextUtils.isEmpty(description)) {
+                if(TextUtils.isEmpty(description) ) {
+                    Toast.makeText(NextActivity.this, "Açıklamaya bir şey yazmadınız!", Toast.LENGTH_LONG).show();
+                }else if (kategori.equals("")){
+                    Toast.makeText(NextActivity.this, "Kayıp/Bulunanlardan birisini seçmediniz!", Toast.LENGTH_LONG).show();
+                }
+                else if (fullAddress.equals("")){
+                    Toast.makeText(NextActivity.this, "Konum Seçmediniz!", Toast.LENGTH_LONG).show();
+                }
+                else if (rangeDestStr.equals("")){
+                    Toast.makeText(NextActivity.this, "Bildirim mesafesini seçmediniz!", Toast.LENGTH_LONG).show();
+                }
+                else if (category.equals("")){
+                    Toast.makeText(NextActivity.this, "Kategori seçmediniz!", Toast.LENGTH_LONG).show();
+                }
+                else{
                     new ShareAsync().execute();
                     Toast.makeText(NextActivity.this, "Paylaşılıyor!", Toast.LENGTH_LONG).show();
                     share.setText("Bekleyiniz!");
                     Intent bottombar = new Intent(NextActivity.this,BottomBarActivity.class);
                     startActivity(bottombar);
-
                 }
 
             }
@@ -549,8 +564,12 @@ public class NextActivity extends AppCompatActivity {
             @Override
             public void onDataChange(DataSnapshot snapshot) {
                 for (DataSnapshot data : snapshot.getChildren()) {
-                    latUsers = data.child("latLng").child("latitude").getValue().toString();
-                    lngUsers = data.child("latLng").child("longitude").getValue().toString();
+                    try {
+                        latUsers = data.child("latLng").child("latitude").getValue().toString();
+                        lngUsers = data.child("latLng").child("longitude").getValue().toString();
+                    }catch (Exception e){
+
+                    }
 
                     tokenUsers = "";
 

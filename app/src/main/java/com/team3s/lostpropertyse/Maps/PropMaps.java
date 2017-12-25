@@ -45,6 +45,8 @@ import com.google.firebase.database.ValueEventListener;
 import com.team3s.lostpropertyse.Post.PostDetailAct;
 import com.team3s.lostpropertyse.R;
 
+import java.util.concurrent.ExecutionException;
+
 public class PropMaps extends FragmentActivity implements OnMapReadyCallback, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, com.google.android.gms.location.LocationListener {
 
     private static GoogleMap mMap;
@@ -162,14 +164,16 @@ public class PropMaps extends FragmentActivity implements OnMapReadyCallback, Go
             @Override
             public void onDataChange(DataSnapshot snapshot) {
                 for (DataSnapshot data : snapshot.getChildren()) {
-                    double latUserL = (double) data.child("latlng").child("latitude").getValue();
-                    double lngUserL = (double) data.child("latlng").child("longitude").getValue();
+                    try {
+                        double latUserL = (double) data.child("latlng").child("latitude").getValue();
+                        double lngUserL = (double) data.child("latlng").child("longitude").getValue();
+                        marker = mMap.addMarker(new MarkerOptions()
+                                .position(new LatLng(latUserL, lngUserL))
+                                .title((String) data.child("questions").getValue())
+                                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE))
+                                .snippet("Kayiplar/"+data.getKey()));
+                    }catch (Exception e){}
 
-                    marker = mMap.addMarker(new MarkerOptions()
-                            .position(new LatLng(latUserL, lngUserL))
-                            .title((String) data.child("questions").getValue())
-                            .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE))
-                            .snippet("Kayiplar/"+data.getKey()));
                 }
             }
 
@@ -180,15 +184,19 @@ public class PropMaps extends FragmentActivity implements OnMapReadyCallback, Go
         mDatabaseFindMap.orderByChild("latlng").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot snapshot) {
-                for (final DataSnapshot data : snapshot.getChildren()) {
-                    double latUserL = (double) data.child("latlng").child("latitude").getValue();
-                    double lngUserL = (double) data.child("latlng").child("longitude").getValue();
+                for (DataSnapshot data : snapshot.getChildren()) {
+                    try {
+                        double latUserL = (double) data.child("latlng").child("latitude").getValue();
+                        double lngUserL = (double) data.child("latlng").child("longitude").getValue();
 
-                    marker = mMap.addMarker(new MarkerOptions()
-                            .position(new LatLng(latUserL, lngUserL))
-                            .title((String) data.child("questions").getValue())
-                            .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED))
-                            .snippet("Bulunanlar/"+data.getKey()));
+                        marker = mMap.addMarker(new MarkerOptions()
+                                .position(new LatLng(latUserL, lngUserL))
+                                .title((String) data.child("questions").getValue())
+                                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED))
+                                .snippet("Bulunanlar/" + data.getKey()));
+                    }catch (Exception e){
+
+                    }
 
                 }
             }

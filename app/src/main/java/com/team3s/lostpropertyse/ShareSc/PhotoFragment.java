@@ -17,6 +17,7 @@ import android.widget.Button;
 import android.widget.Toast;
 
 import com.team3s.lostpropertyse.R;
+import com.team3s.lostpropertyse.Utils.Permissions;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -46,8 +47,15 @@ public class PhotoFragment extends Fragment {
                 Log.d(TAG, "onClick: launching camera.");
 
                 if(((ShareActivity)getActivity()).getCurrentTabNumber() == PHOTO_FRAGMENT_NUM){
+                    if(((ShareActivity)getActivity()).checkPermissions(Permissions.CAMERA_PERMISSION[0])){
+                        Log.d(TAG, "onClick: starting camera");
                         Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
                         startActivityForResult(cameraIntent, CAMERA_REQUEST_CODE);
+                    }else{
+                        Intent intent = new Intent(getActivity(), ShareActivity.class);
+                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                        startActivity(intent);
+                    }
                 }
             }
         });
